@@ -22,17 +22,43 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
     pages.push(i);
   }
 
+  const buttonStyle = (isActive: boolean = false, isDisabled: boolean = false) => ({
+    padding: '0.5rem 1rem',
+    borderRadius: '0.5rem',
+    transition: 'all 0.3s ease',
+    background: isActive
+      ? 'var(--primary-color)'
+      : isDisabled
+      ? 'rgba(255, 255, 255, 0.05)'
+      : 'var(--card-bg)',
+    border: '1px solid var(--border-color)',
+    color: isActive
+      ? 'white'
+      : isDisabled
+      ? 'var(--text-secondary)'
+      : 'var(--text-color)',
+    cursor: isDisabled ? 'not-allowed' : 'pointer'
+  });
+
   return (
     <nav className="flex justify-center items-center gap-2 mt-12 pb-8">
       {/* 上一页 */}
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className={`px-4 py-2 rounded-lg transition-colors ${
-          currentPage === 1
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            : 'bg-white hover:bg-gray-50 text-gray-700 border border-gray-300'
-        }`}
+        style={buttonStyle(false, currentPage === 1)}
+        onMouseEnter={(e) => {
+          if (currentPage !== 1) {
+            (e.target as HTMLElement).style.borderColor = 'var(--primary-color)';
+            (e.target as HTMLElement).style.transform = 'translateY(-2px)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (currentPage !== 1) {
+            (e.target as HTMLElement).style.borderColor = 'var(--border-color)';
+            (e.target as HTMLElement).style.transform = 'translateY(0)';
+          }
+        }}
       >
         上一页
       </button>
@@ -42,11 +68,19 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
         <>
           <button
             onClick={() => onPageChange(1)}
-            className="px-4 py-2 rounded-lg bg-white hover:bg-gray-50 text-gray-700 border border-gray-300"
+            style={buttonStyle()}
+            onMouseEnter={(e) => {
+              (e.target as HTMLElement).style.borderColor = 'var(--primary-color)';
+              (e.target as HTMLElement).style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              (e.target as HTMLElement).style.borderColor = 'var(--border-color)';
+              (e.target as HTMLElement).style.transform = 'translateY(0)';
+            }}
           >
             1
           </button>
-          {startPage > 2 && <span className="px-2 text-gray-400">...</span>}
+          {startPage > 2 && <span style={{ color: 'var(--text-secondary)', padding: '0 0.5rem' }}>...</span>}
         </>
       )}
 
@@ -55,11 +89,19 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
         <button
           key={page}
           onClick={() => onPageChange(page)}
-          className={`px-4 py-2 rounded-lg transition-colors ${
-            page === currentPage
-              ? 'bg-blue-600 text-white'
-              : 'bg-white hover:bg-gray-50 text-gray-700 border border-gray-300'
-          }`}
+          style={buttonStyle(page === currentPage)}
+          onMouseEnter={(e) => {
+            if (page !== currentPage) {
+              (e.target as HTMLElement).style.borderColor = 'var(--primary-color)';
+              (e.target as HTMLElement).style.transform = 'translateY(-2px)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (page !== currentPage) {
+              (e.target as HTMLElement).style.borderColor = 'var(--border-color)';
+              (e.target as HTMLElement).style.transform = 'translateY(0)';
+            }
+          }}
         >
           {page}
         </button>
@@ -68,10 +110,18 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
       {/* 最后一页 */}
       {endPage < totalPages && (
         <>
-          {endPage < totalPages - 1 && <span className="px-2 text-gray-400">...</span>}
+          {endPage < totalPages - 1 && <span style={{ color: 'var(--text-secondary)', padding: '0 0.5rem' }}>...</span>}
           <button
             onClick={() => onPageChange(totalPages)}
-            className="px-4 py-2 rounded-lg bg-white hover:bg-gray-50 text-gray-700 border border-gray-300"
+            style={buttonStyle()}
+            onMouseEnter={(e) => {
+              (e.target as HTMLElement).style.borderColor = 'var(--primary-color)';
+              (e.target as HTMLElement).style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              (e.target as HTMLElement).style.borderColor = 'var(--border-color)';
+              (e.target as HTMLElement).style.transform = 'translateY(0)';
+            }}
           >
             {totalPages}
           </button>
@@ -82,11 +132,19 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className={`px-4 py-2 rounded-lg transition-colors ${
-          currentPage === totalPages
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            : 'bg-white hover:bg-gray-50 text-gray-700 border border-gray-300'
-        }`}
+        style={buttonStyle(false, currentPage === totalPages)}
+        onMouseEnter={(e) => {
+          if (currentPage !== totalPages) {
+            (e.target as HTMLElement).style.borderColor = 'var(--primary-color)';
+            (e.target as HTMLElement).style.transform = 'translateY(-2px)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (currentPage !== totalPages) {
+            (e.target as HTMLElement).style.borderColor = 'var(--border-color)';
+            (e.target as HTMLElement).style.transform = 'translateY(0)';
+          }
+        }}
       >
         下一页
       </button>
