@@ -84,17 +84,17 @@ show_menu() {
     clear
     print_header "Halavah's Tech - 管理控制台"
 
-    echo -e "${PURPLE}═══════════════════════════════════════════════════════════${NC}"
+    echo -e "${PURPLE}═══════════════════════════════════════════════════���═══════${NC}"
     echo -e "${CYAN}  项目管理${NC}"
     echo -e "${PURPLE}═══════════════════════════════════════════════════════════${NC}"
     echo ""
 
-    echo -e "${GREEN}  1.${NC} 🚀 ${BLUE}启动开发服务器${NC}     (start.sh)"
-    echo -e "     ${PURPLE}→${NC} 启动 Next.js 开发环境"
+    echo -e "${GREEN}  1.${NC} 🚢 ${BLUE}部署到 Git${NC}        (deploy.sh)"
+    echo -e "     ${PURPLE}→${NC} 自动提交并推送代码到远程��库"
     echo ""
 
-    echo -e "${GREEN}  2.${NC} 🚢 ${BLUE}部署到 Git${NC}        (deploy.sh)"
-    echo -e "     ${PURPLE}→${NC} 自动提交并推送代码到远程仓库"
+    echo -e "${GREEN}  2.${NC} 🚀 ${BLUE}启动开发服务器${NC}     (start.sh)"
+    echo -e "     ${PURPLE}→${NC} 启动 Next.js 开发环境"
     echo ""
 
     echo -e "${GREEN}  3.${NC} 🧹 ${BLUE}清理 Git 跟踪${NC}     (ignore.sh)"
@@ -107,7 +107,7 @@ show_menu() {
     echo -e "${GREEN}  0.${NC} 🚪 ${BLUE}退出${NC}"
     echo ""
 
-    echo -e "${PURPLE}═══════════════════════════════════════════════════════════${NC}"
+    echo -e "${PURPLE}═════════════════════��═════════════════════════════════════${NC}"
     echo ""
 }
 
@@ -119,21 +119,21 @@ main() {
         # 重置 choice 变量，避免保留上次的输入
         choice=""
 
-        echo -ne "${YELLOW}请选择操作 [0-3] (默认: 2):${NC} "
+        echo -ne "${YELLOW}请选择操作 [0-3] (默认: 1):${NC} "
         read -r choice
 
-        # 如果用户直接按回车，默认选�� 2
-        choice=${choice:-2}
+        # 如果用户直接按回车，默认选择 1
+        choice=${choice:-1}
 
         case $choice in
             1)
-                print_header "执行: 启动开发服务器"
-                run_script "start.sh"
+                print_header "执行: 部署到 Git"
+                run_script "deploy.sh"
                 ;;
 
             2)
-                print_header "执行: 部署到 Git"
-                run_script "deploy.sh"
+                print_header "执行: 启动开发服务器"
+                run_script "start.sh"
                 ;;
 
             3)
@@ -155,7 +155,7 @@ main() {
         # 操作完成后，等待用户按键
         if [ "$choice" != "0" ]; then
             echo ""
-            echo -e "${PURPLE}═════════════════════════════════════��═════════════════════${NC}"
+            echo -e "${PURPLE}═══════════════════════════════════════════════════════════${NC}"
             echo -ne "${YELLOW}按 Enter 键返回主菜单...${NC}"
             read -r
         fi

@@ -28,13 +28,13 @@ echo ╚════════════════════════
 echo.
 echo ═══════════════════════════════════════════════════════════
 echo   项目管理
-echo ══════════════════���════════════════════════════════════════
+echo ═══════════════════════════════════════════════════════════
 echo.
-echo   1. 🚀 启动开发服务器     (start.bat)
-echo      → 启动 Next.js 开发环境
-echo.
-echo   2. 🚢 部署到 Git        (deploy.bat)
+echo   1. 🚢 部署到 Git        (deploy.bat)
 echo      → 自动提交并推送代码到远程仓库
+echo.
+echo   2. 🚀 启动开发服务器     (start.bat)
+echo      → 启动 Next.js 开发环境
 echo.
 echo   3. 🧹 清理 Git 跟踪     (ignore.bat)
 echo      → 根据 .gitignore 移除已跟踪的文件
@@ -46,25 +46,16 @@ echo.
 echo ═══════════════════════════════════════════════════════════
 echo.
 
-set /p choice="请选择操作 [0-3] (默认: 2): "
+set /p choice="请选择操作 [0-3] (默认: 1): "
 
-REM 如果用户直接按回车，默认选择 2
-if "%choice%"=="" set choice=2
+REM 如果用户直接按回车，默认选择 1
+if "%choice%"=="" set choice=1
 
-if "%choice%"=="1" goto START
-if "%choice%"=="2" goto DEPLOY
+if "%choice%"=="1" goto DEPLOY
+if "%choice%"=="2" goto START
 if "%choice%"=="3" goto IGNORE
 if "%choice%"=="0" goto EXIT
 goto INVALID
-
-:START
-echo.
-echo ╔════════════════════════════════════════════════════════════╗
-echo ║  执行: 启动开发服务器
-echo ╚════════════════════════════════════════════════════════════╝
-echo.
-call "%BIN_DIR%\start.bat"
-goto WAIT
 
 :DEPLOY
 echo.
@@ -73,6 +64,15 @@ echo ║  执行: 部署到 Git
 echo ╚════════════════════════════════════════════════════════════╝
 echo.
 call "%BIN_DIR%\deploy.bat"
+goto WAIT
+
+:START
+echo.
+echo ╔════════════════════════════════════════════════════════════╗
+echo ║  执行: 启动开发服务器
+echo ╚════════════════════════════════════════════════════════════╝
+echo.
+call "%BIN_DIR%\start.bat"
 goto WAIT
 
 :IGNORE
