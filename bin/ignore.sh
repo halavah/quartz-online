@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Navigate to the directory where the script is located
+cd "$(dirname "$0")"
+
+# Go back to project root directory
+cd ..
+
 # ignore.sh - 根据 .gitignore 内容移除已被 Git 跟踪的文件
 # 适用于 macOS/Linux 系统
 

@@ -4,6 +4,9 @@ setlocal EnableDelayedExpansion
 :: Navigate to the directory where the script is located
 cd /d "%~dp0"
 
+:: Go back to project root directory
+cd ..
+
 :: Get current branch name
 echo Detecting current Git branch...
 for /f "tokens=*" %%i in ('git rev-parse --abbrev-ref HEAD 2^>nul') do set "current_branch=%%i"

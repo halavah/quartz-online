@@ -1,6 +1,12 @@
 @echo off
 setlocal enabledelayedexpansion
 
+:: 切换到脚本所在目录
+cd /d "%~dp0"
+
+:: 返回项目根目录
+cd ..
+
 :: ignore.bat - 根据 .gitignore 内容移除已被 Git 跟踪的文件
 :: 适用于 Windows 系统
 

@@ -1,10 +1,16 @@
 #!/bin/bash
 
-# TechVerse 开发环境启动脚本
+# Navigate to the directory where the script is located
+cd "$(dirname "$0")"
+
+# Go back to project root directory
+cd ..
+
+# Halavah's Tech 开发环境启动脚本
 # 用于 macOS 和 Linux 系统
 
 echo "=================================="
-echo "🚀 TechVerse 开发环境启动中..."
+echo "🚀 Halavah's Tech 开发环境启动中..."
 echo "=================================="
 
 # 检查 Node.js 是否安装

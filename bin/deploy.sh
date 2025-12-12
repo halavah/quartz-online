@@ -3,6 +3,9 @@
 # Navigate to the directory where the script is located
 cd "$(dirname "$0")"
 
+# Go back to project root directory
+cd ..
+
 # Get current branch name
 echo "Detecting current Git branch..."
 current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)

@@ -1,11 +1,17 @@
 @echo off
 chcp 65001 >nul
 
-REM TechVerse 开发环境启动脚本
+REM 切换到脚本所在目录
+cd /d "%~dp0"
+
+REM 返回项目根目录
+cd ..
+
+REM Halavah's Tech 开发环境启动脚本
 REM 用于 Windows 系统
 
 echo ==================================
-echo 🚀 TechVerse 开发环境启动中...
+echo 🚀 Halavah's Tech 开发环境启动中...
 echo ==================================
 
 REM 检查 Node.js 是否安装
