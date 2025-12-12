@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onyx - 开源 AI 平台：多功能聊天 UI，支持任意 LLM</title>
+    <meta name="description" content="Onyx 是一个功能丰富的、自托管聊天 UI，支持任何 LLM。内置代理、RAG、连接器等高级功能，适用于团队和企业。">
+    <meta name="keywords" content="Onyx, AI 平台, LLM, RAG, 代理, 开源, 自托管">
+
+    <style>
+        /* 全局重置和基础样式 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary-color: #6366F1;
+            --secondary-color: #8B5CF6;
+            --accent-color: #06B6D4;
+            --background-color: #0F172A;
+            --text-color: #F1F5F9;
+            --border-color: #334155;
+            --shadow-color: rgba(99, 102, 241, 0.3);
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+        }
+        body { font-family: 'Inter', sans-serif; line-height: 1.6; color: var(--text-color); background: var(--background-color); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        @media (min-width: 768px) { .container { padding: 0 2rem; } }
+
+        /* 英雄区域 */
+        .hero-section { background: var(--gradient-primary); color: white; padding: 4rem 0; text-align: center; }
+        .hero-title { font-size: 3rem; font-weight: 700; margin-bottom: 1rem; }
+        .hero-subtitle { font-size: 1.25rem; margin-bottom: 2rem; opacity: 0.9; }
+        .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; font-weight: 600; text-decoration: none; transition: all 0.3s; cursor: pointer; }
+        .btn-primary { background: var(--gradient-secondary); color: white; box-shadow: 0 4px 15px var(--shadow-color); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px var(--shadow-color); }
+        .hero-stats { display: flex; justify-content: center; gap: 2rem; margin: 2rem 0; font-size: 1.1rem; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; }
+
+        /* 特性网格 */
+        .features-section { padding: 4rem 0; }
+        .section-header { text-align: center; margin-bottom: 3rem; }
+        .section-title { font-size: 2.5rem; margin-bottom: 1rem; }
+        .section-subtitle { font-size: 1.1rem; opacity: 0.8; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .feature-card { background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 2rem; border: 1px solid var(--border-color); transition: transform 0.3s; }
+        .feature-card:hover { transform: translateY(-5px); }
+        .feature-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .feature-title { font-size: 1.5rem; margin-bottom: 0.5rem; }
+
+        /* 代码展示 */
+        .code-block { background: #1e293b; border-radius: 0.75rem; overflow: hidden; margin: 1rem 0; }
+        .code-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #334155; }
+        pre code { display: block; padding: 1rem; color: #e2e8f0; }
+
+        /* 安装部分 */
+        .installation-section { padding: 4rem 0; background: rgba(255,255,255,0.02); }
+        .install-tabs { margin-top: 2rem; }
+        .tab-buttons { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .tab-btn { padding: 0.5rem 1rem; background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 0.5rem; cursor: pointer; }
+        .tab-btn.active { background: var(--primary-color); }
+
+        /* 页脚 */
+        .footer { background: #0f0f0f; padding: 2rem 0; text-align: center; border-top: 1px solid var(--border-color); }
+    </style>
+</head>
+<body>
+    <!-- 英雄区域 -->
+    <header class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">Onyx</h1>
+            <p class="hero-subtitle">开源 AI 平台：功能丰富的自托管聊天 UI，支持任意 LLM</p>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">15.7k</span>
+                    <span class="stat-label">Stars</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">Python / JS</span>
+                    <span class="stat-label">Language</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">MIT</span>
+                    <span class="stat-label">License</span>
+                </div>
+            </div>
+            <div class="hero-actions">
+                <a href="https://github.com/onyx-dot-app/onyx" class="btn btn-primary">查看源码</a>
+                <a href="#installation" class="btn">快速开始</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 项目概述 -->
+    <section class="overview-section padding: 4rem 0;">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">项目概述</h2>
+                <p class="section-subtitle">Onyx 是一个易部署的开源 AI 平台，支持空气隔离环境。内置代理、Web 搜索、RAG 等高级功能。</p>
+            </div>
+            <p>Onyx 适用于从个人到全球企业的团队，提供企业级搜索、安全性和管理 UI。核心价值：自定义代理、40+ 知识源连接器、深度研究。</p>
+        </div>
+    </section>
+
+    <!-- 核心特性 -->
+    <section class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">核心特性</h2>
+                <p class="section-subtitle">Onyx 加载了代理、RAG、连接器等先进功能，支持所有 LLM。</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="feature-title">自定义代理</h3>
+                    <p>构建具有独特指令、知识和动作的 AI 代理。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3 class="feature-title">RAG</h3>
+                    <p>顶级混合搜索 + 知识图谱，支持上传文件和连接器文档。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3 class="feature-title">Web 搜索</h3>
+                    <p>使用 Google PSE、Exa 等浏览网页，或内置爬虫。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔬</div>
+                    <h3 class="feature-title">深度研究</h3>
+                    <p>通过代理多步搜索获取深入答案。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">▶️</div>
+                    <h3 class="feature-title">动作 & MCP</h3>
+                    <p>让 AI 代理与外部系统交互。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💻</div>
+                    <h3 class="feature-title">代码解释器</h3>
+                    <p>执行代码分析数据、渲染图表。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 安装指南 -->
+    <section class="installation-section" id="installation">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">安装指南</h2>
+                <p class="section-subtitle">支持 Docker、Kubernetes、Terraform 等部署方式。</p>
+            </div>
+            <div class="install-tabs">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="docker">Docker</button>
+                    <button class="tab-btn" data-tab="k8s">Kubernetes</button>
+                    <button class="tab-btn" data-tab="terraform">Terraform</button>
+                </div>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="docker">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">一键安装脚本</div>
+                            </div>
+                            <pre><code>curl -fsSL https://raw.githubusercontent.com/onyx-dot-app/onyx/main/deployment/docker_compose/install.sh > install.sh && chmod +x install.sh && ./install.sh</code></pre>
+                        </div>
+                        <p>访问 http://localhost:3000 体验 Onyx。</p>
+                    </div>
+                    <div class="tab-pane" id="k8s">
+                        <p>使用 Helm Chart 部署到 K8s 集群。参考 <a href="https://docs.onyx.app/deployment/local/kubernetes">Kubernetes 指南</a>。</p>
+                    </div>
+                    <div class="tab-pane" id="terraform">
+                        <p>集成到现有 IaC 流程。参考 <a href="https://docs.onyx.app/deployment/local/terraform">Terraform 指南</a>。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 使用示例 -->
+    <section class="examples-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">使用示例</h2>
+                <p class="section-subtitle">从 Web UI 创建代理，或通过 API 调用。</p>
+            </div>
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-title">使用 OpenAI SDK 调用 Onyx API</div>
+                </div>
+                <pre><code>from openai import OpenAI
+import os
+
+client = OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY"),
+    base_url="http://localhost:8080/openai-assistants",
+    default_headers={"Authorization": f"Bearer {os.environ.get('ONYX_API_KEY')}"},
+)
+
+assistant = client.beta.assistants.create(
+    name="Topic Analyzer",
+    instructions="You are a helpful assistant that analyzes topics by searching through workplace documents.",
+    tools=[{"type": "SearchTool"}],
+    model="gpt-4o",
+)</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- 社区支持 -->
+    <section class="community-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">社区支持</h2>
+                <p class="section-subtitle">活跃开源社区，MIT 许可，CE/EE 版本。</p>
+            </div>
+            <ul>
+                <li>GitHub: <a href="https://github.com/onyx-dot-app/onyx">onyx-dot-app/onyx</a> (15.7k Stars, 2.1k Forks)</li>
+                <li>文档: <a href="https://docs.onyx.app/">docs.onyx.app</a></li>
+                <li>Discord: <a href="https://discord.gg/TDJ59cGV2X">加入讨论</a></li>
+                <li>Roadmap: <a href="https://github.com/orgs/onyx-dot-app/projects/2">GitHub Projects</a></li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <p>基于 <a href="https://github.com/onyx-dot-app/onyx">Onyx</a> 创建</p>
+            <p class="footer-stats">
+                <span id="busuanzi_container_site_pv">访问量 <span id="busuanzi_value_site_pv"></span></span>
+            </p>
+        </div>
+    </footer>
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <script src="/js/floating-banner.js"></script>
+    <script>
+        // 简单交互：标签切换
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

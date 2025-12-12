@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrendRadar - 30秒部署的热点助手</title>
+    <meta name="description" content="TrendRadar是一个30秒可部署的热点助手,聚合35+平台新闻,支持智能推送、趋势分析和AI智能分析。告别无效刷屏,只看真正关心的新闻资讯。">
+    <meta name="keywords" content="TrendRadar,热点监控,新闻聚合,GitHub,开源项目,智能推送,趋势分析,AI分析,MCP">
+
+    <style>
+        /* 全局重置和基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 项目主题色彩变量 */
+        :root {
+            --primary-color: #FF6B35;
+            --secondary-color: #F7931E;
+            --accent-color: #FFC107;
+            --dark-color: #2C3E50;
+            --text-color: #333;
+            --light-gray: #F5F7FA;
+            --border-color: #E1E8ED;
+            --shadow-color: rgba(255, 107, 53, 0.15);
+            --gradient-primary: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            --gradient-hero: linear-gradient(135deg, rgba(255, 107, 53, 0.95) 0%, rgba(247, 147, 30, 0.95) 100%);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--light-gray);
+        }
+
+        /* 英雄区域 */
+        .hero-section {
+            background: var(--gradient-hero);
+            color: white;
+            padding: 5rem 0 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+            margin: 2.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* 主要内容区域 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section {
+            padding: 5rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 特性网格 */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+            border-color: var(--primary-color);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+
+        .feature-description {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .feature-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        /* 技术亮点区域 */
+        .highlight-section {
+            background: white;
+        }
+
+        .highlight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .highlight-item {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 1rem;
+            background: var(--light-gray);
+            transition: all 0.3s ease;
+        }
+
+        .highlight-item:hover {
+            background: var(--gradient-primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .highlight-number {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .highlight-item:hover .highlight-number {
+            -webkit-text-fill-color: white;
+        }
+
+        .highlight-label {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        /* 安装指南 */
+        .install-tabs {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            color: #666;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+        }
+
+        .install-step {
+            margin-bottom: 2rem;
+        }
+
+        .install-step h4 {
+            color: var(--dark-color);
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .code-block {
+            background: #1e293b;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #334155;
+            border-bottom: 1px solid #475569;
+        }
+
+        .code-language {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        .code-content {
+            padding: 1.5rem;
+        }
+
+        .code-content pre {
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        .code-content code {
+            color: #e2e8f0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        /* 推送模式对比 */
+        .modes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .mode-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border-top: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .mode-card:nth-child(2) {
+            border-top-color: var(--secondary-color);
+        }
+
+        .mode-card:nth-child(3) {
+            border-top-color: var(--accent-color);
+        }
+
+        .mode-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .mode-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+
+        .mode-badge {
+            display: inline-block;
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .mode-description {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        /* 页脚 */
+        .footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 3rem 0 2rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-stats {
+            margin-top: 1rem;
+            opacity: 0.7;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.25rem;
+            }
+
+            .hero-stats {
+                gap: 1.5rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .features-grid,
+            .highlight-grid,
+            .modes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .section {
+                padding: 3rem 0;
+            }
+        }
+
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* 标签样式 */
+        .tag {
+            display: inline-block;
+            background: var(--light-gray);
+            color: var(--dark-color);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            margin: 0.25rem;
+            font-weight: 600;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- 英雄区域 -->
+    <header class="hero-section">
+        <div class="hero-container">
+            <div class="hero-badge">开源热点监控工具</div>
+            <h1 class="hero-title">TrendRadar</h1>
+            <p class="hero-subtitle">30秒部署的热点助手 - 告别无效刷屏,只看真正关心的新闻资讯</p>
+
+            <!-- 项目统计信息 -->
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">12.4K</span>
+                    <span class="stat-label">GitHub Stars</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">35+</span>
+                    <span class="stat-label">监控平台</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">Python</span>
+                    <span class="stat-label">开发语言</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">GPL-3.0</span>
+                    <span class="stat-label">开源协议</span>
+                </div>
+            </div>
+
+            <!-- 行动按钮 -->
+            <div class="hero-actions">
+                <a href="https://github.com/sansan0/TrendRadar" class="btn btn-primary" target="_blank">
+                    查看源码
+                </a>
+                <a href="#installation" class="btn btn-secondary">
+                    快速开始
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容区域 -->
+    <main>
+        <!-- 项目概述 -->
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">项目概述</h2>
+                    <p class="section-subtitle">最快30秒部署的热点助手,聚合全网热点新闻,智能推送你关心的内容</p>
+                </div>
+
+                <div class="highlight-grid">
+                    <div class="highlight-item">
+                        <div class="highlight-number">30秒</div>
+                        <div class="highlight-label">极速部署</div>
+                    </div>
+                    <div class="highlight-item">
+                        <div class="highlight-number">35+</div>
+                        <div class="highlight-label">平台监控</div>
+                    </div>
+                    <div class="highlight-item">
+                        <div class="highlight-number">13种</div>
+                        <div class="highlight-label">AI分析工具</div>
+                    </div>
+                    <div class="highlight-item">
+                        <div class="highlight-number">6种</div>
+                        <div class="highlight-label">推送渠道</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 核心特性 -->
+        <section class="section highlight-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">核心特性</h2>
+                    <p class="section-subtitle">强大的功能,简单的操作,让你轻松掌控全网热点</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🌐</div>
+                        <h3 class="feature-title">全网热点聚合</h3>
+                        <p class="feature-description">默认监控11个主流平台,支持自定义添加更多平台:</p>
+                        <ul class="feature-list">
+                            <li>知乎、抖音、Bilibili热搜</li>
+                            <li>华尔街见闻、财联社</li>
+                            <li>百度热搜、微博、贴吧</li>
+                            <li>今日头条、澎湃新闻、凤凰网</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3 class="feature-title">精准内容筛选</h3>
+                        <p class="feature-description">通过关键词配置,只推送你真正关心的内容:</p>
+                        <ul class="feature-list">
+                            <li>支持普通词、必须词(+)、过滤词(!)</li>
+                            <li>词组化管理,独立统计不同主题</li>
+                            <li>智能匹配,过滤无关信息</li>
+                            <li>也可推送完整热点列表</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🚀</div>
+                        <h3 class="feature-title">智能推送策略</h3>
+                        <p class="feature-description">三种推送模式,满足不同需求:</p>
+                        <ul class="feature-list">
+                            <li>当日汇总 - 适合管理者全面了解</li>
+                            <li>当前榜单 - 适合创作者实时追踪</li>
+                            <li>增量监控 - 适合交易员高频监控</li>
+                            <li>支持推送时间窗口控制</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3 class="feature-title">热点趋势分析</h3>
+                        <p class="feature-description">实时追踪新闻热度变化,了解热点演变:</p>
+                        <ul class="feature-list">
+                            <li>时间轴追踪完整时间跨度</li>
+                            <li>热度变化排名和频次统计</li>
+                            <li>新增检测实时识别新话题</li>
+                            <li>跨平台对比分析关注度差异</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">⚖️</div>
+                        <h3 class="feature-title">个性化热点算法</h3>
+                        <p class="feature-description">重新整理全网热搜,按你关心的热度排序:</p>
+                        <ul class="feature-list">
+                            <li>排名权重(默认60%) - 优先显示高排名</li>
+                            <li>频次权重(默认30%) - 关注持续话题</li>
+                            <li>热度权重(默认10%) - 考虑排名质量</li>
+                            <li>支持自定义权重比例</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <h3 class="feature-title">AI智能分析</h3>
+                        <p class="feature-description">基于MCP协议的AI对话分析系统:</p>
+                        <ul class="feature-list">
+                            <li>13种智能分析工具</li>
+                            <li>自然语言交互查询</li>
+                            <li>话题趋势追踪和预测</li>
+                            <li>跨平台数据对比分析</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">📱</div>
+                        <h3 class="feature-title">多渠道实时推送</h3>
+                        <p class="feature-description">支持6种推送渠道,消息直达:</p>
+                        <ul class="feature-list">
+                            <li>企业微信(含微信推送方案)</li>
+                            <li>飞书、钉钉</li>
+                            <li>Telegram、邮件</li>
+                            <li>ntfy(开源免费,支持自托管)</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">💻</div>
+                        <h3 class="feature-title">多端适配</h3>
+                        <p class="feature-description">支持多种部署和访问方式:</p>
+                        <ul class="feature-list">
+                            <li>GitHub Pages - 精美网页报告</li>
+                            <li>Docker部署 - 多架构容器化</li>
+                            <li>数据持久化 - HTML/TXT格式</li>
+                            <li>移动端完美适配</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 推送模式对比 -->
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">推送模式</h2>
+                    <p class="section-subtitle">三种推送模式,满足不同使用场景</p>
+                </div>
+
+                <div class="modes-grid">
+                    <div class="mode-card">
+                        <span class="mode-badge">当日汇总</span>
+                        <h3 class="mode-title">Daily Mode</h3>
+                        <p class="mode-description">
+                            <strong>适用人群:</strong> 企业管理者、普通用户<br>
+                            <strong>推送时机:</strong> 按时推送(默认每小时)<br>
+                            <strong>显示内容:</strong> 当日所有匹配新闻 + 新增区域<br>
+                            <strong>适用场景:</strong> 日报总结,全面了解当日热点趋势
+                        </p>
+                    </div>
+
+                    <div class="mode-card">
+                        <span class="mode-badge">当前榜单</span>
+                        <h3 class="mode-title">Current Mode</h3>
+                        <p class="mode-description">
+                            <strong>适用人群:</strong> 自媒体人、内容创作者<br>
+                            <strong>推送时机:</strong> 按时推送(默认每小时)<br>
+                            <strong>显示内容:</strong> 当前榜单匹配新闻 + 新增区域<br>
+                            <strong>适用场景:</strong> 实时热点追踪,了解当前最火内容
+                        </p>
+                    </div>
+
+                    <div class="mode-card">
+                        <span class="mode-badge">增量监控</span>
+                        <h3 class="mode-title">Incremental Mode</h3>
+                        <p class="mode-description">
+                            <strong>适用人群:</strong> 投资者、交易员<br>
+                            <strong>推送时机:</strong> 有新增才推送<br>
+                            <strong>显示内容:</strong> 新出现的匹配频率词新闻<br>
+                            <strong>适用场景:</strong> 避免重复信息,高频监控场景
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 技术架构 -->
+        <section class="section highlight-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">技术架构</h2>
+                    <p class="section-subtitle">简洁高效的技术栈,确保稳定运行</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🐍</div>
+                        <h3 class="feature-title">核心技术</h3>
+                        <div class="tags-container">
+                            <span class="tag">Python 3.x</span>
+                            <span class="tag">异步爬虫</span>
+                            <span class="tag">数据分析</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🔄</div>
+                        <h3 class="feature-title">自动化部署</h3>
+                        <div class="tags-container">
+                            <span class="tag">GitHub Actions</span>
+                            <span class="tag">定时任务</span>
+                            <span class="tag">自动推送</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🐳</div>
+                        <h3 class="feature-title">容器化支持</h3>
+                        <div class="tags-container">
+                            <span class="tag">Docker</span>
+                            <span class="tag">多架构支持</span>
+                            <span class="tag">数据持久化</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 安装指南 -->
+        <section class="section" id="installation">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">快速开始</h2>
+                    <p class="section-subtitle">选择适合你的部署方式,30秒开始使用</p>
+                </div>
+
+                <div class="install-tabs">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active">GitHub部署</button>
+                        <button class="tab-btn">Docker部署</button>
+                        <button class="tab-btn">AI分析部署</button>
+                    </div>
+
+                    <div class="install-step">
+                        <h4>1. Fork项目到你的GitHub账户</h4>
+                        <p>点击项目页面右上角的"Fork"按钮,将项目复制到你的账户下。</p>
+                    </div>
+
+                    <div class="install-step">
+                        <h4>2. 配置GitHub Secrets</h4>
+                        <p>进入你Fork后的仓库,配置推送渠道:</p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">配置路径</span>
+                            </div>
+                            <div class="code-content">
+                                <pre><code>Settings > Secrets and variables > Actions > New repository secret
+
+可选配置(根据需要选择):
+- WEWORK_WEBHOOK_URL      # 企业微信
+- FEISHU_WEBHOOK_URL      # 飞书
+- DINGTALK_WEBHOOK_URL    # 钉钉
+- TELEGRAM_BOT_TOKEN      # Telegram机器人
+- TELEGRAM_CHAT_ID        # Telegram聊天ID
+- EMAIL_FROM              # 发件邮箱
+- EMAIL_PASSWORD          # 邮箱密码/授权码
+- EMAIL_TO                # 收件邮箱</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="install-step">
+                        <h4>3. 配置关键词</h4>
+                        <p>编辑 config/frequency_words.txt 文件,添加你关心的关键词:</p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">frequency_words.txt</span>
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><code>AI
+ChatGPT
+人工智能
++技术
+
+比亚迪
+特斯拉
++新能源
+
+A股
+股市
++涨跌
+!预测</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="install-step">
+                        <h4>4. 手动测试运行</h4>
+                        <p>进入Actions页面,手动运行一次测试配置效果:</p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">测试步骤</span>
+                            </div>
+                            <div class="code-content">
+                                <pre><code>1. 进入 Actions 标签页
+2. 找到 "Hot News Crawler" 工作流
+3. 点击 "Run workflow" 按钮
+4. 等待1分钟左右,查看推送效果</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="install-step">
+                        <h4>5. 配置GitHub Pages(可选)</h4>
+                        <p>启用GitHub Pages可以在网页上查看热点报告:</p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">配置步骤</span>
+                            </div>
+                            <div class="code-content">
+                                <pre><code>Settings > Pages > Source
+选择 "Deploy from a branch"
+Branch: main 或 master
+点击 Save
+
+访问: https://你的用户名.github.io/TrendRadar/</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Docker部署 -->
+        <section class="section highlight-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Docker快速部署</h2>
+                    <p class="section-subtitle">容器化部署,支持多架构,数据持久化</p>
+                </div>
+
+                <div class="install-tabs">
+                    <div class="install-step">
+                        <h4>方式一: 快速体验(一行命令)</h4>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Bash</span>
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><code># 创建配置目录
+mkdir -p config output
+
+# 下载配置文件
+wget https://raw.githubusercontent.com/sansan0/TrendRadar/master/config/config.yaml -P config/
+wget https://raw.githubusercontent.com/sansan0/TrendRadar/master/config/frequency_words.txt -P config/
+
+# 启动容器
+docker run -d --name trend-radar \
+  -v ./config:/app/config:ro \
+  -v ./output:/app/output \
+  -e FEISHU_WEBHOOK_URL="你的飞书webhook" \
+  -e CRON_SCHEDULE="*/30 * * * *" \
+  -e RUN_MODE="cron" \
+  wantcat/trendradar:latest</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="install-step">
+                        <h4>方式二: 使用docker-compose(推荐)</h4>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Bash</span>
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><code># 创建项目目录
+mkdir -p trendradar/{config,docker}
+cd trendradar
+
+# 下载配置文件
+wget https://raw.githubusercontent.com/sansan0/TrendRadar/master/config/config.yaml -P config/
+wget https://raw.githubusercontent.com/sansan0/TrendRadar/master/config/frequency_words.txt -P config/
+wget https://raw.githubusercontent.com/sansan0/TrendRadar/master/docker/.env
+wget https://raw.githubusercontent.com/sansan0/TrendRadar/master/docker/docker-compose.yml
+
+# 编辑.env文件配置webhook
+# 启动服务
+docker-compose pull
+docker-compose up -d</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="install-step">
+                        <h4>常用管理命令</h4>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Bash</span>
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><code># 查看运行状态
+docker exec -it trend-radar python manage.py status
+
+# 手动执行一次爬虫
+docker exec -it trend-radar python manage.py run
+
+# 查看实时日志
+docker logs -f trend-radar
+
+# 重启容器
+docker restart trend-radar</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI分析功能 -->
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">AI智能分析</h2>
+                    <p class="section-subtitle">基于MCP协议的AI对话分析系统,用自然语言深度挖掘新闻数据</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">💬</div>
+                        <h3 class="feature-title">对话式查询</h3>
+                        <p class="feature-description">用自然语言提问,AI自动调用工具分析:</p>
+                        <ul class="feature-list">
+                            <li>查询昨天知乎的热点</li>
+                            <li>分析比特币最近的热度趋势</li>
+                            <li>生成今天的热点摘要报告</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🔧</div>
+                        <h3 class="feature-title">13种分析工具</h3>
+                        <p class="feature-description">涵盖多个分析维度:</p>
+                        <ul class="feature-list">
+                            <li>基础查询 - 最新新闻、日期查询、热门话题</li>
+                            <li>智能检索 - 搜索、历史关联</li>
+                            <li>高级分析 - 趋势、洞察、情感、相似</li>
+                            <li>系统管理 - 配置、状态、触发</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3 class="feature-title">深度分析能力</h3>
+                        <p class="feature-description">强大的数据分析功能:</p>
+                        <ul class="feature-list">
+                            <li>话题趋势追踪(热度变化、生命周期)</li>
+                            <li>跨平台数据对比(活跃度、关键词)</li>
+                            <li>智能摘要生成、相似新闻查找</li>
+                            <li>情感分析、趋势预测</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">💻</div>
+                        <h3 class="feature-title">多客户端支持</h3>
+                        <p class="feature-description">支持多种MCP客户端:</p>
+                        <ul class="feature-list">
+                            <li>Cherry Studio (GUI配置,推荐)</li>
+                            <li>Claude Desktop、Cursor</li>
+                            <li>VSCode (Cline/Continue)</li>
+                            <li>Claude Code CLI</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 使用场景 -->
+        <section class="section highlight-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">适用场景</h2>
+                    <p class="section-subtitle">从投资到创作,从公关到日常,满足各类需求</p>
+                </div>
+
+                <div class="modes-grid">
+                    <div class="mode-card">
+                        <div class="feature-icon">📈</div>
+                        <h3 class="mode-title">投资监控</h3>
+                        <p class="mode-description">
+                            实时监控股市、数字货币等财经热点,第一时间获取市场动态,
+                            配合增量监控模式,只推送新增信息,避免重复干扰。
+                        </p>
+                    </div>
+
+                    <div class="mode-card">
+                        <div class="feature-icon">✍️</div>
+                        <h3 class="mode-title">内容创作</h3>
+                        <p class="mode-description">
+                            追踪全网热点话题,把握创作方向,了解用户关注点,
+                            当前榜单模式帮助你实时掌握最火内容,提升创作效率。
+                        </p>
+                    </div>
+
+                    <div class="mode-card">
+                        <div class="feature-icon">🏢</div>
+                        <h3 class="mode-title">品牌公关</h3>
+                        <p class="mode-description">
+                            监控品牌舆情,及时发现负面信息,快速响应舆情危机,
+                            保护品牌形象,维护企业声誉。
+                        </p>
+                    </div>
+
+                    <div class="mode-card">
+                        <div class="feature-icon">🔍</div>
+                        <h3 class="mode-title">行业研究</h3>
+                        <p class="mode-description">
+                            跟踪行业动态,分析竞品策略,洞察市场趋势,
+                            为商业决策提供数据支持。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 社区支持 -->
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">社区与支持</h2>
+                    <p class="section-subtitle">活跃的开源社区,及时的技术支持</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">⭐</div>
+                        <h3 class="feature-title">项目数据</h3>
+                        <p class="feature-description">
+                            <strong>12.4K Stars</strong> | <strong>7.4K Forks</strong><br>
+                            获得阮一峰周刊、小众软件、LinuxDo社区推荐,
+                            62+位贡献者支持,持续活跃更新。
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">📚</div>
+                        <h3 class="feature-title">完善文档</h3>
+                        <p class="feature-description">
+                            详细的部署教程、使用说明、FAQ文档,
+                            还有MCP AI分析专门教程,帮助你快速上手。
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">💬</div>
+                        <h3 class="feature-title">技术支持</h3>
+                        <p class="feature-description">
+                            GitHub Issues针对性解答,
+                            公众号"硅基茶水间"快速咨询,
+                            活跃的社区讨论。
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🔄</div>
+                        <h3 class="feature-title">持续更新</h3>
+                        <p class="feature-description">
+                            从v1.0到v3.0.5,持续迭代更新,
+                            不断新增功能和优化体验,
+                            最新版本支持Docker环境变量配置。
+                        </p>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 3rem;">
+                    <a href="https://github.com/sansan0/TrendRadar" class="btn btn-primary" target="_blank">
+                        访问GitHub仓库
+                    </a>
+                    <a href="https://github.com/sansan0/TrendRadar/issues" class="btn btn-secondary" target="_blank" style="margin-left: 1rem;">
+                        提交Issue
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>基于 <a href="https://github.com/sansan0/TrendRadar" target="_blank">TrendRadar</a> 创建 | GPL-3.0 License</p>
+            <p class="footer-stats">
+                <span id="busuanzi_container_site_pv">
+                    访问量 <span id="busuanzi_value_site_pv"></span>
+                </span>
+            </p>
+        </div>
+    </footer>
+
+    <!-- 统计脚本 -->
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <!-- 悬浮横幅脚本 -->
+    <script src="/js/floating-banner.js"></script>
+
+    <script>
+        // 代码复制功能
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const code = codeBlock.querySelector('code').textContent;
+
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '已复制!';
+                button.style.background = '#10b981';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('复制失败:', err);
+            });
+        }
+
+        // 标签页切换功能
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // 移除所有active类
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                // 添加active类到当前按钮
+                button.classList.add('active');
+            });
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 滚动动画
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // 为卡片添加动画
+        document.querySelectorAll('.feature-card, .mode-card, .highlight-item').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.6s ease-out';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
