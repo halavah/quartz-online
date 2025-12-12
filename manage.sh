@@ -84,13 +84,13 @@ show_menu() {
     clear
     print_header "Halavah's Tech - 管理控制台"
 
-    echo -e "${PURPLE}═══════════════════════════════════════════════════���═══════${NC}"
+    echo -e "${PURPLE}═══════════════════════════════════════════════════════════${NC}"
     echo -e "${CYAN}  项目管理${NC}"
     echo -e "${PURPLE}═══════════════════════════════════════════════════════════${NC}"
     echo ""
 
     echo -e "${GREEN}  1.${NC} 🚢 ${BLUE}部署到 Git${NC}        (deploy.sh)"
-    echo -e "     ${PURPLE}→${NC} 自动提交并推送代码到远程��库"
+    echo -e "     ${PURPLE}→${NC} 自动提交并推送代码到远程仓库"
     echo ""
 
     echo -e "${GREEN}  2.${NC} 🚀 ${BLUE}启动开发服务器${NC}     (start.sh)"
@@ -107,7 +107,7 @@ show_menu() {
     echo -e "${GREEN}  0.${NC} 🚪 ${BLUE}退出${NC}"
     echo ""
 
-    echo -e "${PURPLE}═════════════════════��═════════════════════════════════════${NC}"
+    echo -e "${PURPLE}═══════════════════════════════════════════════════════════${NC}"
     echo ""
 }
 
