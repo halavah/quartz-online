@@ -24,6 +24,7 @@ export async function generateStaticParams() {
 
 export default async function ArticlePage({ params }: { params: Promise<{ htmlFile: string[] }> }) {
   const { htmlFile } = await params;
+  const { config } = articlesData;
 
   // Decode URL-encoded path parts to handle Chinese characters
   const decodedPathParts = htmlFile.map(part => decodeURIComponent(part));
@@ -66,7 +67,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ htmlFi
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            <span>返回 TechHub</span>
+            <span>返回 {config.siteName}</span>
           </Link>
         </div>
       </header>
