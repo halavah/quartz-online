@@ -9,22 +9,9 @@ import Navbar from './components/Navbar';
 export default function Home() {
   const { config, articles } = articlesData;
 
-  // 搜索功能
-  const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
-
   // 分类筛选
   const [selectedCategory, setSelectedCategory] = useState('全部');
   const categories = ['全部', 'AI工具', '开发工具', '技术趋势', '前端框架'];
-
-  // 搜索防抖（300ms）
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
 
   // 计算每个分类的文章数量
   const categoryCounts = useMemo(() => {
@@ -39,18 +26,13 @@ export default function Home() {
   // 文章筛选和排序
   const filteredArticles = useMemo(() => {
     return articles.filter((article: any) => {
-      // 搜索匹配（标题或描述）
-      const matchesSearch = debouncedSearchQuery.trim() === '' ||
-        article.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-        article.description.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
-
       // 分类匹配
       const articleCategory = article.category || '开发工具';
       const matchesCategory = selectedCategory === '全部' || articleCategory === selectedCategory;
 
-      return matchesSearch && matchesCategory;
+      return matchesCategory;
     });
-  }, [articles, debouncedSearchQuery, selectedCategory]);
+  }, [articles, selectedCategory]);
 
   // 分页设置
   const ARTICLES_PER_PAGE = 6;
@@ -69,12 +51,7 @@ export default function Home() {
   // 重置分页当筛选条件改变时
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory, debouncedSearchQuery]);
-
-  // 处理搜索回调
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-  };
+  }, [selectedCategory]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--dark-bg)', transition: 'background-color 0.3s ease' }}>
@@ -82,8 +59,6 @@ export default function Home() {
       <Navbar
         siteName={config.siteName}
         githubUrl={(config as any).githubUrl}
-        showSearch={true}
-        onSearch={handleSearch}
       />
 
       {/* Hero */}
@@ -128,11 +103,10 @@ export default function Home() {
                 未找到匹配的文章
               </h3>
               <p className="text-lg mb-6" style={{ color: 'var(--text-secondary)' }}>
-                尝试调整搜索关键词或选择其他分类
+                尝试选择其他分类
               </p>
               <button
                 onClick={() => {
-                  setSearchQuery('');
                   setSelectedCategory('全部');
                 }}
                 className="px-6 py-3 rounded-lg font-medium transition-all hover:scale-105"
@@ -142,7 +116,7 @@ export default function Home() {
                   boxShadow: '0 5px 15px rgba(0, 102, 255, 0.3)'
                 }}
               >
-                清除所有筛选
+                查看所有文章
               </button>
             </div>
           ) : (
