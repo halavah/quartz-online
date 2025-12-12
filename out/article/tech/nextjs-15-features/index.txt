@@ -1,0 +1,144 @@
+1:"$Sreact.fragment"
+2:I[5244,[],""]
+3:I[3866,[],""]
+5:I[6213,[],"OutletBoundary"]
+7:I[6213,[],"MetadataBoundary"]
+9:I[6213,[],"ViewportBoundary"]
+b:I[4835,[],""]
+:HL["/_next/static/media/e4af272ccee01ff0-s.p.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/_next/static/css/8f783771ad712c09.css","style"]
+0:{"P":null,"b":"GC-3G_-dyH-qtPpve6T4t","p":"","c":["","article","tech","nextjs-15-features",""],"i":false,"f":[[["",{"children":["article",{"children":[["htmlFile","tech/nextjs-15-features","c"],{"children":["__PAGE__",{}]}]}]},"$undefined","$undefined",true],["",["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/css/8f783771ad712c09.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]],["$","html",null,{"lang":"zh-CN","children":["$","body",null,{"className":"__variable_f367f3 font-sans antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","segmentPath":["children"],"error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[],[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":["article",["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","segmentPath":["children","article","children"],"error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["htmlFile","tech/nextjs-15-features","c"],["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","segmentPath":["children","article","children","$0:f:0:1:2:children:2:children:0","children"],"error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":["__PAGE__",["$","$1","c",{"children":["$L4",null,["$","$L5",null,{"children":"$L6"}]]}],{},null,false]},null,false]},null,false]},null,false],["$","$1","h",{"children":[null,["$","$1","f8ru9Kzrjjl4-Wt0KrchW",{"children":[["$","$L7",null,{"children":"$L8"}],["$","$L9",null,{"children":"$La"}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}]]}],false]],"m":"$undefined","G":["$b","$undefined"],"s":false,"S":true}
+a:[["$","meta","0",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
+8:[["$","meta","0",{"charSet":"utf-8"}],["$","title","1",{"children":"TechVerse - 探索技术的无限可能"}],["$","meta","2",{"name":"description","content":"TechVerse 是一个专注于前沿技术的高质量技术博客，涵盖 AI、开发工具、区块链、Web 开发等领域，分享深度技术文章和实践经验。"}],["$","meta","3",{"name":"keywords","content":"AI,编程,技术博客,人工智能,Next.js,React,开发工具,前端开发"}]]
+6:null
+c:I[8173,["173","static/chunks/173-2e1b10b5fe49dfd2.js","305","static/chunks/app/article/%5B...htmlFile%5D/page-d9f1ef9321e2cde0.js"],""]
+d:T110e,<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深入理解 Next.js 15 的革新特性</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.8;
+            color: #1e293b;
+        }
+        h1 { font-size: 2.5em; color: #0f172a; margin-bottom: 1rem; }
+        h2 { font-size: 2em; color: #1e293b; margin-top: 2rem; margin-bottom: 1rem; }
+        h3 { font-size: 1.5em; color: #334155; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+        p { margin-bottom: 1.5rem; }
+        code {
+            background: #f1f5f9;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.9em;
+            color: #0f172a;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+        blockquote {
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+            margin: 1.5rem 0;
+            color: #64748b;
+            font-style: italic;
+        }
+        .feature-list {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+        .feature-list li {
+            margin-bottom: 0.5rem;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        .feature-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #3b82f6;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>深入理解 Next.js 15 的革新特性</h1>
+
+    <p>Next.js 15 带来了令人兴奋的新特性和改进，这些变化将显著提升开发体验和应用性能。让我们深入了解这些重要的更新。</p>
+
+    <h2>1. 改进的 App Router</h2>
+    <p>App Router 在 Next.js 15 中获得了多项重要改进：</p>
+    <div class="feature-list">
+        <ul>
+            <li><strong>更快的路由转换</strong> - 优化了路由切换的性能</li>
+            <li><strong>更好的类型支持</strong> - 改进了 TypeScript 类型推断</li>
+            <li><strong>简化布局模型</strong> - 让嵌套布局更加直观</li>
+        </ul>
+    </div>
+
+    <h2>2. 缓存优化</h2>
+    <p>Next.js 15 引入了更智能的缓存策略：</p>
+    <pre><code>// 新的缓存配置
+export const config = {
+  runtime: 'edge',
+  cache: 'force-cache',
+  revalidate: 3600
+};</code></pre>
+
+    <h2>3. Turbopack 的改进</h2>
+    <p>Turbopack 现在更加稳定，并提供了：</p>
+    <div class="feature-list">
+        <ul>
+            <li>快 53% 的本地开发启动时间</li>
+            <li>94% 的增量更新速度提升</li>
+            <li>更好的内存管理</li>
+        </ul>
+    </div>
+
+    <h2>4. 服务器组件增强</h2>
+    <p>服务器组件现在支持更多功能：</p>
+    <pre><code>// 服务器组件中的异步操作
+async function PostList() {
+  const posts = await fetch('https://api.example.com/posts');
+  return (
+    &lt;div&gt;
+      {posts.map(post => (
+        &lt;PostCard key={post.id} post={post} /&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+    <h2>5. Web Vitals 优化</h2>
+    <p>Next.js 15 自动优化了以下核心 Web Vitals：</p>
+    <div class="feature-list">
+        <ul>
+            <li>Largest Contentful Paint (LCP)</li>
+            <li>First Input Delay (FID)</li>
+            <li>Cumulative Layout Shift (CLS)</li>
+        </ul>
+    </div>
+
+    <h2>6. 开发体验改进</h2>
+    <blockquote>
+        <p>Next.js 15 的错误提示更加友好，调试体验显著提升。开发者现在可以获得更清晰的错误信息和堆栈跟踪。</p>
+    </blockquote>
+
+    <h3>如何升级到 Next.js 15</h3>
+    <p>升级过程非常简单：</p>
+    <pre><code>npm install next@15 react@18 react-dom@18</code></pre>
+
+    <h2>总结</h2>
+    <p>Next.js 15 是一个重要版本，带来了许多令人兴奋的改进。无论是性能、开发体验还是功能特性，都有了显著的提升。建议尽快升级以享受这些新特性带来的好处。</p>
+</body>
+</html>4:["$","div",null,{"className":"min-h-screen","children":[["$","header",null,{"className":"sticky top-0 z-50 bg-white border-b border-gray-200","children":["$","div",null,{"className":"w-full px-8 py-4","children":["$","$Lc",null,{"href":"/","className":"inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors","children":[["$","svg",null,{"className":"w-5 h-5","fill":"none","stroke":"currentColor","viewBox":"0 0 24 24","children":["$","path",null,{"strokeLinecap":"round","strokeLinejoin":"round","strokeWidth":2,"d":"M10 19l-7-7m0 0l7-7m-7 7h18"}]}],["$","span",null,{"children":"返回"}]]}]}]}],["$","main",null,{"className":"w-full","children":["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$d"}}]}]]}]

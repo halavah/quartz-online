@@ -1,0 +1,189 @@
+1:"$Sreact.fragment"
+2:I[5244,[],""]
+3:I[3866,[],""]
+5:I[6213,[],"OutletBoundary"]
+7:I[6213,[],"MetadataBoundary"]
+9:I[6213,[],"ViewportBoundary"]
+b:I[4835,[],""]
+:HL["/_next/static/media/e4af272ccee01ff0-s.p.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/_next/static/css/8f783771ad712c09.css","style"]
+0:{"P":null,"b":"GC-3G_-dyH-qtPpve6T4t","p":"","c":["","article","frontend","react-server-components",""],"i":false,"f":[[["",{"children":["article",{"children":[["htmlFile","frontend/react-server-components","c"],{"children":["__PAGE__",{}]}]}]},"$undefined","$undefined",true],["",["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/css/8f783771ad712c09.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]],["$","html",null,{"lang":"zh-CN","children":["$","body",null,{"className":"__variable_f367f3 font-sans antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","segmentPath":["children"],"error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[],[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":["article",["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","segmentPath":["children","article","children"],"error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["htmlFile","frontend/react-server-components","c"],["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","segmentPath":["children","article","children","$0:f:0:1:2:children:2:children:0","children"],"error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":["__PAGE__",["$","$1","c",{"children":["$L4",null,["$","$L5",null,{"children":"$L6"}]]}],{},null,false]},null,false]},null,false]},null,false],["$","$1","h",{"children":[null,["$","$1","IXIA-19F0Nohas3rkooV7",{"children":[["$","$L7",null,{"children":"$L8"}],["$","$L9",null,{"children":"$La"}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}]]}],false]],"m":"$undefined","G":["$b","$undefined"],"s":false,"S":true}
+a:[["$","meta","0",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
+8:[["$","meta","0",{"charSet":"utf-8"}],["$","title","1",{"children":"TechVerse - 探索技术的无限可能"}],["$","meta","2",{"name":"description","content":"TechVerse 是一个专注于前沿技术的高质量技术博客，涵盖 AI、开发工具、区块链、Web 开发等领域，分享深度技术文章和实践经验。"}],["$","meta","3",{"name":"keywords","content":"AI,编程,技术博客,人工智能,Next.js,React,开发工具,前端开发"}]]
+6:null
+c:I[8173,["173","static/chunks/173-2e1b10b5fe49dfd2.js","305","static/chunks/app/article/%5B...htmlFile%5D/page-d9f1ef9321e2cde0.js"],""]
+d:T148f,<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Server Components 实践指南</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.8;
+            color: #1e293b;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #0f172a;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+        h2 {
+            font-size: 2em;
+            color: #1e293b;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        h3 {
+            font-size: 1.5em;
+            color: #334155;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+        }
+        p { margin-bottom: 1.5rem; }
+        code {
+            background: #f1f5f9;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.9em;
+            color: #0f172a;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+        .tip {
+            background: #f0f9ff;
+            border-left: 4px solid #0ea5e9;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 0.25rem;
+        }
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>React Server Components 实践指南</h1>
+
+    <p>React Server Components（RSC）是 React 团队推出的革命性特性，它允许组件在服务器端渲染，带来更好的性能和开发体验。本文将深入探讨 RSC 的核心概念和实际应用。</p>
+
+    <h2>什么是 Server Components？</h2>
+    <p>Server Components 是一种特殊的 React 组件，它们在服务器上运行，而不是在客户端。这使得它们能够直接访问后端资源，同时保持组件化的开发体验。</p>
+
+    <h2>核心优势</h2>
+    <div class="tip">
+        <strong>主要优势：</strong>
+        <ul>
+            <li>零客户端 JavaScript 包大小</li>
+            <li>直接访问服务器资源（数据库、文件系统等）</li>
+            <li>自动代码分割</li>
+            <li>更好的首屏加载性能</li>
+        </ul>
+    </div>
+
+    <h2>基本语法</h2>
+    <p>Server Components 使用 <code>'use server'</code> 指令来标识：</p>
+
+    <pre><code>// ServerComponent.server.js
+'use server'
+
+import { db } from './database'
+
+export default async function PostList() {
+  const posts = await db.posts.findMany()
+
+  return (
+    &lt;div&gt;
+      {posts.map(post => (
+        &lt;div key={post.id}&gt;
+          &lt;h2&gt;{post.title}&lt;/h2&gt;
+          &lt;p&gt;{post.content}&lt;/p&gt;
+        &lt;/div&gt;
+      ))}
+    &lt;/div&gt;
+  )
+}</code></pre>
+
+    <h2>与 Client Components 的区别</h2>
+    <div class="warning">
+        <strong>注意：</strong> Server Components 不能使用 hooks、事件处理器或浏览器 API。需要交互的组件应该使用 Client Components。
+    </div>
+
+    <pre><code>// ClientComponent.client.js
+'use client'
+
+import { useState, useEffect } from 'react'
+
+export default function Counter() {
+  const [count, setCount] = useState(0)
+
+  return (
+    &lt;button onClick={() => setCount(count + 1)}&gt;
+      Count: {count}
+    &lt;/button&gt;
+  )
+}</code></pre>
+
+    <h2>最佳实践</h2>
+    <h3>1. 混合使用 Server 和 Client Components</h3>
+    <p>在 Server Components 中嵌入 Client Components：</p>
+    <pre><code>// PostPage.server.js
+import Counter from './Counter.client'
+
+export default function PostPage({ post }) {
+  return (
+    &lt;article&gt;
+      &lt;h1&gt;{post.title}&lt;/h1&gt;
+      &lt;p&gt;{post.content}&lt;/p&gt;
+      &lt;Counter /&gt;
+    &lt;/article&gt;
+  )
+}</code></pre>
+
+    <h3>2. 数据获取模式</h3>
+    <p>利用 Server Components 的优势进行数据获取：</p>
+    <pre><code>// UserProfile.server.js
+async function getUser(id) {
+  const res = await fetch(`https://api.example.com/users/${id}`)
+  return res.json()
+}
+
+export default async function UserProfile({ userId }) {
+  const user = await getUser(userId)
+
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;{user.name}&lt;/h1&gt;
+      &lt;p&gt;{user.email}&lt;/p&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+
+    <h2>性能优化技巧</h2>
+    <ul>
+        <li>使用 Suspense 处理加载状态</li>
+        <li>合理拆分组件，避免不必要的重渲染</li>
+        <li>利用 Streaming SSR 提升感知性能</li>
+    </ul>
+
+    <h2>总结</h2>
+    <p>React Server Components 代表了 React 的未来方向。通过将组件分层（Server vs Client），我们能够构建更高效、更易于维护的应用。在实际项目中，合理使用 Server Components 可以显著提升应用性能。</p>
+</body>
+</html>4:["$","div",null,{"className":"min-h-screen","children":[["$","header",null,{"className":"sticky top-0 z-50 bg-white border-b border-gray-200","children":["$","div",null,{"className":"w-full px-8 py-4","children":["$","$Lc",null,{"href":"/","className":"inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors","children":[["$","svg",null,{"className":"w-5 h-5","fill":"none","stroke":"currentColor","viewBox":"0 0 24 24","children":["$","path",null,{"strokeLinecap":"round","strokeLinejoin":"round","strokeWidth":2,"d":"M10 19l-7-7m0 0l7-7m-7 7h18"}]}],["$","span",null,{"children":"返回"}]]}]}]}],["$","main",null,{"className":"w-full","children":["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$d"}}]}]]}]
