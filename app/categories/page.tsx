@@ -15,7 +15,7 @@ export default function CategoriesPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--dark-bg)', transition: 'background-color 0.3s ease' }}>
       {/* 导航栏 */}
-      <Navbar siteName={config.siteName} githubUrl={(config as any).githubUrl} />
+      <Navbar siteName={config.siteName} githubUrl={(config as any).githubUrl} articles={articles} />
 
       {/* Hero */}
       <section className="py-20" style={{ background: 'linear-gradient(135deg, rgba(0, 102, 255, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%)' }}>

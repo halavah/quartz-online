@@ -59,6 +59,7 @@ export default function Home() {
       <Navbar
         siteName={config.siteName}
         githubUrl={(config as any).githubUrl}
+        articles={articles}
       />
 
       {/* Hero */}

@@ -1,18 +1,28 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+
+interface Article {
+  title: string;
+  description: string;
+  htmlFile: string;
+  category: string;
+}
 
 interface NavbarProps {
   siteName: string;
   githubUrl?: string;
+  articles?: Article[];
 }
 
-export default function Navbar({ siteName, githubUrl }: NavbarProps) {
+export default function Navbar({ siteName, githubUrl, articles = [] }: NavbarProps) {
   const pathname = usePathname();
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [mounted, setMounted] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // 初始化主题
   useEffect(() => {
@@ -39,7 +49,31 @@ export default function Navbar({ siteName, githubUrl }: NavbarProps) {
     return pathname?.startsWith(path);
   };
 
+  // 搜索功能
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const query = searchQuery.toLowerCase();
+    return articles.filter(article =>
+      article.title.toLowerCase().includes(query) ||
+      article.description.toLowerCase().includes(query) ||
+      article.category.toLowerCase().includes(query)
+    ).slice(0, 8); // 最多显示8条结果
+  }, [searchQuery, articles]);
+
+  // ESC 键关闭搜索
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && searchOpen) {
+        setSearchOpen(false);
+        setSearchQuery('');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [searchOpen]);
+
   return (
+    <>
     <nav className="sticky top-0 z-50 backdrop-blur-lg" style={{
       background: theme === 'dark' ? 'rgba(10, 14, 39, 0.9)' : 'rgba(255, 255, 255, 0.9)',
       borderBottom: '1px solid var(--border-color)',
@@ -102,19 +136,17 @@ export default function Navbar({ siteName, githubUrl }: NavbarProps) {
 
             {/* 工具按钮组 */}
             <div className="flex items-center gap-4">
-              {/* GitHub 链接 */}
-              <a
-                href={githubUrl || "https://github.com/halavah"}
-                target="_blank"
-                rel="noopener noreferrer"
+              {/* 搜索按钮 */}
+              <button
+                onClick={() => setSearchOpen(true)}
                 className="p-2 rounded-lg hover:bg-blue-500/10 transition-all"
                 style={{ color: 'var(--text-secondary)' }}
-                title="GitHub"
+                title="搜索文章"
               >
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path fillRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" clipRule="evenodd" />
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-              </a>
+              </button>
 
               {/* 主题切换按钮 */}
               <button
@@ -145,5 +177,191 @@ export default function Navbar({ siteName, githubUrl }: NavbarProps) {
         </div>
       </div>
     </nav>
+
+    {/* 炫酷搜索弹窗 */}
+    {searchOpen && (
+      <div
+        className="fixed inset-0 z-[100] flex items-start justify-center pt-[10vh] px-4"
+        style={{
+          background: 'rgba(0, 0, 0, 0.8)',
+          backdropFilter: 'blur(8px)',
+          animation: 'fadeIn 0.2s ease-out'
+        }}
+        onClick={() => {
+          setSearchOpen(false);
+          setSearchQuery('');
+        }}
+      >
+        <div
+          className="w-full max-w-3xl"
+          style={{
+            animation: 'slideDown 0.3s ease-out'
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* 搜索框 */}
+          <div
+            className="rounded-2xl shadow-2xl overflow-hidden"
+            style={{
+              background: theme === 'dark'
+                ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%)'
+                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)',
+              border: '1px solid var(--border-color)',
+              backdropFilter: 'blur(20px)'
+            }}
+          >
+            {/* 输入框区域 */}
+            <div className="flex items-center gap-4 p-6 border-b" style={{ borderColor: 'var(--border-color)' }}>
+              <svg className="w-6 h-6 flex-shrink-0" style={{ color: 'var(--text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="搜索文章标题、描述或分类..."
+                autoFocus
+                className="flex-1 text-lg bg-transparent border-none outline-none"
+                style={{
+                  color: 'var(--text-color)',
+                  caretColor: '#3b82f6'
+                }}
+              />
+              <button
+                onClick={() => {
+                  setSearchOpen(false);
+                  setSearchQuery('');
+                }}
+                className="flex-shrink-0 px-3 py-1 rounded-lg text-sm font-medium transition-all hover:bg-gray-500/10"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                ESC
+              </button>
+            </div>
+
+            {/* 搜索结果 */}
+            <div className="max-h-[60vh] overflow-y-auto">
+              {searchQuery.trim() && searchResults.length === 0 ? (
+                <div className="p-12 text-center">
+                  <svg className="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>
+                    未找到相关文章
+                  </p>
+                  <p className="text-sm mt-2" style={{ color: 'var(--text-secondary)', opacity: 0.7 }}>
+                    试试其他关键词吧
+                  </p>
+                </div>
+              ) : searchQuery.trim() ? (
+                <div className="p-2">
+                  {searchResults.map((article) => (
+                    <Link
+                      key={article.htmlFile}
+                      href={`/article/${article.htmlFile.replace('.html', '')}`}
+                      onClick={() => {
+                        setSearchOpen(false);
+                        setSearchQuery('');
+                      }}
+                      className="block p-4 rounded-xl transition-all hover:scale-[1.02] mb-2"
+                      style={{
+                        background: theme === 'dark' ? 'rgba(51, 65, 85, 0.3)' : 'rgba(241, 245, 249, 0.5)',
+                        border: '1px solid transparent',
+                        cursor: 'pointer'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = '#3b82f6';
+                        e.currentTarget.style.background = theme === 'dark' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(59, 130, 246, 0.05)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = 'transparent';
+                        e.currentTarget.style.background = theme === 'dark' ? 'rgba(51, 65, 85, 0.3)' : 'rgba(241, 245, 249, 0.5)';
+                      }}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-base font-semibold mb-2 truncate" style={{ color: 'var(--text-color)' }}>
+                            {article.title}
+                          </h3>
+                          <p className="text-sm line-clamp-2 mb-2" style={{ color: 'var(--text-secondary)', opacity: 0.8 }}>
+                            {article.description}
+                          </p>
+                          <span
+                            className="inline-block px-3 py-1 text-xs font-medium rounded-full"
+                            style={{
+                              background: 'rgba(59, 130, 246, 0.1)',
+                              color: '#3b82f6'
+                            }}
+                          >
+                            {article.category}
+                          </span>
+                        </div>
+                        <svg className="w-5 h-5 flex-shrink-0 mt-1" style={{ color: 'var(--text-secondary)', opacity: 0.5 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-12 text-center">
+                  <svg className="w-16 h-16 mx-auto mb-4" style={{ color: 'var(--text-secondary)', opacity: 0.3 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>
+                    开始搜索
+                  </p>
+                  <p className="text-sm mt-2" style={{ color: 'var(--text-secondary)', opacity: 0.7 }}>
+                    输入关键词查找文章
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 提示信息 */}
+          <div className="flex items-center justify-center gap-6 mt-4 text-sm" style={{ color: 'var(--text-secondary)', opacity: 0.6 }}>
+            <span className="flex items-center gap-2">
+              <kbd className="px-2 py-1 rounded" style={{ background: 'rgba(255, 255, 255, 0.1)' }}>ESC</kbd>
+              关闭
+            </span>
+            <span className="flex items-center gap-2">
+              <kbd className="px-2 py-1 rounded" style={{ background: 'rgba(255, 255, 255, 0.1)' }}>↵</kbd>
+              打开
+            </span>
+          </div>
+        </div>
+
+        <style jsx>{`
+          @keyframes fadeIn {
+            from {
+              opacity: 0;
+            }
+            to {
+              opacity: 1;
+            }
+          }
+
+          @keyframes slideDown {
+            from {
+              opacity: 0;
+              transform: translateY(-20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          }
+        `}</style>
+      </div>
+    )}
+    </>
   );
 }
