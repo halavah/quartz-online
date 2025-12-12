@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next.js 15 完全指南</title>
+    <meta name="description" content="全面解析 Next.js 15 的革命性新特性，包括 App Router 优化、缓存策略升级、Turbopack 改进等">
+    <meta name="keywords" content="Next.js,Next.js 15,App Router,Turbopack,React 18,Server Components,缓存优化,性能提升,前端框架">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0066ff;
+            --secondary-color: #00d4ff;
+            --accent-color: #ff6b00;
+            --dark-bg: #0a0e27;
+            --card-bg: #1a1f3a;
+            --text-color: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --border-color: #2a2f4a;
+            --success-color: #00c853;
+            --warning-color: #ff9800;
+            --info-color: #0ea5e9;
+            --error-color: #ef4444;
+            --gradient-primary: linear-gradient(135deg, #0066ff 0%, #00d4ff 100%);
+            --gradient-hero: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+            --shadow-glow: 0 0 30px rgba(0, 102, 255, 0.3);
+            --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--dark-bg);
+            overflow-x: hidden;
+        }
+
+        /* 英雄区域 */
+        .hero-section {
+            background: var(--gradient-hero);
+            padding: 6rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(0, 102, 255, 0.2);
+            color: var(--secondary-color);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 800px;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section {
+            margin-bottom: 5rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* 版本时间线 */
+        .version-timeline {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .version-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-color);
+            transform: translateX(-50%);
+        }
+
+        .version-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .version-item:nth-child(odd) {
+            flex-direction: row-reverse;
+        }
+
+        .version-content {
+            flex: 1;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 0 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .version-content:hover {
+            transform: scale(1.02);
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .version-dot {
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 0 4px var(--dark-bg), 0 0 0 6px var(--primary-color);
+        }
+
+        .version-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .version-date {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        /* 特性卡片 */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-badge {
+            display: inline-block;
+            background: rgba(0, 102, 255, 0.2);
+            color: var(--secondary-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .feature-badge.breaking {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error-color);
+        }
+
+        .feature-badge.new {
+            background: rgba(0, 200, 83, 0.2);
+            color: var(--success-color);
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .feature-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+        }
+
+        /* 代码展示 */
+        .code-showcase {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 2rem 0;
+            box-shadow: var(--shadow-card);
+        }
+
+        .code-header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .code-title {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .code-language {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+        }
+
+        .code-content {
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .code-content pre {
+            margin: 0;
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        /* 性能指标 */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .metric-value {
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            font-size: 1.125rem;
+            color: var(--text-color);
+        }
+
+        .metric-improvement {
+            font-size: 0.875rem;
+            color: var(--success-color);
+            margin-top: 0.5rem;
+        }
+
+        /* 迁移指南 */
+        .migration-steps {
+            counter-reset: step-counter;
+            list-style: none;
+            padding: 0;
+            margin: 2rem 0;
+        }
+
+        .migration-step {
+            position: relative;
+            padding-left: 4rem;
+            margin-bottom: 2rem;
+            counter-increment: step-counter;
+        }
+
+        .migration-step::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--gradient-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .migration-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .migration-description {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* 提示框 */
+        .tip-box {
+            background: rgba(0, 200, 83, 0.1);
+            border: 1px solid var(--success-color);
+            border-left: 4px solid var(--success-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .tip-box strong {
+            color: var(--success-color);
+        }
+
+        .warning-box {
+            background: rgba(255, 152, 0, 0.1);
+            border: 1px solid var(--warning-color);
+            border-left: 4px solid var(--warning-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .warning-box strong {
+            color: var(--warning-color);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.25rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .version-item,
+            .version-item:nth-child(odd) {
+                flex-direction: column;
+            }
+
+            .version-line {
+                left: 20px;
+            }
+
+            .version-dot {
+                left: 20px;
+            }
+
+            .version-content {
+                margin: 1rem 0 1rem 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 英雄区域 -->
+    <section class="hero-section">
+        <div class="hero-container">
+            <div class="hero-badge">⚡ Next.js 最新版本</div>
+            <h1 class="hero-title">Next.js 15 完全指南</h1>
+            <p class="hero-subtitle">
+                探索 Next.js 15 的革命性改进，打造极速全栈应用
+            </p>
+
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">53%</span>
+                    <span class="stat-label">开发速度提升</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">94%</span>
+                    <span class="stat-label">增量更新加速</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">React 18 支持</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 版本演进时间线 -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">版本演进历程</h2>
+                <p class="section-subtitle">
+                    Next.js 从 Pages Router 到 App Router 的重大转变
+                </p>
+            </div>
+
+            <div class="version-timeline">
+                <div class="version-line"></div>
+
+                <div class="version-item">
+                    <div class="version-dot"></div>
+                    <div class="version-content">
+                        <div class="version-number">Next.js 12</div>
+                        <div class="version-date">2021年10月</div>
+                        <p>引入 Turbopack Alpha，大幅提升构建速度</p>
+                    </div>
+                </div>
+
+                <div class="version-item">
+                    <div class="version-dot"></div>
+                    <div class="version-content">
+                        <div class="version-number">Next.js 13</div>
+                        <div class="version-date">2022年10月</div>
+                        <p>革命性的 App Router 发布，引入 Server Components</p>
+                    </div>
+                </div>
+
+                <div class="version-item">
+                    <div class="version-dot"></div>
+                    <div class="version-content">
+                        <div class="version-number">Next.js 14</div>
+                        <div class="version-date">2023年10月</div>
+                        <p>稳定 Turbopack，优化 Server Actions</p>
+                    </div>
+                </div>
+
+                <div class="version-item">
+                    <div class="version-dot"></div>
+                    <div class="version-content">
+                        <div class="version-number">Next.js 15</div>
+                        <div class="version-date">2024年12月</div>
+                        <p>全面改进缓存策略，Turbopack 生产就绪</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 核心新特性 -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">核心新特性</h2>
+                <p class="section-subtitle">
+                    Next.js 15 带来的重要更新和改进
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-badge breaking">重大变更</div>
+                    <h3 class="feature-title">优化缓存策略</h3>
+                    <p class="feature-description">
+                        重新设计了缓存机制，提供更灵活的控制
+                    </p>
+                    <ul class="feature-list">
+                        <li>默认 Opt-Out 缓存策略</li>
+                        <li>细粒度的缓存控制</li>
+                        <li>改进的 revalidate API</li>
+                        <li>更智能的缓存失效</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-badge new">全新功能</div>
+                    <h3 class="feature-title">Turbopack 稳定版</h3>
+                    <p class="feature-description">
+                        Turbopack 现在已可用于生产环境
+                    </p>
+                    <ul class="feature-list">
+                        <li>快 53% 的本地开发启动</li>
+                        <li>94% 的增量更新速度提升</li>
+                        <li>更好的内存管理</li>
+                        <li>完全兼容 Next.js 生态</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-badge new">性能提升</div>
+                    <h3 class="feature-title">改进的 App Router</h3>
+                    <p class="feature-description">
+                        App Router 获得多项重要改进
+                    </p>
+                    <ul class="feature-list">
+                        <li>更快的路由转换</li>
+                        <li>更好的类型支持</li>
+                        <li>简化布局模型</li>
+                        <li>改进的并行路由</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-badge new">增强功能</div>
+                    <h3 class="feature-title">Partial Prerendering</h3>
+                    <p class="feature-description">
+                        静态生成与动态渲染的完美结合
+                    </p>
+                    <ul class="feature-list">
+                        <li>混合渲染模式</li>
+                        <li>流式 SSR</li>
+                        <li>动态岛屿架构</li>
+                        <li>最优的缓存策略</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-badge breaking">API 变更</div>
+                    <h3 class="feature-title">Next.js 15 RC 更新</h3>
+                    <p class="feature-description">
+                        重要的 API 变更和改进
+                    </p>
+                    <ul class="feature-list">
+                        <li>fetch 请求默认不再缓存</li>
+                        <li>GET 路由处理程序需要重新验证</li>
+                        <li>客户端导航不再预取</li>
+                        <li>改进的 Cookie 处理</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-badge new">开发体验</div>
+                    <h3 class="feature-title">增强的调试工具</h3>
+                    <p class="feature-description">
+                        更好的开发和调试体验
+                    </p>
+                    <ul class="feature-list">
+                        <li>更友好的错误提示</li>
+                        <li>改进的堆栈跟踪</li>
+                        <li>性能分析工具</li>
+                        <li>可视化调试界面</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 性能提升 -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">性能提升指标</h2>
+                <p class="section-subtitle">
+                    Next.js 15 带来的实际性能改进
+                </p>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">53%</div>
+                    <div class="metric-label">本地开发启动速度</div>
+                    <div class="metric-improvement">使用 Turbopack</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-value">94%</div>
+                    <div class="metric-label">增量更新速度</div>
+                    <div class="metric-improvement">热重载优化</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-value">30%</div>
+                    <div class="metric-label">构建时间减少</div>
+                    <div class="metric-improvement">优化依赖解析</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-value">40%</div>
+                    <div class="metric-label">内存使用优化</div>
+                    <div class="metric-improvement">改进的缓存策略</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-value">60%</div>
+                    <div class="metric-label">首屏加载提升</div>
+                    <div class="metric-improvement">Partial Prerendering</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-value">25%</div>
+                    <div class="metric-label">包大小减少</div>
+                    <div class="metric-improvement">Tree-shaking 增强</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 代码示例 -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">新特性代码示例</h2>
+                <p class="section-subtitle">
+                    通过实际代码了解 Next.js 15 的改进
+                </p>
+            </div>
+
+            <!-- 缓存配置示例 -->
+            <div class="code-showcase">
+                <div class="code-header">
+                    <div class="code-title">新的缓存配置</div>
+                    <div class="code-language">typescript</div>
+                </div>
+                <div class="code-content">
+                    <pre><code>// app/page.tsx
+export const revalidate = 3600 // 每小时重新验证
+export const dynamic = 'force-static' // 静态生成
+
+// 动态路由
+export const dynamicParams = true // 允许动态参数
+
+// 数据获取
+async function getPosts() {
+  // Next.js 15 中 fetch 默认不缓存
+  const res = await fetch('https://api.example.com/posts', {
+    cache: 'force-cache', // 明确指定缓存
+    next: {
+      revalidate: 3600,
+      tags: ['posts']
+    }
+  })
+
+  return res.json()
+}
+
+export default async function Page() {
+  const posts = await getPosts()
+
+  return (
+    &lt;div&gt;
+      {posts.map(post => (
+        &PostCard key={post.id} post={post} /&gt;
+      ))}
+    &lt;/div&gt;
+  )
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- Turbopack 配置示例 -->
+            <div class="code-showcase">
+                <div class="code-header">
+                    <div class="code-title">启用 Turbopack</div>
+                    <div class="code-language">bash</div>
+                </div>
+                <div class="code-content">
+                    <pre><code># 开发环境使用 Turbopack
+npm run dev -- --turbo
+
+# 或者更新 package.json
+{
+  "scripts": {
+    "dev": "next dev --turbo",
+    "build": "next build"
+  }
+}
+
+# next.config.js 配置优化
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // 启用 Turbopack 用于构建
+  experimental: {
+    turbotrace: {
+      logLevel: 'error'
+    }
+  },
+
+  // 优化构建
+  swcMinify: true,
+
+  // 启用压缩
+  compress: true
+}
+
+module.exports = nextConfig</code></pre>
+                </div>
+            </div>
+
+            <!-- Partial Prerendering 示例 -->
+            <div class="code-showcase">
+                <div class="code-header">
+                    <div class="code-title">Partial Prerendering</div>
+                    <div class="code-language">typescript</div>
+                </div>
+                <div class="code-content">
+                    <pre><code>// app/dashboard/@user/[id]/page.tsx
+import { Suspense } from 'react'
+import UserProfile from '@/components/UserProfile'
+import UserActivity from '@/components/UserActivity'
+
+export default async function DashboardPage({ params }) {
+  // 静态部分：预渲染
+  const staticData = await getStaticDashboardData()
+
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Dashboard&lt;/h1&gt;
+
+      {/* 静态内容 */}
+      &lt;nav&gt;
+        &lt;Link href="/dashboard/settings"&gt;Settings&lt;/Link&gt;
+        &lt;Link href="/dashboard/profile"&gt;Profile&lt;/Link&gt;
+      &lt;/nav&gt;
+
+      {/* 动态部分：流式渲染 */}
+      &lt;Suspense fallback={&lt;Loading /&gt;}&gt;
+        &lt;UserProfile userId={params.id} /&gt;
+      &lt;/Suspense&gt;
+
+      &lt;Suspense fallback={&lt;Loading /&gt;}&gt;
+        &lt;UserActivity userId={params.id} /&gt;
+      &lt;/Suspense&gt;
+    &lt;/div&gt;
+  )
+}
+
+// 静态数据获取
+async function getStaticDashboardData() {
+  // 这些数据会被预渲染
+  return {
+    navigation: await getNavigationItems(),
+    userStats: await getUserStats(params.id)
+  }
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 迁移指南 -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">迁移到 Next.js 15</h2>
+                <p class="section-subtitle">
+                    从 Next.js 14 平滑升级到 15 的步骤指南
+                </p>
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ 重要提示：</strong>
+                <p>Next.js 15 包含一些重大变更，请仔细阅读迁移指南并测试所有功能。</p>
+            </div>
+
+            <ol class="migration-steps">
+                <li class="migration-step">
+                    <h3 class="migration-title">1. 更新依赖</h3>
+                    <p class="migration-description">
+                        更新到 Next.js 15 和 React 18
+                    </p>
+                    <div class="code-showcase">
+                        <div class="code-content" style="padding: 1rem;">
+                            <pre><code>npm install next@15 react@18 react-dom@18</code></pre>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="migration-step">
+                    <h3 class="migration-title">2. 更新缓存策略</h3>
+                    <p class="migration-description">
+                        检查所有 fetch 调用，明确指定缓存行为
+                    </p>
+                    <div class="code-showcase">
+                        <div class="code-content" style="padding: 1rem;">
+                            <pre><code>// 之前
+fetch('/api/data')
+
+// 之后
+fetch('/api/data', { cache: 'force-cache' })</code></pre>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="migration-step">
+                    <h3 class="migration-title">3. 更新路由处理程序</h3>
+                    <p class="migration-description">
+                        GET 路由处理程序现在需要明确的缓存配置
+                    </p>
+                    <div class="code-showcase">
+                        <div class="code-content" style="padding: 1rem;">
+                            <pre><code>export async function GET() {
+  const data = await fetchData()
+
+  return NextResponse.json(data, {
+    headers: {
+      'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30'
+    }
+  })
+}</code></pre>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="migration-step">
+                    <h3 class="migration-title">4. 启用 Turbopack（可选）</h3>
+                    <p class="migration-description">
+                        在开发环境中启用 Turbopack 以获得更好的性能
+                    </p>
+                    <div class="code-showcase">
+                        <div class="code-content" style="padding: 1rem;">
+                            <pre><code>"scripts": {
+  "dev": "next dev --turbo"
+}</code></pre>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="migration-step">
+                    <h3 class="migration-title">5. 测试应用</h3>
+                    <p class="migration-description">
+                        全面测试应用的各个方面，特别关注：
+                    </p>
+                    <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+                        <li>数据获取和缓存行为</li>
+                        <li>路由转换</li>
+                        <li>Server Actions</li>
+                        <li>静态生成页面</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <div class="tip-box">
+                <strong>💡 迁移提示：</strong>
+                <ul style="margin-top: 1rem; margin-left: 1.5rem;">
+                    <li>先在开发环境测试所有功能</li>
+                    <li>使用 Vercel 的 Speed Insights 监控性能</li>
+                    <li>逐步迁移，可以先启用部分新特性</li>
+                    <li>查看官方迁移文档获取最新信息</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 最佳实践 -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">最佳实践建议</h2>
+                <p class="section-subtitle">
+                    充分利用 Next.js 15 新特性的建议
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3 class="feature-title">🚀 使用 Turbopack</h3>
+                    <p class="feature-description">
+                        在开发环境中启用 Turbopack，享受极速的开发体验。对于大型项目，考虑在生产构建中也使用它。
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3 class="feature-title">💾 智能缓存</h3>
+                    <p class="feature-description">
+                        根据数据特性选择合适的缓存策略。静态内容使用长时间缓存，动态内容使用短时间或无缓存。
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3 class="feature-title">🔄 Partial Prerendering</h3>
+                    <p class="feature-description">
+                        将页面拆分为静态和动态部分，使用 Partial Prerendering 获得最佳性能。
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3 class="feature-title">📊 性能监控</h3>
+                    <p class="feature-description">
+                        使用 Next.js 内置的性能监控工具，持续跟踪和优化应用性能。
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3 class="feature-title">🎯 Server Components</h3>
+                    <p class="feature-description">
+                        充分利用 Server Components 减少客户端 JavaScript，提升首屏加载速度。
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3 class="feature-title">🔧 代码分割</h3>
+                    <p class="feature-description">
+                        使用动态导入和 React.lazy 实现更细粒度的代码分割，减少初始包大小。
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

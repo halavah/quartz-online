@@ -4,50 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tracy Profiler - 纳秒级实时性能分析工具</title>
-    <meta name="description" content="Tracy是一款强大的实时性能分析工具,提供纳秒级分辨率测量能力,支持CPU、GPU、内存分析,适用于游戏和应用程序性能优化">
+    <meta name="description" content="Tracy 是一款强大的实时性能分析工具，提供纳秒级分辨率测量能力，支持 CPU、GPU、内存分析，适用于游戏和应用程序性能优化">
     <meta name="keywords" content="Tracy,Profiler,性能分析,CPU分析,GPU分析,内存分析,游戏开发,C++,性能优化,实时分析">
 
     <style>
-        /* 全局重置 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* Tracy主题配色方案 - 基于官网深色主题 */
         :root {
-            --primary-color: #bdd72e;
-            --primary-dark: #9ab825;
-            --secondary-color: #3c3c3c;
-            --accent-color: #64b5f6;
-            --background-dark: #1a1a1a;
-            --background-darker: #0d0d0d;
-            --text-color: #e8e8e8;
-            --text-muted: #a0a0a0;
-            --border-color: #404040;
-            --shadow-color: rgba(0, 0, 0, 0.5);
-            --gradient-primary: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
-            --gradient-accent: linear-gradient(135deg, #bdd72e 0%, #9ab825 100%);
-            --card-bg: #252525;
+            --primary-color: #0066ff;
+            --secondary-color: #00d4ff;
+            --accent-color: #ff6b00;
+            --dark-bg: #0a0e27;
+            --card-bg: #1a1f3a;
+            --text-color: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --border-color: #2a2f4a;
+            --success-color: #00c853;
+            --warning-color: #ff9800;
+            --gradient-primary: linear-gradient(135deg, #0066ff 0%, #00d4ff 100%);
+            --gradient-hero: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+            --shadow-glow: 0 0 30px rgba(0, 102, 255, 0.3);
         }
 
-        /* 基础样式 */
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;
             color: var(--text-color);
-            background: var(--background-dark);
+            background: var(--dark-bg);
             overflow-x: hidden;
         }
 
         /* 英雄区域 */
         .hero-section {
+            background: var(--gradient-hero);
+            padding: 6rem 2rem 4rem;
             position: relative;
-            background: var(--gradient-primary);
-            padding: 5rem 0 4rem;
             overflow: hidden;
-            border-bottom: 3px solid var(--primary-color);
         }
 
         .hero-section::before {
@@ -58,53 +54,53 @@
             right: 0;
             bottom: 0;
             background:
-                radial-gradient(circle at 20% 30%, rgba(189, 215, 46, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(100, 181, 246, 0.05) 0%, transparent 50%);
+                radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
             pointer-events: none;
         }
 
         .hero-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 2rem;
             position: relative;
             z-index: 1;
         }
 
         .hero-badge {
             display: inline-block;
-            background: var(--gradient-accent);
-            color: var(--background-darker);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
+            background: rgba(0, 102, 255, 0.2);
+            color: var(--secondary-color);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
             font-size: 0.875rem;
-            font-weight: 700;
+            font-weight: 600;
+            border: 1px solid rgba(0, 212, 255, 0.3);
             margin-bottom: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            backdrop-filter: blur(10px);
         }
 
         .hero-title {
             font-size: 3.5rem;
             font-weight: 800;
-            color: var(--primary-color);
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px var(--shadow-color);
             line-height: 1.2;
         }
 
         .hero-subtitle {
             font-size: 1.5rem;
-            color: var(--text-color);
+            color: var(--text-secondary);
             margin-bottom: 2rem;
             max-width: 800px;
-            line-height: 1.4;
         }
 
         .hero-stats {
             display: flex;
-            gap: 2rem;
-            margin: 2.5rem 0;
+            gap: 3rem;
+            margin: 2rem 0;
             flex-wrap: wrap;
         }
 
@@ -112,30 +108,20 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            padding: 1.25rem 2rem;
-            border-radius: 12px;
-            border: 1px solid rgba(189, 215, 46, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .stat-item:hover {
-            transform: translateY(-3px);
-            border-color: var(--primary-color);
-            box-shadow: 0 10px 30px rgba(189, 215, 46, 0.2);
         }
 
         .stat-number {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 0.25rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .stat-label {
             font-size: 0.875rem;
-            color: var(--text-muted);
+            color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -143,18 +129,17 @@
         .hero-actions {
             display: flex;
             gap: 1rem;
-            flex-wrap: wrap;
             margin-top: 2rem;
+            flex-wrap: wrap;
         }
 
-        /* 按钮样式 */
         .btn {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
             padding: 1rem 2rem;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-weight: 600;
             font-size: 1rem;
             text-decoration: none;
@@ -163,20 +148,21 @@
         }
 
         .btn-primary {
-            background: var(--gradient-accent);
-            color: var(--background-darker);
-            box-shadow: 0 4px 15px rgba(189, 215, 46, 0.3);
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-glow);
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(189, 215, 46, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 0 40px rgba(0, 102, 255, 0.5);
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
             color: var(--text-color);
-            border: 1px solid var(--border-color);
+            border: 2px solid var(--border-color);
+            backdrop-filter: blur(10px);
         }
 
         .btn-secondary:hover {
@@ -184,16 +170,15 @@
             border-color: var(--primary-color);
         }
 
-        /* 容器 */
-        .container {
+        /* 主要内容区域 */
+        .main-content {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 2rem;
+            padding: 4rem 2rem;
         }
 
-        /* 章节样式 */
         .section {
-            padding: 4rem 0;
+            margin-bottom: 5rem;
         }
 
         .section-header {
@@ -204,73 +189,18 @@
         .section-title {
             font-size: 2.5rem;
             font-weight: 700;
-            color: var(--primary-color);
             margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .section-subtitle {
             font-size: 1.125rem;
-            color: var(--text-muted);
+            color: var(--text-secondary);
             max-width: 700px;
             margin: 0 auto;
-        }
-
-        /* 概述区域 */
-        .overview-section {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 3rem;
-            margin: 3rem 0;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 10px 40px var(--shadow-color);
-        }
-
-        .overview-content h3 {
-            font-size: 1.75rem;
-            color: var(--primary-color);
-            margin-bottom: 1.5rem;
-        }
-
-        .overview-content p {
-            font-size: 1.125rem;
-            color: var(--text-color);
-            line-height: 1.8;
-            margin-bottom: 1.5rem;
-        }
-
-        .overview-highlights {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .highlight-item {
-            display: flex;
-            align-items: start;
-            gap: 1rem;
-            padding: 1.5rem;
-            background: rgba(189, 215, 46, 0.05);
-            border-radius: 12px;
-            border-left: 3px solid var(--primary-color);
-        }
-
-        .highlight-icon {
-            font-size: 2rem;
-            flex-shrink: 0;
-        }
-
-        .highlight-text h4 {
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-            font-size: 1.125rem;
-        }
-
-        .highlight-text p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin: 0;
         }
 
         /* 特性网格 */
@@ -283,9 +213,9 @@
 
         .feature-card {
             background: var(--card-bg);
-            border-radius: 16px;
-            padding: 2.5rem;
             border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
@@ -297,16 +227,16 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            background: var(--gradient-accent);
+            height: 3px;
+            background: var(--gradient-primary);
             transform: scaleX(0);
             transition: transform 0.3s ease;
         }
 
         .feature-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(189, 215, 46, 0.15);
             border-color: var(--primary-color);
+            box-shadow: var(--shadow-glow);
         }
 
         .feature-card:hover::before {
@@ -315,136 +245,72 @@
 
         .feature-icon {
             font-size: 3rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .feature-title {
             font-size: 1.5rem;
-            color: var(--primary-color);
+            font-weight: 600;
             margin-bottom: 1rem;
-            font-weight: 600;
-        }
-
-        .feature-description {
-            color: var(--text-muted);
-            line-height: 1.7;
-            font-size: 1rem;
-        }
-
-        .feature-list {
-            list-style: none;
-            margin-top: 1rem;
-        }
-
-        .feature-list li {
-            padding: 0.5rem 0;
-            padding-left: 1.5rem;
-            position: relative;
-            color: var(--text-muted);
-        }
-
-        .feature-list li::before {
-            content: '▸';
-            position: absolute;
-            left: 0;
-            color: var(--primary-color);
-            font-weight: bold;
-        }
-
-        /* 安装指南 */
-        .installation-section {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 3rem;
-            margin: 3rem 0;
-            border: 1px solid var(--border-color);
-        }
-
-        .install-tabs {
-            margin-top: 2rem;
-        }
-
-        .tab-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .tab-btn {
-            padding: 0.875rem 1.75rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-muted);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .tab-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
             color: var(--text-color);
         }
 
-        .tab-btn.active {
-            background: var(--gradient-accent);
-            color: var(--background-darker);
-            border-color: var(--primary-color);
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.8;
         }
 
-        .install-step {
-            margin-bottom: 2rem;
+        /* 平台支持 */
+        .platforms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
         }
 
-        .install-step h4 {
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-            font-size: 1.25rem;
-        }
-
-        /* 代码块 */
-        .code-block {
-            position: relative;
-            background: var(--background-darker);
-            border-radius: 12px;
-            overflow: hidden;
-            margin: 1.5rem 0;
+        .platform-badge {
+            background: var(--card-bg);
             border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .platform-badge:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 102, 255, 0.2);
+        }
+
+        .platform-name {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-top: 0.5rem;
+        }
+
+        /* 代码展示 */
+        .code-showcase {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 2rem 0;
         }
 
         .code-header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 1.5rem;
-            background: #1f1f1f;
             border-bottom: 1px solid var(--border-color);
         }
 
-        .code-lang {
-            color: var(--primary-color);
+        .code-title {
             font-weight: 600;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .copy-btn {
-            background: var(--primary-color);
-            color: var(--background-darker);
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .copy-btn:hover {
-            background: var(--primary-dark);
-            transform: scale(1.05);
+            color: var(--text-color);
         }
 
         .code-content {
@@ -454,78 +320,48 @@
 
         .code-content pre {
             margin: 0;
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
             font-size: 0.9rem;
             line-height: 1.6;
-        }
-
-        .code-content code {
-            color: #e8e8e8;
-        }
-
-        /* 语法高亮 */
-        .keyword { color: #bdd72e; }
-        .string { color: #64b5f6; }
-        .comment { color: #6a6a6a; font-style: italic; }
-        .function { color: #ffa726; }
-
-        /* 使用示例展示 */
-        .showcase-section {
-            margin: 4rem 0;
-        }
-
-        .showcase-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-            align-items: center;
-            margin-bottom: 3rem;
-        }
-
-        .showcase-content h3 {
-            font-size: 2rem;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
-
-        .showcase-content p {
-            color: var(--text-muted);
-            line-height: 1.8;
-            margin-bottom: 1.5rem;
-        }
-
-        /* 页脚 */
-        .footer {
-            background: var(--background-darker);
-            border-top: 2px solid var(--border-color);
-            padding: 3rem 0;
-            margin-top: 4rem;
-        }
-
-        .footer-content {
-            text-align: center;
-            color: var(--text-muted);
-        }
-
-        .footer-content p {
-            margin-bottom: 0.75rem;
-        }
-
-        .footer-content a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-        .footer-content a:hover {
             color: var(--text-color);
         }
 
-        .footer-stats {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-color);
+        /* 性能指标 */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .metric-value {
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            font-size: 1.125rem;
+            color: var(--text-color);
         }
 
         /* 响应式设计 */
@@ -538,643 +374,262 @@
                 font-size: 1.25rem;
             }
 
-            .hero-stats {
-                gap: 1rem;
-            }
-
-            .stat-item {
-                padding: 1rem 1.5rem;
-            }
-
-            .section-title {
-                font-size: 2rem;
-            }
-
-            .showcase-grid {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-
             .features-grid {
                 grid-template-columns: 1fr;
             }
 
-            .container {
-                padding: 0 1rem;
+            .platforms-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
 
-            .overview-section,
-            .installation-section {
-                padding: 2rem 1.5rem;
+            .metrics-grid {
+                grid-template-columns: 1fr;
             }
-        }
-
-        /* 滚动动画 */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .fade-in-up {
-            animation: fadeInUp 0.6s ease-out;
-        }
-
-        /* 自定义滚动条 */
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--background-darker);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 5px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-color);
         }
     </style>
 </head>
 <body>
     <!-- 英雄区域 -->
-    <header class="hero-section">
+    <section class="hero-section">
         <div class="hero-container">
-            <div class="hero-badge">实时性能分析工具</div>
+            <div class="hero-badge">⚡ 性能分析利器</div>
             <h1 class="hero-title">Tracy Profiler</h1>
-            <p class="hero-subtitle">纳秒级分辨率的实时远程遥测混合帧与采样性能分析器,专为游戏和应用程序设计</p>
+            <p class="hero-subtitle">
+                纳秒级实时性能分析工具，专为游戏和应用程序开发者设计
+            </p>
 
             <div class="hero-stats">
                 <div class="stat-item">
-                    <span class="stat-number">13.3k</span>
-                    <span class="stat-label">GitHub Stars</span>
+                    <span class="stat-number">纳秒级</span>
+                    <span class="stat-label">时间分辨率</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-number">C++</span>
-                    <span class="stat-label">主要语言</span>
+                    <span class="stat-number">多语言</span>
+                    <span class="stat-label">支持</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number">BSD-3</span>
-                    <span class="stat-label">开源许可</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">v0.13.0</span>
-                    <span class="stat-label">最新版本</span>
+                    <span class="stat-label">开源协议</span>
                 </div>
             </div>
 
             <div class="hero-actions">
-                <a href="https://github.com/wolfpld/tracy" class="btn btn-primary" target="_blank">
-                    <span>📦</span>
-                    查看源码
+                <a href="https://github.com/wolfpld/tracy" class="btn btn-primary">
+                    <span>⬇</span>
+                    <span>下载 Tracy</span>
                 </a>
-                <a href="https://tracy.nereid.pl/" class="btn btn-secondary" target="_blank">
-                    <span>🚀</span>
-                    在线演示
-                </a>
-                <a href="https://github.com/wolfpld/tracy/releases/latest/download/tracy.pdf" class="btn btn-secondary" target="_blank">
-                    <span>📚</span>
-                    下载文档
+                <a href="#features" class="btn btn-secondary">
+                    <span>📖</span>
+                    <span>查看文档</span>
                 </a>
             </div>
         </div>
-    </header>
+    </section>
 
     <!-- 主要内容 -->
-    <main>
-        <!-- 项目概述 -->
-        <section class="section">
-            <div class="container">
-                <div class="overview-section fade-in-up">
-                    <div class="overview-content">
-                        <h3>什么是 Tracy Profiler?</h3>
-                        <p>Tracy 是一款先进的实时性能分析工具,专为游戏开发者和应用程序工程师打造。它提供纳秒级别的精确测量能力,通过远程遥测技术实现实时性能监控,结合帧分析和采样分析的混合方法,帮助开发者深入了解程序运行时的性能瓶颈。</p>
-                        <p>与传统的事后分析工具不同,Tracy 采用实时监控架构,允许开发者在程序运行过程中即时查看性能数据,快速定位问题并验证优化效果。这种即时反馈机制大大提升了性能优化的效率。</p>
-                    </div>
-
-                    <div class="overview-highlights">
-                        <div class="highlight-item">
-                            <div class="highlight-icon">⚡</div>
-                            <div class="highlight-text">
-                                <h4>纳秒级精度</h4>
-                                <p>提供业界领先的纳秒级时间分辨率,精确捕捉每一个性能细节</p>
-                            </div>
-                        </div>
-                        <div class="highlight-item">
-                            <div class="highlight-icon">📡</div>
-                            <div class="highlight-text">
-                                <h4>远程遥测</h4>
-                                <p>支持远程实时监控,无需停止程序即可查看性能数据</p>
-                            </div>
-                        </div>
-                        <div class="highlight-item">
-                            <div class="highlight-icon">🎯</div>
-                            <div class="highlight-text">
-                                <h4>混合分析</h4>
-                                <p>结合基于帧的分析和采样分析,提供全面的性能视图</p>
-                            </div>
-                        </div>
-                        <div class="highlight-item">
-                            <div class="highlight-icon">🌍</div>
-                            <div class="highlight-text">
-                                <h4>多平台支持</h4>
-                                <p>支持 Windows、Linux、macOS 等主流平台,跨平台性能分析</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
+    <main class="main-content">
         <!-- 核心特性 -->
-        <section class="section">
-            <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">核心特性</h2>
-                    <p class="section-subtitle">Tracy 提供全方位的性能分析能力,从 CPU 到 GPU,从内存到锁,一网打尽</p>
+        <section class="section" id="features">
+            <div class="section-header">
+                <h2 class="section-title">核心特性</h2>
+                <p class="section-subtitle">
+                    Tracy 提供了全面的性能分析功能，帮助开发者优化应用程序性能
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⏱️</div>
+                    <h3 class="feature-title">纳秒级精度</h3>
+                    <p class="feature-description">
+                        提供纳秒级的时间分辨率，能够精确测量最微小的性能差异，
+                        适合高性能应用和游戏的精确优化。
+                    </p>
                 </div>
 
-                <div class="features-grid">
-                    <div class="feature-card fade-in-up">
-                        <div class="feature-icon">💻</div>
-                        <h3 class="feature-title">CPU 性能分析</h3>
-                        <p class="feature-description">直接支持多种编程语言的 CPU 性能分析,社区提供更多语言绑定</p>
-                        <ul class="feature-list">
-                            <li>原生支持:C、C++、Lua、Python、Fortran</li>
-                            <li>社区绑定:Rust、Zig、C#、OCaml、Odin</li>
-                            <li>函数级别的性能追踪</li>
-                            <li>调用栈分析和热点检测</li>
-                        </ul>
-                    </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">实时分析</h3>
+                    <p class="feature-description">
+                        实时收集和显示性能数据，无需停止应用程序即可查看性能瓶颈，
+                        支持热重载和动态更新。
+                    </p>
+                </div>
 
-                    <div class="feature-card fade-in-up">
-                        <div class="feature-icon">🎮</div>
-                        <h3 class="feature-title">GPU 性能分析</h3>
-                        <p class="feature-description">全面支持主流图形 API,深入分析 GPU 性能瓶颈</p>
-                        <ul class="feature-list">
-                            <li>OpenGL、Vulkan 完整支持</li>
-                            <li>Direct3D 11/12 性能追踪</li>
-                            <li>Metal、OpenCL、CUDA 支持</li>
-                            <li>ROCm / Rocprof 支持 (v0.13.0)</li>
-                        </ul>
-                    </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🖥️</div>
+                    <h3 class="feature-title">CPU & GPU 分析</h3>
+                    <p class="feature-description">
+                        同时支持 CPU 和 GPU 性能分析，包括渲染管线、计算着色器、
+                        内存带宽等多个维度的性能指标。
+                    </p>
+                </div>
 
-                    <div class="feature-card fade-in-up">
-                        <div class="feature-icon">🧠</div>
-                        <h3 class="feature-title">内存分析</h3>
-                        <p class="feature-description">追踪内存分配模式,优化内存使用效率</p>
-                        <ul class="feature-list">
-                            <li>实时内存分配追踪</li>
-                            <li>内存泄漏检测</li>
-                            <li>分配模式可视化</li>
-                            <li>内存使用统计分析</li>
-                        </ul>
-                    </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💾</div>
+                    <h3 class="feature-title">内存追踪</h3>
+                    <p class="feature-description">
+                        实时监控内存分配和释放，检测内存泄漏，分析内存使用模式，
+                        支持自定义内存标记和分组。
+                    </p>
+                </div>
 
-                    <div class="feature-card fade-in-up">
-                        <div class="feature-icon">🔒</div>
-                        <h3 class="feature-title">锁与并发分析</h3>
-                        <p class="feature-description">监控多线程同步,发现并发性能问题</p>
-                        <ul class="feature-list">
-                            <li>锁竞争检测</li>
-                            <li>上下文切换监控</li>
-                            <li>线程时间线可视化</li>
-                            <li>Fiber 进出事件追踪</li>
-                        </ul>
-                    </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">锁分析</h3>
+                    <p class="feature-description">
+                        监控互斥锁和其他同步原语的性能，识别死锁和竞争条件，
+                        优化多线程应用的并发性能。
+                    </p>
+                </div>
 
-                    <div class="feature-card fade-in-up">
-                        <div class="feature-icon">📸</div>
-                        <h3 class="feature-title">帧截图与可视化</h3>
-                        <p class="feature-description">自动捕获帧截图,直观展示性能数据</p>
-                        <ul class="feature-list">
-                            <li>自动帧截图关联</li>
-                            <li>性能数据可视化</li>
-                            <li>时间线浏览器</li>
-                            <li>多视图对比分析</li>
-                        </ul>
-                    </div>
-
-                    <div class="feature-card fade-in-up">
-                        <div class="feature-icon">🤖</div>
-                        <h3 class="feature-title">LLM 智能集成</h3>
-                        <p class="feature-description">v0.13.0 新特性:本地 LLM 辅助性能分析</p>
-                        <ul class="feature-list">
-                            <li>用户手册智能检索</li>
-                            <li>调用栈智能分析</li>
-                            <li>汇编代码解释</li>
-                            <li>性能问题智能诊断</li>
-                        </ul>
-                    </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">可视化界面</h3>
+                    <p class="feature-description">
+                        直观的图形化界面，提供火焰图、时间线、统计图表等多种
+                        数据可视化方式，便于性能分析。
+                    </p>
                 </div>
             </div>
         </section>
 
-        <!-- 技术架构 -->
-        <section class="section" style="background: var(--card-bg);">
-            <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">技术架构</h2>
-                    <p class="section-subtitle">现代化的架构设计,支持多种构建系统和平台</p>
+        <!-- 性能指标 -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">性能指标</h2>
+                <p class="section-subtitle">
+                    Tracy 能够测量的关键性能指标
+                </p>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">0.1ns</div>
+                    <div class="metric-label">最小时间精度</div>
                 </div>
 
-                <div class="overview-highlights">
-                    <div class="highlight-item">
-                        <div class="highlight-icon">⚙️</div>
-                        <div class="highlight-text">
-                            <h4>构建系统</h4>
-                            <p>支持 CMake 和 Meson 构建系统,灵活适配不同项目需求</p>
-                        </div>
-                    </div>
-                    <div class="highlight-item">
-                        <div class="highlight-icon">🖥️</div>
-                        <div class="highlight-text">
-                            <h4>跨平台</h4>
-                            <p>Windows、Linux、macOS 全平台支持,包括 GDK 游戏开发套件</p>
-                        </div>
-                    </div>
-                    <div class="highlight-item">
-                        <div class="highlight-icon">📦</div>
-                        <div class="highlight-text">
-                            <h4>预编译版本</h4>
-                            <p>提供 Windows x64 预编译二进制,开箱即用</p>
-                        </div>
-                    </div>
-                    <div class="highlight-item">
-                        <div class="highlight-icon">🔧</div>
-                        <div class="highlight-text">
-                            <h4>低侵入性</h4>
-                            <p>客户端集成简单,对原有代码影响最小化</p>
-                        </div>
-                    </div>
+                <div class="metric-card">
+                    <div class="metric-value">>1M</div>
+                    <div class="metric-label">每秒采样数</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-value">0.1%</div>
+                    <div class="metric-label">CPU 开销</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-value">无限</div>
+                    <div class="metric-label">区域数量</div>
                 </div>
             </div>
         </section>
 
-        <!-- 安装指南 -->
+        <!-- 支持平台 -->
         <section class="section">
-            <div class="container">
-                <div class="installation-section">
-                    <div class="section-header" style="margin-bottom: 2rem;">
-                        <h2 class="section-title">安装指南</h2>
-                        <p class="section-subtitle">选择适合你的安装方式快速开始</p>
-                    </div>
+            <div class="section-header">
+                <h2 class="section-title">支持平台</h2>
+                <p class="section-subtitle">
+                    Tracy 支持多种编程语言和平台
+                </p>
+            </div>
 
-                    <div class="install-tabs">
-                        <div class="tab-buttons">
-                            <button class="tab-btn active">预编译版本</button>
-                            <button class="tab-btn">CMake 构建</button>
-                            <button class="tab-btn">Meson 构建</button>
-                        </div>
+            <div class="platforms-grid">
+                <div class="platform-badge">
+                    <div style="font-size: 2rem;">C++</div>
+                    <div class="platform-name">C/C++</div>
+                </div>
 
-                        <div class="install-step">
-                            <h4>1. 下载预编译版本 (Windows)</h4>
-                            <p style="color: var(--text-muted); margin-bottom: 1rem;">
-                                访问 GitHub Releases 页面下载最新版本的预编译二进制文件:
-                            </p>
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <span class="code-lang">下载链接</span>
-                                </div>
-                                <div class="code-content">
-                                    <pre><code>https://github.com/wolfpld/tracy/releases/latest</code></pre>
-                                </div>
-                            </div>
-                            <p style="color: var(--text-muted);">
-                                下载 Tracy-{version}.7z 压缩包并解压即可使用
-                            </p>
-                        </div>
+                <div class="platform-badge">
+                    <div style="font-size: 2rem;">🦀</div>
+                    <div class="platform-name">Rust</div>
+                </div>
 
-                        <div class="install-step">
-                            <h4>2. 使用 CMake 构建</h4>
-                            <p style="color: var(--text-muted); margin-bottom: 1rem;">
-                                从源码编译 Tracy 服务器和客户端:
-                            </p>
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <span class="code-lang">Bash</span>
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                </div>
-                                <div class="code-content">
-                                    <pre><code><span class="comment"># 克隆仓库</span>
-git clone https://github.com/wolfpld/tracy.git
-cd tracy
+                <div class="platform-badge">
+                    <div style="font-size: 2rem;">☕</div>
+                    <div class="platform-name">Java</div>
+                </div>
 
-<span class="comment"># 创建构建目录</span>
-mkdir build && cd build
+                <div class="platform-badge">
+                    <div style="font-size: 2rem;">🐍</div>
+                    <div class="platform-name">Python</div>
+                </div>
 
-<span class="comment"># 配置和构建</span>
-cmake ..
-cmake --build . --config Release
+                <div class="platform-badge">
+                    <div style="font-size: 2rem;">📱</div>
+                    <div class="platform-name">移动端</div>
+                </div>
 
-<span class="comment"># 运行 Tracy 分析器</span>
-./Tracy-release</code></pre>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="install-step">
-                            <h4>3. 使用 Meson 构建</h4>
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <span class="code-lang">Bash</span>
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                </div>
-                                <div class="code-content">
-                                    <pre><code><span class="comment"># 配置构建</span>
-meson setup build
-
-<span class="comment"># 编译</span>
-meson compile -C build
-
-<span class="comment"># 运行</span>
-./build/Tracy</code></pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="platform-badge">
+                    <div style="font-size: 2rem;">🎮</div>
+                    <div class="platform-name">游戏主机</div>
                 </div>
             </div>
         </section>
 
         <!-- 使用示例 -->
-        <section class="section showcase-section">
-            <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">使用示例</h2>
-                    <p class="section-subtitle">快速集成 Tracy 到你的项目中</p>
-                </div>
-
-                <div class="showcase-grid">
-                    <div class="showcase-content">
-                        <h3>基础 C++ 集成</h3>
-                        <p>在你的 C++ 项目中集成 Tracy 非常简单,只需包含头文件并添加性能标记宏。Tracy 会自动追踪这些区域的性能数据。</p>
-                        <ul class="feature-list">
-                            <li>最小化代码侵入</li>
-                            <li>零配置开箱即用</li>
-                            <li>支持条件编译</li>
-                            <li>运行时开销极低</li>
-                        </ul>
-                    </div>
-
-                    <div class="code-block">
-                        <div class="code-header">
-                            <span class="code-lang">C++</span>
-                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                        </div>
-                        <div class="code-content">
-                            <pre><code><span class="comment">// 包含 Tracy 客户端</span>
-<span class="keyword">#include</span> <span class="string">"TracyClient.cpp"</span>
-
-<span class="keyword">void</span> <span class="function">MyFunction</span>() {
-    <span class="comment">// 标记性能分析区域</span>
-    <span class="keyword">ZoneScoped;</span>
-
-    <span class="comment">// 你的代码逻辑</span>
-    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="string">0</span>; i < <span class="string">1000</span>; i++) {
-        <span class="comment">// 嵌套区域分析</span>
-        <span class="keyword">ZoneScopedN</span>(<span class="string">"Inner Loop"</span>);
-        ProcessData(i);
-    }
-
-    <span class="comment">// 标记帧边界</span>
-    <span class="keyword">FrameMark;</span>
-}</code></pre>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="showcase-grid">
-                    <div class="code-block">
-                        <div class="code-header">
-                            <span class="code-lang">Python</span>
-                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                        </div>
-                        <div class="code-content">
-                            <pre><code><span class="keyword">from</span> tracy_client <span class="keyword">import</span> *
-
-<span class="comment"># 使用装饰器标记函数</span>
-<span class="keyword">@profile</span>
-<span class="keyword">def</span> <span class="function">process_data</span>(data):
-    <span class="keyword">with</span> <span class="function">Zone</span>(<span class="string">"Data Processing"</span>):
-        result = expensive_operation(data)
-
-    <span class="keyword">with</span> <span class="function">Zone</span>(<span class="string">"Result Validation"</span>):
-        validate(result)
-
-    <span class="keyword">return</span> result</code></pre>
-                        </div>
-                    </div>
-
-                    <div class="showcase-content">
-                        <h3>Python 集成</h3>
-                        <p>Tracy 也支持 Python 性能分析,通过简单的装饰器和上下文管理器,即可为 Python 代码添加性能追踪。</p>
-                        <ul class="feature-list">
-                            <li>Pythonic API 设计</li>
-                            <li>装饰器和上下文管理器</li>
-                            <li>自动内存追踪</li>
-                            <li>与 C++ 混合分析</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="overview-section" style="margin-top: 3rem;">
-                    <h3 style="color: var(--primary-color); margin-bottom: 1.5rem;">GPU 性能追踪示例</h3>
-                    <div class="code-block">
-                        <div class="code-header">
-                            <span class="code-lang">C++ (Vulkan)</span>
-                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                        </div>
-                        <div class="code-content">
-                            <pre><code><span class="comment">// Vulkan GPU 性能追踪</span>
-<span class="keyword">#include</span> <span class="string">"TracyVulkan.hpp"</span>
-
-<span class="comment">// 创建 Tracy Vulkan 上下文</span>
-<span class="keyword">auto</span> tracyCtx = <span class="function">TracyVkContext</span>(physicalDevice, device, queue, commandBuffer);
-
-<span class="comment">// 在命令缓冲区中标记 GPU 区域</span>
-<span class="keyword">TracyVkZone</span>(tracyCtx, commandBuffer, <span class="string">"Render Pass"</span>);
-
-<span class="comment">// 你的渲染代码</span>
-vkCmdBeginRenderPass(...);
-vkCmdDraw(...);
-vkCmdEndRenderPass(...);</code></pre>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 文档与资源 -->
-        <section class="section" style="background: var(--card-bg);">
-            <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">文档与学习资源</h2>
-                    <p class="section-subtitle">丰富的文档和教程助你快速上手</p>
-                </div>
-
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">📚</div>
-                        <h3 class="feature-title">完整文档</h3>
-                        <p class="feature-description">详细的 PDF 用户手册,涵盖所有功能和最佳实践</p>
-                        <a href="https://github.com/wolfpld/tracy/releases/latest/download/tracy.pdf" class="btn btn-secondary" style="margin-top: 1rem;" target="_blank">下载 PDF</a>
-                    </div>
-
-                    <div class="feature-card">
-                        <div class="feature-icon">🎥</div>
-                        <h3 class="feature-title">视频教程</h3>
-                        <p class="feature-description">官方 YouTube 频道提供从 v0.2 到 v0.8 的完整教程系列</p>
-                        <a href="https://www.youtube.com/watch?v=fB5B46lbapc" class="btn btn-secondary" style="margin-top: 1rem;" target="_blank">观看教程</a>
-                    </div>
-
-                    <div class="feature-card">
-                        <div class="feature-icon">🎤</div>
-                        <h3 class="feature-title">CppCon 演讲</h3>
-                        <p class="feature-description">Marcos Slomp 在 CppCon 2023 的深度介绍</p>
-                        <a href="https://youtu.be/ghXk3Bk5F2U?t=37" class="btn btn-secondary" style="margin-top: 1rem;" target="_blank">观看演讲</a>
-                    </div>
-
-                    <div class="feature-card">
-                        <div class="feature-icon">🌐</div>
-                        <h3 class="feature-title">在线演示</h3>
-                        <p class="feature-description">交互式在线演示,体验 Tracy 的强大功能</p>
-                        <a href="https://tracy.nereid.pl/" class="btn btn-secondary" style="margin-top: 1rem;" target="_blank">访问演示</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 社区支持 -->
         <section class="section">
-            <div class="container">
-                <div class="overview-section">
-                    <h3 style="text-align: center; color: var(--primary-color); margin-bottom: 2rem;">加入 Tracy 社区</h3>
-                    <div style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">
-                        <p style="font-size: 1.125rem; margin-bottom: 1rem;">Tracy 拥有活跃的开源社区,欢迎贡献代码、报告问题或参与讨论</p>
-                    </div>
-                    <div class="overview-highlights">
-                        <div class="highlight-item">
-                            <div class="highlight-icon">⭐</div>
-                            <div class="highlight-text">
-                                <h4>GitHub 仓库</h4>
-                                <p>13.3k Stars | 899 Forks | 181 贡献者 | 9,310+ 提交</p>
-                            </div>
-                        </div>
-                        <div class="highlight-item">
-                            <div class="highlight-icon">🚀</div>
-                            <div class="highlight-text">
-                                <h4>活跃开发</h4>
-                                <p>持续更新维护,最新版本 v0.13.0 (2025-11-11)</p>
-                            </div>
-                        </div>
-                        <div class="highlight-item">
-                            <div class="highlight-icon">💖</div>
-                            <div class="highlight-text">
-                                <h4>赞助支持</h4>
-                                <p>通过 GitHub Sponsors 支持项目持续发展</p>
-                            </div>
-                        </div>
-                        <div class="highlight-item">
-                            <div class="highlight-icon">📝</div>
-                            <div class="highlight-text">
-                                <h4>开源协议</h4>
-                                <p>BSD-3-Clause 许可证,商业友好</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="text-align: center; margin-top: 2rem;">
-                        <a href="https://github.com/wolfpld/tracy" class="btn btn-primary" target="_blank">访问 GitHub 仓库</a>
-                        <a href="https://github.com/sponsors/wolfpld/" class="btn btn-secondary" target="_blank" style="margin-left: 1rem;">赞助项目</a>
-                    </div>
+            <div class="section-header">
+                <h2 class="section-title">快速开始</h2>
+                <p class="section-subtitle">
+                    只需几行代码即可集成 Tracy
+                </p>
+            </div>
+
+            <div class="code-showcase">
+                <div class="code-header">
+                    <div class="code-title">C++ 集成示例</div>
+                </div>
+                <div class="code-content">
+                    <pre><code>#include "Tracy.hpp"
+
+// 创建性能区域
+void GameLoop() {
+    ZoneScoped;  // 自动命名的性能区域
+
+    // 命名的性能区域
+    ZoneScopedN("Physics Update");
+
+    // 自定义文本区域
+    TracyText("FPS", "60");
+
+    // 内存分配追踪
+    void* ptr = TracyAlloc(1024, 12);
+
+    // ... 你的代码 ...
+
+    TracyFree(ptr);
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="code-showcase">
+                <div class="code-header">
+                    <div class="code-title">配置文件示例</div>
+                </div>
+                <div class="code-content">
+                    <pre><code>// tracy.cpp
+#define TRACY_ENABLE
+#define TRACY_ON_DEMAND
+
+#include "common/TracySystem.hpp"
+
+tracy::SourceHistogramData g_sourceHistogram;
+int main(int argc, char** argv) {
+    tracy::InitRuntime();
+
+    // 初始化 Tracy
+    ___tracy_set_thread_name("Main Thread");
+
+    // 启动应用程序
+    RunApplication();
+
+    return 0;
+}</code></pre>
                 </div>
             </div>
         </section>
     </main>
-
-    <!-- 页脚 -->
-    <footer class="footer">
-        <div class="footer-content">
-            <p>基于 <a href="https://github.com/wolfpld/tracy" target="_blank">Tracy Profiler</a> 创建 | 作者: Bartosz Taudul</p>
-            <p>BSD-3-Clause License | Copyright © 2017-2025</p>
-            <p class="footer-stats">
-                <span id="busuanzi_container_site_pv">
-                    访问量 <span id="busuanzi_value_site_pv"></span>
-                </span>
-            </p>
-        </div>
-    </footer>
-
-    <!-- 统计脚本 -->
-    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <!-- 悬浮横幅脚本 -->
-    <script src="/js/floating-banner.js"></script>
-
-    <!-- 交互脚本 -->
-    <script>
-        // 代码复制功能
-        function copyCode(btn) {
-            const codeBlock = btn.closest('.code-block');
-            const code = codeBlock.querySelector('code').textContent;
-
-            navigator.clipboard.writeText(code).then(() => {
-                const originalText = btn.textContent;
-                btn.textContent = '已复制!';
-                btn.style.background = '#64b5f6';
-
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.style.background = '';
-                }, 2000);
-            }).catch(err => {
-                console.error('复制失败:', err);
-                alert('复制失败,请手动复制');
-            });
-        }
-
-        // 滚动动画
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animation = 'fadeInUp 0.6s ease-out forwards';
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
-
-        // 观察所有卡片元素
-        document.querySelectorAll('.feature-card, .highlight-item').forEach(card => {
-            card.style.opacity = '0';
-            observer.observe(card);
-        });
-
-        // 平滑滚动
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-    </script>
 </body>
 </html>
