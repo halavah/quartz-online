@@ -2,35 +2,15 @@
 
 import Link from 'next/link';
 import articlesData from '../../data/articles.json';
+import Navbar from '../components/Navbar';
 
 export default function AboutPage() {
   const { config } = articlesData;
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--dark-bg)' }}>
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--dark-bg)', transition: 'background-color 0.3s ease' }}>
       {/* 导航栏 */}
-      <nav className="sticky top-0 z-50 backdrop-blur-lg" style={{
-        background: 'rgba(10, 14, 39, 0.9)',
-        borderBottom: '1px solid var(--border-color)'
-      }}>
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="text-2xl font-black" style={{
-              background: 'var(--gradient-primary)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}>
-              {config.siteName}
-            </Link>
-            <div className="flex items-center gap-8">
-              <Link href="/" className="text-sm hover:text-blue-400 transition-colors" style={{ color: 'var(--text-secondary)' }}>首页</Link>
-              <Link href="/articles" className="text-sm hover:text-blue-400 transition-colors" style={{ color: 'var(--text-secondary)' }}>文章</Link>
-              <Link href="/categories" className="text-sm hover:text-blue-400 transition-colors" style={{ color: 'var(--text-secondary)' }}>分类</Link>
-              <Link href="/about" className="text-sm hover:text-blue-400 transition-colors" style={{ color: 'var(--text-color)' }}>关于</Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar siteName={config.siteName} githubUrl={(config as any).githubUrl} />
 
       {/* Hero */}
       <section className="py-20" style={{ background: 'linear-gradient(135deg, rgba(0, 102, 255, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%)' }}>
