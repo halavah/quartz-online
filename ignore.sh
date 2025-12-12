@@ -21,15 +21,33 @@ fi
 
 # 临时文件存储要处理的文件
 TEMP_FILES=$(mktemp)
-TEMP_DIRS=$(mktemp)
 
-echo "第一步：分析 .gitignore 文件..."
+echo "第一步：查找被跟踪但应该被忽略的文件..."
 echo ""
 
-# 处理 .gitignore 中的每一行
+# 方法1: 直接处理最常见的目录模式
+echo "处理 out/ 目录..."
+git ls-files | grep "^out/" >> "$TEMP_FILES"
+
+echo "处理 .next/ 目录..."
+git ls-files | grep "^\\.next/" >> "$TEMP_FILES"
+
+echo "处理 node_modules/ 目录..."
+git ls-files | grep "^node_modules/" >> "$TEMP_FILES"
+
+echo "处理 build/ 目录..."
+git ls-files | grep "^build/" >> "$TEMP_FILES"
+
+echo "处理 dist/ 目录..."
+git ls-files | grep "^dist/" >> "$TEMP_FILES"
+
+# 方法2: 处理 .gitignore 中的特定模式
+echo ""
+echo "处理 .gitignore 中的其他模式..."
+
 while IFS= read -r line || [[ -n "$line" ]]; do
-    # 跳过空行和注释
-    if [[ -z "$line" || "$line" == \#* ]]; then
+    # 跳过空行、注释和已经处理的目录
+    if [[ -z "$line" || "$line" == \#* || "$line" == "out/" || "$line" == ".next/" || "$line" == "node_modules/" || "$line" == "build/" || "$line" == "dist/" ]]; then
         continue
     fi
 
@@ -38,23 +56,36 @@ while IFS= read -r line || [[ -n "$line" ]]; do
         continue
     fi
 
-    # 移除末尾的斜杠（目录标记）
-    pattern="${line%/}"
-
-    echo "处理模式: $pattern"
-
-    # 查找匹配的被跟踪文件
-    # 使用 git ls-files 列出所有被跟踪的文件，然后匹配模式
-    if [[ "$line" == */ ]]; then
-        # 如果是目录模式（以 / 结尾）
-        git ls-files | grep -E "^${pattern}(/|$)" | head -10 >> "$TEMP_FILES"
-    else
-        # 普通文件模式
-        # 转换 glob 模式到正则表达式
-        regex_pattern=$(echo "$pattern" | sed 's/\./\\./g' | sed 's/\*/.*/g')
-        git ls-files | grep -E "$regex_pattern" | head -10 >> "$TEMP_FILES"
-    fi
-
+    # 处理特定文件模式
+    case "$line" in
+        *.log)
+            git ls-files | grep "\.log$" >> "$TEMP_FILES"
+            ;;
+        .env*)
+            git ls-files | grep "^\\.env" >> "$TEMP_FILES"
+            ;;
+        *.tmp)
+            git ls-files | grep "\\.tmp$" >> "$TEMP_FILES"
+            ;;
+        .DS_Store)
+            git ls-files | grep "\\.DS_Store$" >> "$TEMP_FILES"
+            ;;
+        package-lock.json)
+            git ls-files | grep "package-lock\\.json$" >> "$TEMP_FILES"
+            ;;
+        yarn.lock)
+            git ls-files | grep "yarn\\.lock$" >> "$TEMP_FILES"
+            ;;
+        pnpm-lock.yaml)
+            git ls-files | grep "pnpm-lock\\.yaml$" >> "$TEMP_FILES"
+            ;;
+        coverage/)
+            git ls-files | grep "^coverage/" >> "$TEMP_FILES"
+            ;;
+        .cache)
+            git ls-files | grep "^\\.cache" >> "$TEMP_FILES"
+            ;;
+    esac
 done < .gitignore
 
 # 去重
@@ -69,7 +100,8 @@ echo ""
 
 # 显示将要移除的文件
 if [ -s "$TEMP_FILES" ]; then
-    echo "以下文件将被从 Git 跟踪中移除（但不会删除本地文件）："
+    file_count=$(wc -l < "$TEMP_FILES")
+    echo "找到 $file_count 个文件将被从 Git 跟踪中移除（但不会删除本地文件）："
     echo "---------------------------------------------------"
     cat "$TEMP_FILES"
     echo "---------------------------------------------------"
@@ -82,13 +114,18 @@ if [ -s "$TEMP_FILES" ]; then
         echo ""
         echo "第三步：移除 Git 跟踪..."
 
-        # 移除文件跟踪
-        while IFS= read -r file; do
-            if [ -n "$file" ]; then
-                echo "移除跟踪: $file"
-                git rm --cached -r "$file" 2>/dev/null || echo "警告：无法移除 $file"
-            fi
-        done < "$TEMP_FILES"
+        # 使用 xargs 批量处理以提高效率
+        if command -v xargs >/dev/null 2>&1; then
+            xargs -I {} git rm --cached "{}" < "$TEMP_FILES"
+        else
+            # 如果没有 xargs，使用循环
+            while IFS= read -r file; do
+                if [ -n "$file" ]; then
+                    echo "移除跟踪: $file"
+                    git rm --cached -r "$file" 2>/dev/null || echo "警告：无法移除 $file"
+                fi
+            done < "$TEMP_FILES"
+        fi
 
         echo ""
         echo "操作完成！已从 Git 跟踪中移除匹配 .gitignore 的文件。"
@@ -105,7 +142,7 @@ else
 fi
 
 # 清理临时文件
-rm -f "$TEMP_FILES" "$TEMP_DIRS"
+rm -f "$TEMP_FILES"
 
 echo ""
 echo "脚本执行完成。"

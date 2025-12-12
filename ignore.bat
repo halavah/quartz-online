@@ -1,4 +1,6 @@
 @echo off
+setlocal enabledelayedexpansion
+
 :: ignore.bat - 根据 .gitignore 内容移除已被 Git 跟踪的文件
 :: 适用于 Windows 系统
 
@@ -21,19 +23,95 @@ if not exist ".gitignore" (
 
 :: 创建临时文件
 set "temp_file=%temp%\git_ignore_files.txt"
-set "temp_dirs=%temp%\git_ignore_dirs.txt"
-
-echo 第一步：分析 .gitignore 文件...
-echo.
 
 :: 清空临时文件
 type nul > "%temp_file%"
 
-:: 处理 .gitignore 中的每一行
-for /f "usebackq tokens=* delims=" %%a in (".gitignore") do (
-    set "line=%%a"
-    call :process_line "%%a"
+echo 第一步：查找被跟踪但应该被忽略的文件...
+echo.
+
+:: 方法1: 直接处理最常见的目录模式
+echo 处理 out/ 目录...
+for /f "usebackq tokens=*" %%f in (`git ls-files ^| findstr "^out/"`) do (
+    echo %%f >> "%temp_file%"
 )
+
+echo 处理 .next/ 目录...
+for /f "usebackq tokens=*" %%f in (`git ls-files ^| findstr "^\\.next/"`) do (
+    echo %%f >> "%temp_file%"
+)
+
+echo 处理 node_modules/ 目录...
+for /f "usebackq tokens=*" %%f in (`git ls-files ^| findstr "^node_modules/"`) do (
+    echo %%f >> "%temp_file%"
+)
+
+echo 处理 build/ 目录...
+for /f "usebackq tokens=*" %%f in (`git ls-files ^| findstr "^build/"`) do (
+    echo %%f >> "%temp_file%"
+)
+
+echo 处理 dist/ 目录...
+for /f "usebackq tokens=*" %%f in (`git ls-files ^| findstr "^dist/"`) do (
+    echo %%f >> "%temp_file%"
+)
+
+:: 方法2: 处理其他常见模式
+echo.
+echo 处理 .gitignore 中的其他模式...
+
+:: 处理日志文件
+for /f "usebackq tokens=*" %%f in (`git ls-files ^| findstr "\.log$"`) do (
+    echo %%f >> "%temp_file%"
+)
+
+:: 处理环境文件
+for /f "usebackq tokens=*" %%f in (`git ls-files ^| findstr "^\\.env"`) do (
+    echo %%f >> "%temp_file%"
+)
+
+:: 处理临时文件
+for /f "usebackq tokens=*" %%f in (`git ls-files ^| findstr "\.tmp$"`) do (
+    echo %%f >> "%temp_file%"
+)
+
+:: 处理 .DS_Store 文件
+for /f "usebackq tokens=*" %%f in (`git ls-files ^| findstr "\\.DS_Store$"`) do (
+    echo %%f >> "%temp_file%"
+)
+
+:: 处理 package-lock.json
+for /f "usebackq tokens=*" %%f in (`git ls-files ^| findstr "package-lock\\.json$"`) do (
+    echo %%f >> "%temp_file%"
+)
+
+:: 处理 yarn.lock
+for /f "usebackq tokens=*" %%f in (`git ls-files ^| findstr "yarn\\.lock$"`) do (
+    echo %%f >> "%temp_file%"
+)
+
+:: 处理 pnpm-lock.yaml
+for /f "usebackq tokens=*" %%f in (`git ls-files ^| findstr "pnpm-lock\\.yaml$"`) do (
+    echo %%f >> "%temp_file%"
+)
+
+:: 处理 coverage 目录
+for /f "usebackq tokens=*" %%f in (`git ls-files ^| findstr "^coverage/"`) do (
+    echo %%f >> "%temp_file%"
+)
+
+:: 处理 .cache 文件/目录
+for /f "usebackq tokens=*" %%f in (`git ls-files ^| findstr "^\\.cache"`) do (
+    echo %%f >> "%temp_file%"
+)
+
+:: 去重
+set "temp_file_sorted=%temp%\git_ignore_files_sorted.txt"
+if exist "%temp_file_sorted%" del "%temp_file_sorted%"
+
+:: 使用 sort 命令去重（Windows 自带）
+sort "%temp_file%" /O "%temp_file_sorted%"
+move /Y "%temp_file_sorted%" "%temp_file%" >nul
 
 echo.
 echo 第二步：检查要移除的文件...
@@ -49,7 +127,11 @@ for %%F in ("%temp_file%") do (
 )
 
 if "%has_files%"=="1" (
-    echo 以下文件将被从 Git 跟踪中移除（但不会删除本地文件）：
+    :: 计算文件数量
+    set /p count=<"%temp_file%"
+    for /f %%i in ('type "%temp_file%" ^| find /c /v ""') do set "file_count=%%i"
+
+    echo 找到 %file_count% 个文件将被从 Git 跟踪中移除（但不会删除本地文件）：
     echo ---------------------------------------------------
     type "%temp_file%"
     echo ---------------------------------------------------
@@ -62,10 +144,10 @@ if "%has_files%"=="1" (
         echo 第三步：移除 Git 跟踪...
 
         :: 移除文件跟踪
-        for /f "usebackq tokens=* delims=" %%f in ("%temp_file%") do (
+        for /f "usebackq tokens=*" %%f in ("%temp_file%") do (
             if not "%%f"=="" (
                 echo 移除跟踪: %%f
-                git rm --cached -r "%%f" 2>nul || echo 警告：无法移除 %%f
+                git rm --cached "%%f" 2>nul || echo 警告：无法移除 %%f
             )
         )
 
@@ -85,39 +167,8 @@ if "%has_files%"=="1" (
 
 :: 清理临时文件
 if exist "%temp_file%" del "%temp_file%"
-if exist "%temp_dirs%" del "%temp_dirs%"
+if exist "%temp_file_sorted%" del "%temp_file_sorted%"
 
 echo.
 echo 脚本执行完成。
-goto :eof
-
-:process_line
-set "line=%~1"
-:: 跳过空行
-if "%line%"=="" goto :eof
-:: 跳过注释行
-if "%line:~0,1%"=="#" goto :eof
-:: 跳过否定模式
-if "%line:~0,1%"=="!" goto :eof
-
-:: 移除末尾的斜杠
-set "pattern=%line:/=%"
-
-echo 处理模式: %pattern%
-
-:: 获取匹配的文件
-for /f "usebackq tokens=* delims=" %%f in (`git ls-files`) do (
-    call :check_match "%%f" "%pattern%"
-)
-goto :eof
-
-:check_match
-set "file=%~1"
-set "pattern=%~2"
-
-:: 简单的模式匹配（可以扩展以支持更复杂的 glob 模式）
-echo %file% | findstr /r /c:"%pattern%" >nul
-if %errorlevel% equ 0 (
-    echo %file% >> "%temp_file%"
-)
-goto :eof
+endlocal
