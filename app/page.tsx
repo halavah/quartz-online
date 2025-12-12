@@ -9,19 +9,6 @@ import Navbar from './components/Navbar';
 export default function Home() {
   const { config, articles } = articlesData;
 
-  // 主题切换 - 从localStorage读取或默认为dark
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-  const [mounted, setMounted] = useState(false);
-
-  // 初始化主题
-  useEffect(() => {
-    setMounted(true);
-    const savedTheme = localStorage.getItem('theme') as 'dark' | 'light' | null;
-    const initialTheme = savedTheme || 'dark';
-    setTheme(initialTheme);
-    document.documentElement.setAttribute('data-theme', initialTheme);
-  }, []);
-
   // 搜索功能
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
@@ -49,15 +36,15 @@ export default function Home() {
     return counts;
   }, [articles]);
 
-  // 文章筛选和排序（使用 useMemo 优化性能）
+  // 文章筛选和排序
   const filteredArticles = useMemo(() => {
     return articles.filter((article: any) => {
-      // 搜索匹配（标题或描述）- 使用防抖后的搜索词
+      // 搜索匹配（标题或描述）
       const matchesSearch = debouncedSearchQuery.trim() === '' ||
         article.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
         article.description.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
 
-      // 分类匹配 - 直接使用 article.category 字段
+      // 分类匹配
       const articleCategory = article.category || '开发工具';
       const matchesCategory = selectedCategory === '全部' || articleCategory === selectedCategory;
 
@@ -84,84 +71,52 @@ export default function Home() {
     setCurrentPage(1);
   }, [selectedCategory, debouncedSearchQuery]);
 
+  // 处理搜索回调
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--dark-bg)', transition: 'background-color 0.3s ease' }}>
-      {/* 顶部导航栏 */}
-      <Navbar siteName={config.siteName} githubUrl={(config as any).githubUrl} />
+      {/* 导航栏 */}
+      <Navbar
+        siteName={config.siteName}
+        githubUrl={(config as any).githubUrl}
+        showSearch={true}
+        onSearch={handleSearch}
+      />
 
-      {/* 搜索区域 */}
-      <div className="max-w-7xl mx-auto px-6 pt-6">
-        <input
-          type="text"
-          placeholder="搜索文章标题或描述..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-          style={{
-            background: 'var(--card-bg)',
-            border: '1px solid var(--border-color)',
-            color: 'var(--text-color)'
-          }}
-        />
-        {searchQuery && (
-          <div className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-            找到 {filteredArticles.length} 篇相关文章
-          </div>
-        )}
-      </div>
-
-      {/* Hero 区�� */}
-      <section className="relative overflow-hidden py-20" style={{
-        background: 'linear-gradient(135deg, rgba(0, 102, 255, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%)'
-      }}>
-        {/* 网格背景 */}
-        <div className="absolute inset-0 opacity-20" style={{
-          backgroundImage: 'linear-gradient(var(--border-color) 1px, transparent 1px), linear-gradient(90deg, var(--border-color) 1px, transparent 1px)',
-          backgroundSize: '50px 50px'
-        }} />
-
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="text-center">
-            <h1 className="text-5xl md:text-6xl font-black mb-6" style={{
-              background: 'var(--gradient-primary)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}>
-              关于我们
-            </h1>
-            <p className="text-xl md:text-2xl" style={{ color: 'var(--text-secondary)' }}>
-              {config.siteDescription}
-            </p>
-          </div>
+      {/* Hero */}
+      <section className="py-20" style={{ background: 'linear-gradient(135deg, rgba(0, 102, 255, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%)' }}>
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <h1 className="text-5xl font-black mb-4" style={{
+            background: 'var(--gradient-primary)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}>技术分享平台</h1>
+          <p className="text-xl" style={{ color: 'var(--text-secondary)' }}>{config.siteDescription}</p>
         </div>
       </section>
 
-      {/* 主内容区 */}
+      {/* 分类筛选 + 文章列表 */}
       <main className="max-w-7xl mx-auto px-6 py-12">
-        {/* 分类筛选栏 */}
-        <div className="mb-10">
-          <div className="flex flex-wrap gap-3 justify-center">
-            {categories.map(category => {
-              const count = categoryCounts[category] || 0;
-              const isActive = selectedCategory === category;
-              return (
-                <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className="px-6 py-2 rounded-full font-medium transition-all hover:scale-105"
-                  style={{
-                    background: isActive ? 'var(--gradient-primary)' : 'var(--card-bg)',
-                    border: `1px solid ${isActive ? 'transparent' : 'var(--border-color)'}`,
-                    color: isActive ? 'white' : 'var(--text-secondary)',
-                    boxShadow: isActive ? '0 5px 15px rgba(0, 102, 255, 0.3)' : 'none'
-                  }}
-                >
-                  {category} ({count})
-                </button>
-              );
-            })}
-          </div>
+        {/* 分类筛选 */}
+        <div className="flex flex-wrap gap-3 justify-center mb-10">
+          {categories.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className="px-6 py-2 rounded-full font-medium transition-all hover:scale-105"
+              style={{
+                background: selectedCategory === cat ? 'var(--gradient-primary)' : 'var(--card-bg)',
+                border: `1px solid ${selectedCategory === cat ? 'transparent' : 'var(--border-color)'}`,
+                color: selectedCategory === cat ? 'white' : 'var(--text-secondary)',
+                boxShadow: selectedCategory === cat ? '0 5px 15px rgba(0, 102, 255, 0.3)' : 'none'
+              }}
+            >
+              {cat} ({categoryCounts[cat] || 0})
+            </button>
+          ))}
         </div>
 
         {/* 文章网格 */}
@@ -290,87 +245,6 @@ export default function Home() {
           </div>
         )}
       </main>
-
-      {/* 页脚 */}
-      <footer style={{
-        background: 'var(--card-bg)',
-        borderTop: '1px solid var(--border-color)',
-        marginTop: '5rem'
-      }}>
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* 关于我们 */}
-            <div>
-              <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--text-color)' }}>
-                关于我们
-              </h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.7 }}>
-                {config.siteDescription}
-              </p>
-            </div>
-
-            {/* 快速链接 */}
-            <div>
-              <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--text-color)' }}>
-                快速链接
-              </h3>
-              <ul className="space-y-2">
-                {['首页', '文章', '分类', '关于'].map(item => (
-                  <li key={item}>
-                    <Link href="/" className="hover:text-blue-400 transition-colors" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                      {item}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* 资源 */}
-            <div>
-              <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--text-color)' }}>
-                资源
-              </h3>
-              <ul className="space-y-2">
-                {['文档', 'API', '社区', '博客'].map(item => (
-                  <li key={item}>
-                    <Link href="/" className="hover:text-blue-400 transition-colors" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                      {item}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* 关注我们 */}
-            <div>
-              <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--text-color)' }}>
-                关注我们
-              </h3>
-              <div className="flex gap-4">
-                <a href={(config as any).githubUrl} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors" style={{ color: 'var(--text-secondary)' }}>
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path fillRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" clipRule="evenodd" />
-                  </svg>
-                </a>
-                <a href="#" className="hover:text-blue-400 transition-colors" style={{ color: 'var(--text-secondary)' }}>
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                  </svg>
-                </a>
-              </div>
-            </div>
-          </div>
-
-          {/* 版权信息 */}
-          <div className="mt-12 pt-8 text-center" style={{
-            borderTop: '1px solid var(--border-color)',
-            color: 'var(--text-secondary)',
-            fontSize: '0.85rem'
-          }}>
-            <p>© 2025 {config.siteName}. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

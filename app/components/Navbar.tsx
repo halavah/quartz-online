@@ -7,12 +7,15 @@ import { usePathname } from 'next/navigation';
 interface NavbarProps {
   siteName: string;
   githubUrl?: string;
+  onSearch?: (query: string) => void;
+  showSearch?: boolean;
 }
 
-export default function Navbar({ siteName, githubUrl }: NavbarProps) {
+export default function Navbar({ siteName, githubUrl, onSearch, showSearch = false }: NavbarProps) {
   const pathname = usePathname();
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [mounted, setMounted] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // 初始化主题
   useEffect(() => {
@@ -37,6 +40,15 @@ export default function Navbar({ siteName, githubUrl }: NavbarProps) {
       return pathname === '/';
     }
     return pathname?.startsWith(path);
+  };
+
+  // 处理搜索输入变化
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    if (onSearch) {
+      onSearch(value);
+    }
   };
 
   return (
@@ -93,6 +105,24 @@ export default function Navbar({ siteName, githubUrl }: NavbarProps) {
 
           {/* 右侧工具栏 */}
           <div className="flex items-center gap-4">
+            {/* 搜索框 - 仅在首页显示 */}
+            {showSearch && (
+              <div className="hidden md:block relative">
+                <input
+                  type="text"
+                  placeholder="搜索文章标题或描述..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  className="w-64 px-4 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  style={{
+                    background: 'var(--card-bg)',
+                    border: '1px solid var(--border-color)',
+                    color: 'var(--text-color)'
+                  }}
+                />
+              </div>
+            )}
+
             {/* GitHub 链接 */}
             <a
               href={githubUrl || "https://github.com/halavah"}
