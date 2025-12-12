@@ -31,7 +31,7 @@ export default function CategoriesPage() {
               <Link href="/" className="text-sm hover:text-blue-400 transition-colors" style={{ color: 'var(--text-secondary)' }}>首页</Link>
               <Link href="/articles" className="text-sm hover:text-blue-400 transition-colors" style={{ color: 'var(--text-secondary)' }}>文章</Link>
               <Link href="/categories" className="text-sm hover:text-blue-400 transition-colors" style={{ color: 'var(--text-color)' }}>分类</Link>
-              <Link href="/about" className="text-sm hover:text-blue-400 transition-colors" style={{ color: 'var(--text-secondary)' }}>��于</Link>
+              <Link href="/about" className="text-sm hover:text-blue-400 transition-colors" style={{ color: 'var(--text-secondary)' }}>关于</Link>
             </div>
           </div>
         </div>

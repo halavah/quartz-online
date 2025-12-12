@@ -3,7 +3,47 @@
 @tailwind utilities;
 
 :root {
-  /* 深色科技风格变量 */
+  /* 深色科技风格变量 (默认) */
+  --primary-color: #0066ff;
+  --secondary-color: #00d4ff;
+  --accent-color: #ff6b00;
+  --dark-bg: #0a0e27;
+  --card-bg: #1a1f3a;
+  --text-color: #e8eaed;
+  --text-secondary: #9aa0a6;
+  --border-color: #2a2f4a;
+  --success-color: #00c853;
+  --warning-color: #ff9800;
+  --info-color: #0ea5e9;
+  --error-color: #ef4444;
+  --gradient-primary: linear-gradient(135deg, #0066ff 0%, #00d4ff 100%);
+  --gradient-hero: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+  --shadow-glow: 0 0 30px rgba(0, 102, 255, 0.3);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* 明亮主题 */
+[data-theme="light"] {
+  --primary-color: #0066ff;
+  --secondary-color: #00a8e8;
+  --accent-color: #ff6b00;
+  --dark-bg: #ffffff;
+  --card-bg: #f8f9fa;
+  --text-color: #1a202c;
+  --text-secondary: #64748b;
+  --border-color: #e2e8f0;
+  --success-color: #00c853;
+  --warning-color: #ff9800;
+  --info-color: #0ea5e9;
+  --error-color: #ef4444;
+  --gradient-primary: linear-gradient(135deg, #0066ff 0%, #00a8e8 100%);
+  --gradient-hero: linear-gradient(135deg, #f8f9fa 0%, #e8eaed 50%, #f8f9fa 100%);
+  --shadow-glow: 0 0 30px rgba(0, 102, 255, 0.2);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* 暗色主题 */
+[data-theme="dark"] {
   --primary-color: #0066ff;
   --secondary-color: #00d4ff;
   --accent-color: #ff6b00;
