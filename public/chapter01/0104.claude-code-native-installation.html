@@ -285,6 +285,42 @@
             }
         }
 
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+        }
+
+        .back-to-top:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .back-to-top.show {
+            display: flex;
+        }
+
+        .back-to-top svg {
+            width: 16px;
+            height: 16px;
+        }
+
         @media (max-width: 768px) {
             .hero-title {
                 font-size: 2rem;
@@ -297,10 +333,25 @@
             .main-content {
                 padding: 2rem 1rem;
             }
+
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 16px;
+                font-size: 13px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Back to top button -->
+    <button class="back-to-top" id="backToTop">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 15l-6-6-6 6"/>
+        </svg>
+        <span>返回顶部</span>
+    </button>
+
     <div class="hero-section">
         <div class="hero-container">
             <h1 class="hero-title">Claude Code 原生安装完全指南</h1>
@@ -311,17 +362,42 @@
     <div class="main-content">
         <div class="content-wrapper">
         <section id="overview" class="section">
-            <h2 class="section-title">原生安装概述</h2>
-            <p class="section-description">Claude Code 原生版本是使用 Bun 编译器将整个应用打包成单一可执行文件的全新安装方式。它彻底摆脱了对 Node.js 运行时的依赖，提供了更快、更轻量的使用体验。</p>
+            <h2 class="section-title">什么是原生安装？</h2>
+            <p class="section-description">Claude Code 原生安装是使用 Bun 编译器将整个应用打包成单一可执行文件的全新安装方式。它彻底摆脱了对 Node.js 运行时的依赖，提供了更快、更轻量的使用体验。</p>
 
             <div class="card">
                 <h4>核心优势</h4>
                 <ul class="list">
-                    <li><strong>零依赖</strong>：无需安装 Node.js 或任何运行时环境</li>
-                    <li><strong>极速启动</strong>：启动时间从 2-3 秒缩短至 0.5-0.7 秒</li>
-                    <li><strong>资源优化</strong>：内存占用减少 30-50%，体积缩小 90% 以上</li>
-                    <li><strong>部署简单</strong>：单文件部署，特别适合服务器和 CI/CD 环境</li>
+                    <li><strong>无需 Node.js</strong>：不再需要安装 Node.js 和 npm，降低了入门门槛，避免了版本兼容问题</li>
+                    <li><strong>单一可执行文件</strong>：使用 Bun 编译成自包含的原生二进制文件，包含完整运行时，无需任何外部依赖</li>
+                    <li><strong>极速启动</strong>：启动时间从 2-3 秒缩短至 0.5-0.7 秒，提升 4 倍</li>
+                    <li><strong>资源优化</strong>：基于 JavaScriptCore 引擎，优先优化启动时间和内存占用，特别适合 CLI 工具</li>
+                    <li><strong>稳定的自动更新</strong>：改进的自动更新机制，后台下载安装，无需手动干预</li>
+                    <li><strong>全平台支持</strong>：支持 macOS、Linux、Windows（WSL/Git Bash），一次编译，到处运行</li>
+                    <li><strong>更安全可靠</strong>：避免 npm 权限问题和安全风险，提供更稳定的运行环境</li>
                 </ul>
+            </div>
+
+            <div class="card">
+                <h4>技术实现：从 TypeScript 到原生二进制</h4>
+                <p class="section-description">使用 Bun 将 TypeScript 代码编译成单一可执行文件的过程：</p>
+                <ol class="list">
+                    <li><strong>转译 TypeScript</strong>：将 TypeScript 代码转译成 JavaScript</li>
+                    <li><strong>字节码编译</strong>：使用 <code>--bytecode</code> 标志预编译成 JavaScriptCore 字节码</li>
+                    <li><strong>打包依赖</strong>：将所有 npm 包和代码打包进来</li>
+                    <li><strong>嵌入运行时</strong>：将完整的 Bun 运行时（基于 JavaScriptCore）一起打包</li>
+                    <li><strong>生成二进制</strong>：输出平台原生的自包含可执行文件</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <div class="code-block">
+                    <code># 使用 Bun 编译成单一可执行文件
+bun build --compile --bytecode ./src/index.ts --outfile claude
+
+# 生成的文件是完全自包含的
+./claude --version</code>
+                </div>
             </div>
         </section>
 
@@ -355,7 +431,8 @@
         </section>
 
         <section id="installation-methods" class="section">
-            <h2 class="section-title">安装方法</h2>
+            <h2 class="section-title">安装指南</h2>
+            <p class="section-description">选择适合你的操作系统的安装方式</p>
 
             <h3 class="section-subtitle">方法一：官方安装脚本（推荐）</h3>
             <p class="section-description">适用于所有平台，自动检测系统并下载对应版本</p>
@@ -365,6 +442,7 @@
                 <div class="code-block">
                     <code>irm https://claude.ai/install.ps1 | iex</code>
                 </div>
+                <p class="section-description">⚠️ 注意：Windows 需要先安装 Git Bash</p>
             </div>
 
             <div class="card">
@@ -384,7 +462,99 @@
                 </ul>
             </div>
 
-            <h3 class="section-subtitle">方法二：手动下载安装</h3>
+            <h3 class="section-subtitle">方法二：Windows 详细安装步骤</h3>
+            <div class="card">
+                <h4>步骤 1：安装 Git Bash（前置要求）</h4>
+                <p class="section-description">Claude Code 在 Windows 上需要 Git Bash 才能运行。请先下载安装：</p>
+                <div class="code-block">
+                    <code>下载地址：https://git-scm.com/downloads/win</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>步骤 2：使用 CMD 安装</h4>
+                <div class="code-block">
+                    <code>curl -fsSL https://claude.ai/install.cmd -o install.cmd
+install.cmd</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>步骤 3：配置环境变量 PATH</h4>
+                <p class="section-description">安装完成后，需要手动添加到系统 PATH：</p>
+                <ol class="list">
+                    <li>按 <code>Win + R</code>，输入 <code>sysdm.cpl</code>，回车</li>
+                    <li>点击"高级"标签，然后点击"环境变量"</li>
+                    <li>在"用户变量"中，找到 <code>Path</code>，点击"编辑"</li>
+                    <li>点击"新建"，添加：<code>C:\Users\你的用户名\.local\bin</code></li>
+                    <li>确定保存，重启 CMD 或 Git Bash</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h4>步骤 4：配置 API 环境变量</h4>
+                <p class="section-description">在"环境变量"窗口中，点击"新建"添加以下三个变量：</p>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>变量名</th>
+                                <th>值</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ANTHROPIC_BASE_URL</td>
+                                <td>https://api.claudecode.net.cn/api/claudecode</td>
+                            </tr>
+                            <tr>
+                                <td>ANTHROPIC_API_KEY</td>
+                                <td>sk-ant-api03-你的密钥</td>
+                            </tr>
+                            <tr>
+                                <td>ANTHROPIC_AUTH_TOKEN</td>
+                                <td>sk-ant-api03-你的密钥</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="note">
+                    <strong>或者使用配置文件：</strong>创建文件 <code>%USERPROFILE%\.claude\settings.json</code>，内容如下：
+                    <div class="code-block">
+                        <code>{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.claudecode.net.cn/api/claudecode",
+    "ANTHROPIC_API_KEY": "sk-ant-api03-pbKM2cfaKU******",
+    "ANTHROPIC_AUTH_TOKEN": "sk-ant-api03-pbKM2cfaKU******"
+  }
+}</code>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="section-subtitle">从 Node.js 版本迁移</h3>
+            <p class="section-description">一条命令完成迁移，保留所有配置和设置</p>
+
+            <div class="card">
+                <h4>自动迁移</h4>
+                <p class="section-description">如果你之前通过 npm 安装了 Claude Code，迁移到原生安装非常简单。运行以下命令会自动检测当前安装，并将其迁移到原生二进制版本：</p>
+                <div class="code-block">
+                    <code># 自动迁移命令
+claude --migrate-to-native</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>迁移会保留的内容</h4>
+                <ul class="list">
+                    <li><strong>API Keys</strong>：所有已配置的 API 密钥将被保留</li>
+                    <li><strong>自定义配置</strong>：settings.json 中的所有配置项</li>
+                    <li><strong>Subagents 定义</strong>：自定义的子代理配置</li>
+                    <li><strong>Slash Commands</strong>：自定义的斜杠命令</li>
+                </ul>
+            </div>
+
+            <h3 class="section-subtitle">方法三：手动下载安装</h3>
             <p class="section-description">适用于需要特定版本或离线安装的场景</p>
 
             <div class="card">
@@ -723,7 +893,52 @@ claude pr</code>
             <h2 class="section-title">常见问题</h2>
 
             <div class="card">
-                <h4>Q1: Windows 显示安全警告</h4>
+                <h4>Q1: 原生安装是如何工作的？</h4>
+                <p><strong>回答</strong>：使用 Bun 的 <code>--compile</code> 功能将 TypeScript 代码、所有依赖和 Bun 运行时打包成单一的原生可执行文件。类似于 Go 或 Rust 编译出来的二进制文件。</p>
+            </div>
+
+            <div class="card">
+                <h4>Q2: 为什么启动速度更快？</h4>
+                <p><strong>回答</strong>：Bun 使用 Apple 的 JavaScriptCore 引擎（Safari 的 JS 引擎），优先优化启动时间和内存占用。而 Node.js 使用 V8 引擎，更注重长时间运行的性能。</p>
+            </div>
+
+            <div class="card">
+                <h4>Q3: 需要卸载 Node.js 吗？</h4>
+                <p><strong>回答</strong>：不需要。原生安装的 Claude Code 完全独立运行，不会影响系统中的 Node.js。你可以继续使用 Node.js 进行其他开发工作。</p>
+            </div>
+
+            <div class="card">
+                <h4>Q4: Alpine Linux 支持吗？</h4>
+                <p><strong>回答</strong>：Alpine Linux 使用 musl libc，而原生版本基于 glibc，因此不支持。建议使用 Ubuntu、Debian、CentOS 等主流发行版。</p>
+            </div>
+
+            <div class="card">
+                <h4>Q5: 如何验证安装类型？</h4>
+                <p><strong>回答</strong>：运行 <code>claude doctor</code> 命令可以检查你的安装类型、版本和系统配置。</p>
+            </div>
+
+            <div class="card">
+                <h4>Q6: 可以回退到 npm 版本吗？</h4>
+                <p><strong>回答</strong>：可以，但不推荐。你可以卸载原生版本后重新使用 <code>npm install -g @anthropic-ai/claude-code</code> 安装。</p>
+            </div>
+
+            <div class="card">
+                <h4>Q7: Windows 安装后提示找不到 claude 命令？</h4>
+                <p><strong>解决</strong>：需要将 <code>C:\Users\你的用户名\.local\bin</code> 添加到系统 PATH 环境变量中。可以使用 PowerShell 命令一键配置，或通过"系统属性 → 环境变量"手动添加。</p>
+            </div>
+
+            <div class="card">
+                <h4>Q8: Windows 上需要 Git Bash 吗？</h4>
+                <p><strong>回答</strong>：是的。原生版本在 Windows 上通过 Git Bash 运行，因为提供了更好的 Unix 兼容性。安装 Git for Windows 后会自动包含 Git Bash。</p>
+            </div>
+
+            <div class="card">
+                <h4>Q9: 如何配置中转 API？</h4>
+                <p><strong>回答</strong>：设置三个环境变量：<code>ANTHROPIC_BASE_URL</code>（中转地址）、<code>ANTHROPIC_API_KEY</code> 和 <code>ANTHROPIC_AUTH_TOKEN</code>（API 密钥）。也可以在 <code>~/.claude/settings.json</code> 中配置。</p>
+            </div>
+
+            <div class="card">
+                <h4>Q10: Windows 显示安全警告</h4>
                 <p><strong>问题</strong>：运行 .exe 文件时 Windows Defender 提示安全风险</p>
                 <p><strong>解决</strong>：</p>
                 <ul class="list">
@@ -734,7 +949,7 @@ claude pr</code>
             </div>
 
             <div class="card">
-                <h4>Q2: Linux/macOS 权限被拒绝</h4>
+                <h4>Q11: Linux/macOS 权限被拒绝</h4>
                 <p><strong>问题</strong>：执行 claude 命令时提示 permission denied</p>
                 <p><strong>解决</strong>：</p>
                 <div class="code-block">
@@ -743,30 +958,7 @@ claude pr</code>
             </div>
 
             <div class="card">
-                <h4>Q3: 命令找不到</h4>
-                <p><strong>问题</strong>：输入 claude 命令提示 command not found</p>
-                <p><strong>解决</strong>：</p>
-                <ul class="list">
-                    <li>确认安装路径已添加到 PATH</li>
-                    <li>Windows: 检查 <code>%USERPROFILE%\.local\bin</code></li>
-                    <li>macOS/Linux: 检查 <code>~/.local/bin</code></li>
-                    <li>重新打开终端</li>
-                </ul>
-            </div>
-
-            <div class="card">
-                <h4>Q4: API 认证失败</h4>
-                <p><strong>问题</strong>：运行时提示认证错误</p>
-                <p><strong>解决</strong>：</p>
-                <ul class="list">
-                    <li>检查 API Key 是否正确（以 sk-ant-api03- 开头）</li>
-                    <li>确认环境变量或配置文件已设置</li>
-                    <li>运行 <code>claude doctor</code> 检查配置</li>
-                </ul>
-            </div>
-
-            <div class="card">
-                <h4>Q5: 自动更新失败</h4>
+                <h4>Q12: 自动更新失败</h4>
                 <p><strong>问题</strong>：claude update 命令执行失败</p>
                 <p><strong>解决</strong>：</p>
                 <ul class="list">
@@ -915,9 +1107,9 @@ claude</code>
         <aside class="toc-sidebar">
             <h3>📋 目录</h3>
             <ul>
-                <li><a href="#overview">原生安装概述</a></li>
+                <li><a href="#overview">什么是原生安装？</a></li>
                 <li><a href="#system-requirements">系统要求</a></li>
-                <li><a href="#installation-methods">安装方法</a></li>
+                <li><a href="#installation-methods">安装指南</a></li>
                 <li><a href="#configuration">配置说明</a></li>
                 <li><a href="#usage">使用指南</a></li>
                 <li><a href="#comparison">版本对比</a></li>
@@ -983,6 +1175,26 @@ claude</code>
 
     document.querySelectorAll('section[id]').forEach(section => {
         observer.observe(section);
+    });
+
+    // Back to top button functionality
+    const backToTop = document.getElementById('backToTop');
+
+    // Show/hide button based on scroll position
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            backToTop.classList.add('show');
+        } else {
+            backToTop.classList.remove('show');
+        }
+    });
+
+    // Smooth scroll to top when button is clicked
+    backToTop.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     });
     </script>
 </body>
