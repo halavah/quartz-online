@@ -39,13 +39,20 @@ npm run dev
 
 访问 [http://localhost:3000](http://localhost:3000) 查看网站。
 
-### 3. 构建静态网站
+### 3. 构建网站
 
 ```bash
+# 本地构建
 npm run build
+
+# 查看 Vercel 部署日志
+npm run vercel:logs
+
+# 生产环境部署（如果已登录 Vercel）
+npm run deploy
 ```
 
-生成的静态文件在 `out/` 目录。
+生成的静态文件在 `.next/` 目录。
 
 ## 📁 项目结构
 
