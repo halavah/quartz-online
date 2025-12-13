@@ -86,12 +86,12 @@ export default function Home() {
       {/* 分类筛选 + 文章列表 */}
       <main className="max-w-7xl mx-auto px-6 py-12">
         {/* 分类筛选 */}
-        <div className="flex flex-wrap gap-3 justify-center mb-10">
+        <div className="flex flex-wrap gap-2 sm:gap-3 justify-center mb-8 sm:mb-10">
           {categories.map(cat => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className="px-6 py-2 rounded-full font-medium transition-all hover:scale-105"
+              className="px-4 sm:px-6 py-1.5 sm:py-2 rounded-full font-medium text-sm sm:text-base transition-all hover:scale-105"
               style={{
                 background: selectedCategory === cat ? 'var(--gradient-primary)' : 'var(--card-bg)',
                 border: `1px solid ${selectedCategory === cat ? 'transparent' : 'var(--border-color)'}`,
@@ -105,7 +105,7 @@ export default function Home() {
         </div>
 
         {/* 视图切换和文章统计 */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 sm:mb-8">
           <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
             共找到 {filteredArticles.length} 篇文章
           </div>
@@ -144,7 +144,7 @@ export default function Home() {
         </div>
 
         {/* 文章网格/列表 */}
-        <div className={`${viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'} mb-12`}>
+        <div className={`${viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6' : 'space-y-3 sm:space-y-4'} mb-8 sm:mb-12`}>
           {currentArticles.length === 0 ? (
             <div className="col-span-full text-center py-20">
               <div className="text-7xl mb-6">🔍</div>
@@ -182,7 +182,7 @@ export default function Home() {
                       background: 'var(--card-bg)',
                       border: '1px solid var(--border-color)',
                       borderRadius: '1rem',
-                      padding: '2rem',
+                      padding: '1.5rem',
                       transition: 'all 0.3s ease',
                       position: 'relative',
                       overflow: 'hidden',
@@ -265,7 +265,7 @@ export default function Home() {
                     href={`/article/${article.htmlFile.replace('.html', '')}`}
                     className="block group"
                   >
-                    <div className="p-6 rounded-lg transition-all hover:scale-[1.02] hover:shadow-xl" style={{
+                    <div className="p-4 sm:p-6 rounded-lg transition-all hover:scale-[1.02] hover:shadow-xl" style={{
                       background: 'var(--card-bg)',
                       border: '1px solid var(--border-color)'
                     }}>

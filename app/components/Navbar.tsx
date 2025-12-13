@@ -91,7 +91,7 @@ export default function Navbar({ siteName, githubUrl, articles = [] }: NavbarPro
           </Link>
 
           {/* 右侧：导航链接 + 工具栏 */}
-          <div className="flex items-center gap-4 md:gap-6 flex-wrap">
+          <div className="flex items-center gap-2 sm:gap-4 md:gap-6 flex-wrap">
   
             {/* 广告横幅 - 可关闭 */}
             {bannerVisible && (
@@ -109,8 +109,8 @@ export default function Navbar({ siteName, githubUrl, articles = [] }: NavbarPro
                     boxShadow: '0 2px 10px rgba(255, 107, 0, 0.3)'
                   }}
                 >
-                  <span className="hidden sm:inline">🔥 限时优惠：Claude Code 正版授权，立享85折</span>
-                  <span className="sm:hidden">🔥 限时优惠85折</span>
+                  <span className="hidden sm:inline">🔥 Claude Code 85折</span>
+                  <span className="sm:hidden">🔥 85折</span>
                   <button
                     onClick={(e) => {
                       e.preventDefault();
@@ -141,11 +141,11 @@ export default function Navbar({ siteName, githubUrl, articles = [] }: NavbarPro
             }} />
 
             {/* 工具按钮组 */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
               {/* 搜索按钮 */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className="p-2 rounded-lg hover:bg-blue-500/10 transition-all"
+                className="p-2 sm:p-2.5 rounded-lg hover:bg-blue-500/10 transition-all"
                 style={{ color: 'var(--text-secondary)' }}
                 title="搜索文章"
               >
@@ -157,7 +157,7 @@ export default function Navbar({ siteName, githubUrl, articles = [] }: NavbarPro
               {/* 主题切换按钮 */}
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-lg hover:bg-blue-500/10 transition-all"
+                className="p-2 sm:p-2.5 rounded-lg hover:bg-blue-500/10 transition-all"
                 style={{ color: 'var(--text-secondary)' }}
                 title={theme === 'dark' ? '切换到明亮模式' : '切换到暗色模式'}
               >
@@ -173,7 +173,7 @@ export default function Navbar({ siteName, githubUrl, articles = [] }: NavbarPro
               </button>
 
               {/* 移动端菜单按钮 */}
-              <button className="md:hidden p-2 rounded-lg hover:bg-blue-500/10 transition-all" style={{ color: 'var(--text-secondary)' }}>
+              <button className="md:hidden p-2.5 rounded-lg hover:bg-blue-500/10 transition-all" style={{ color: 'var(--text-secondary)' }}>
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
