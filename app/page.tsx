@@ -5,6 +5,7 @@ import Link from 'next/link';
 import articlesData from '../data/articles.json';
 import Pagination from './components/Pagination';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
 export default function Home() {
   const { config, articles } = articlesData;
@@ -227,6 +228,9 @@ export default function Home() {
           </div>
         )}
       </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

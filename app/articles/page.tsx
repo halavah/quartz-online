@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useMemo } from 'react';
 import articlesData from '../../data/articles.json';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
 export default function ArticlesPage() {
   const { config, articles } = articlesData;
@@ -91,6 +92,9 @@ export default function ArticlesPage() {
           ))}
         </div>
       </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
