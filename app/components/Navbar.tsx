@@ -95,7 +95,7 @@ export default function Navbar({ siteName, githubUrl, articles = [] }: NavbarPro
   
             {/* 广告横幅 - 可关闭 */}
             {bannerVisible && (
-              <div className="animate-fade-in order-first lg:order-none w-full lg:w-auto mb-2 lg:mb-0">
+              <div className="animate-fade-in order-first lg:order-none w-full lg:w-auto mb-2 lg:mb-0 hidden md:block">
                 <a
                   href={articlesData.config.adLink}
                   target="_blank"

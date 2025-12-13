@@ -59,7 +59,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ htmlFi
           </Link>
 
           {/* Right: Ad space */}
-          <div className="flex-1 flex items-center justify-end">
+          <div className="flex-1 flex items-center justify-end hidden md:flex">
             <a
               href="https://api.nekoapi.com/"
               target="_blank"
