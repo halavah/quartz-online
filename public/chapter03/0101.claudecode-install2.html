@@ -1,0 +1,1110 @@
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #D4A27F;
+            --secondary-color: #EBDBBC;
+            --accent-color: #CB785C;
+            --background-color: #FDFDFB;
+            --text-color: #40403E;
+            --border-color: #E8E8E3;
+            --shadow-color: rgba(64, 64, 62, 0.1);
+            --code-bg: #1e293b;
+            --gradient-primary: linear-gradient(135deg, #D4A27F 0%, #CB785C 100%);
+            --gradient-secondary: linear-gradient(135deg, #EBDBBC 0%, #D4A27F 100%);
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            line-height: 1.7;
+            color: var(--text-color);
+            background: var(--background-color);
+        }
+
+        /* 英雄区域 */
+        .hero-section {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 4rem 0 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="60" fill="none"/><circle cx="30" cy="30" r="1.5" fill="rgba(255,255,255,0.1)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            max-width: 700px;
+        }
+
+        /* 主内容区域 - 两栏布局 */
+        .main-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: flex;
+            gap: 3rem;
+            position: relative;
+            background: var(--background-color);
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* 右侧目录导航 */
+        .toc-sidebar {
+            width: var(--sidebar-width);
+            flex-shrink: 0;
+            align-self: flex-start;
+        }
+
+        .toc-container {
+            position: sticky;
+            top: 2rem;
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .toc-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .toc-link {
+            display: block;
+            color: #666;
+            text-decoration: none;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .toc-link:hover {
+            background: #f8f9fa;
+            color: var(--accent-color);
+            padding-left: 1rem;
+        }
+
+        .toc-link.active {
+            background: var(--gradient-secondary);
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .toc-sublist {
+            list-style: none;
+            margin-left: 1rem;
+            margin-top: 0.25rem;
+        }
+
+        .toc-sublist .toc-link {
+            font-size: 0.85rem;
+            padding: 0.4rem 0.75rem;
+        }
+
+        /* 内容区块 */
+        .section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 2rem;
+            background: var(--background-color);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .section-subtitle {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 2rem 0 1rem;
+        }
+
+        .section-content {
+            line-height: 1.8;
+            color: #555;
+            background: transparent;
+        }
+
+        .main-content {
+            background: var(--background-color);
+        }
+
+        .section-content p {
+            margin-bottom: 1rem;
+        }
+
+        .section-content ul, .section-content ol {
+            margin: 1rem 0 1rem 2rem;
+            line-height: 2;
+        }
+
+        .section-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* 特性卡片 */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-color);
+        }
+
+        .feature-description {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* 代码块 */
+        .code-block {
+            background: var(--code-bg);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            margin: 1.5rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: #334155;
+            border-bottom: 1px solid #475569;
+        }
+
+        .code-title {
+            color: #e2e8f0;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .copy-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-color);
+        }
+
+        .code-content {
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .code-content pre {
+            margin: 0;
+            color: #e2e8f0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .code-content code {
+            color: #e2e8f0;
+        }
+
+        /* 提示框 */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            border-color: #0c5460;
+            color: #0c5460;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        /* 步骤列表 */
+        .step-list {
+            counter-reset: step-counter;
+            list-style: none;
+            margin: 2rem 0;
+        }
+
+        .step-item {
+            counter-increment: step-counter;
+            margin-bottom: 2rem;
+            padding-left: 3rem;
+            position: relative;
+        }
+
+        .step-item::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2rem;
+            height: 2rem;
+            background: var(--gradient-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .step-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-color);
+        }
+
+        .step-content {
+            color: #555;
+            line-height: 1.8;
+        }
+
+        /* 图片展示 */
+        .demo-image {
+            width: 100%;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            margin: 1.5rem 0;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-wrapper {
+                flex-direction: column-reverse;
+                padding: 2rem 1rem;
+                gap: 2rem;
+            }
+
+            .toc-sidebar {
+                width: 100%;
+            }
+
+            .toc-container {
+                position: static;
+                max-height: none;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 滚动条样式 */
+        .toc-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .toc-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .toc-container::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        .toc-container::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
+        }
+    </style>
+    <!-- 英雄区域 -->
+    <header class="hero-section">
+        <div class="hero-container">
+            <div class="hero-badge">📚 完整教程</div>
+            <h1 class="hero-title">Claude Code 安装教程</h1>
+            <p class="hero-subtitle">详细的图文指引，帮助你在 Windows、MacOS、Linux 平台快速安装和配置 Claude Code AI 编程助手</p>
+        </div>
+    </header>
+
+    <!-- 主内容区域 -->
+    <div class="main-wrapper">
+        <!-- 左侧主内容 -->
+        <main class="main-content">
+            <!-- 项目介绍 -->
+            <section id="intro" class="section">
+                <h2 class="section-title">项目介绍</h2>
+                <div class="section-content">
+                    <p>Claude Code 是 Anthropic 推出的命令行 AI 编程助手，它能够直接在终端中帮助你编写代码、调试问题、解释代码逻辑，并自动执行各种开发任务。</p>
+                    <p>与传统的代码编辑器插件不同，Claude Code 是一个独立的命令行工具，具有更强大的上下文理解能力和自主操作能力。它可以：</p>
+                    <ul>
+                        <li>理解整个项目的代码结构和上下文</li>
+                        <li>自动读取、编辑和创建文件</li>
+                        <li>执行命令行工具和脚本</li>
+                        <li>进行代码审查和重构建议</li>
+                        <li>生成测试用例和文档</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 效果演示 -->
+            <section id="demo" class="section">
+                <h2 class="section-title">效果演示</h2>
+                <div class="section-content">
+                    <p>Claude Code 的交互界面简洁直观，支持多轮对话和上下文保持。你可以自然地用中文或英文与它交流，就像和一个经验丰富的开发者结对编程一样。</p>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">💻</div>
+                            <h3 class="feature-title">命令行界面</h3>
+                            <p class="feature-description">原生终端体验，支持彩色输出和代码高亮，响应快速流畅。</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🎯</div>
+                            <h3 class="feature-title">智能补全</h3>
+                            <p class="feature-description">理解项目上下文，提供精准的代码建议和自动补全。</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🔍</div>
+                            <h3 class="feature-title">代码分析</h3>
+                            <p class="feature-description">深度分析代码结构，发现潜在问题并提供优化建议。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 特性 -->
+            <section id="features" class="section">
+                <h2 class="section-title">核心特性</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🚀</div>
+                        <h3 class="feature-title">快速启动</h3>
+                        <p class="feature-description">原生安装，启动速度快 4 倍，无需 Node.js 依赖。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <h3 class="feature-title">强大的 AI 能力</h3>
+                        <p class="feature-description">基于 Claude Sonnet 4.5 模型，理解复杂的编程任务。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔧</div>
+                        <h3 class="feature-title">自动化操作</h3>
+                        <p class="feature-description">可以自主执行文件操作、运行命令、安装依赖等。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📝</div>
+                        <h3 class="feature-title">多语言支持</h3>
+                        <p class="feature-description">支持主流编程语言，包括 Python、JavaScript、Go、Rust 等。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔐</div>
+                        <h3 class="feature-title">安全可控</h3>
+                        <p class="feature-description">所有文件操作需要确认，可配置安全策略和访问限制。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚙️</div>
+                        <h3 class="feature-title">高度可定制</h3>
+                        <p class="feature-description">支持自定义命令、配置文件、环境变量等个性化设置。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI 模型配置方法 -->
+            <section id="api-config" class="section">
+                <h2 class="section-title">AI 模型配置方法</h2>
+                <div class="section-content">
+                    <p>Claude Code 需要 Anthropic API Key 才能正常工作。你可以通过以下几种方式配置：</p>
+
+                    <h3 class="section-subtitle">方法一：环境变量配置（推荐）</h3>
+                    <p>在系统环境变量中设置 API Key，这是最常用的方法：</p>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">Linux / MacOS</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <div class="code-content">
+                            <pre><code># 在 ~/.bashrc 或 ~/.zshrc 中添加
+export ANTHROPIC_API_KEY="sk-ant-api03-your-api-key-here"
+export ANTHROPIC_BASE_URL="https://api.anthropic.com"  # 可选，使用中转服务时需要</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">Windows PowerShell</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <div class="code-content">
+                            <pre><code># 临时设置（当前会话有效）
+$env:ANTHROPIC_API_KEY="sk-ant-api03-your-api-key-here"
+
+# 永久设置（用户级别）
+[Environment]::SetEnvironmentVariable("ANTHROPIC_API_KEY", "sk-ant-api03-your-api-key-here", "User")</code></pre>
+                        </div>
+                    </div>
+
+                    <h3 class="section-subtitle">方法二：配置文件</h3>
+                    <p>在 Claude Code 配置目录中创建 <code>settings.json</code> 文件：</p>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">~/.claude/settings.json</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <div class="code-content">
+                            <pre><code>{
+  "env": {
+    "ANTHROPIC_API_KEY": "sk-ant-api03-your-api-key-here",
+    "ANTHROPIC_BASE_URL": "https://api.anthropic.com"
+  }
+}</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>💡 提示：</strong>如果你在中国大陆，可能需要使用 API 中转服务。将 <code>ANTHROPIC_BASE_URL</code> 设置为中转服务的地址即可。
+                    </div>
+                </div>
+            </section>
+
+            <!-- Windows 端图文指引 -->
+            <section id="windows-install" class="section">
+                <h2 class="section-title">Windows 端图文指引</h2>
+                <div class="section-content">
+                    <div class="alert alert-warning">
+                        <strong>⚠️ 重要提示：</strong>Claude Code 在 Windows 上需要 Git Bash 才能运行。请先确保安装了 Git for Windows。
+                    </div>
+
+                    <ol class="step-list">
+                        <li class="step-item">
+                            <h3 class="step-title">安装 Git for Windows</h3>
+                            <div class="step-content">
+                                <p>访问 <a href="https://git-scm.com/downloads/win" target="_blank" style="color: var(--accent-color);">https://git-scm.com/downloads/win</a> 下载最新版本的 Git for Windows。</p>
+                                <p>运行安装程序，保持默认选项即可。安装完成后，你将拥有 Git Bash 终端环境。</p>
+                            </div>
+                        </li>
+
+                        <li class="step-item">
+                            <h3 class="step-title">使用 PowerShell 安装 Claude Code</h3>
+                            <div class="step-content">
+                                <p>以管理员身份打开 PowerShell，运行以下命令：</p>
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">PowerShell 安装命令</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code># 安装最新稳定版本
+irm https://claude.ai/install.ps1 | iex
+
+# 或安装指定版本
+& ([scriptblock]::Create((irm https://claude.ai/install.ps1))) 1.0.58</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="step-item">
+                            <h3 class="step-title">配置环境变量 PATH</h3>
+                            <div class="step-content">
+                                <p>安装完成后，需要将 Claude Code 添加到系统 PATH 中。在 PowerShell 中运行：</p>
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">添加到 PATH</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code># 永久添加到用户 PATH
+[Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "User") + ";$env:USERPROFILE\.local\bin", "User")
+
+# 立即在当前会话生效
+$env:Path += ";$env:USERPROFILE\.local\bin"</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="step-item">
+                            <h3 class="step-title">配置 API Key</h3>
+                            <div class="step-content">
+                                <p>设置 Anthropic API Key 环境变量：</p>
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">配置 API Key</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code># 永久设置 API Key（替换为你的实际 API Key）
+[Environment]::SetEnvironmentVariable("ANTHROPIC_API_KEY", "sk-ant-api03-your-key-here", "User")
+
+# 如果使用中转服务，还需要设置 Base URL
+[Environment]::SetEnvironmentVariable("ANTHROPIC_BASE_URL", "https://your-proxy-url.com", "User")</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="step-item">
+                            <h3 class="step-title">验证安装</h3>
+                            <div class="step-content">
+                                <p>重新打开一个 PowerShell 或 Git Bash 窗口，运行以下命令验证安装：</p>
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">验证安装</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code># 查看版本
+claude --version
+
+# 测试运行
+claude "Hello, Claude!"
+
+# 系统诊断
+claude doctor</code></pre>
+                                    </div>
+                                </div>
+                                <div class="alert alert-success">
+                                    <strong>✅ 成功提示：</strong>如果能看到版本号和正常响应，说明安装成功！
+                                </div>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <!-- MacOS 端图文指引 -->
+            <section id="macos-install" class="section">
+                <h2 class="section-title">MacOS 端图文指引</h2>
+                <div class="section-content">
+                    <p>MacOS 上的安装过程最为简单，支持多种安装方式。</p>
+
+                    <ol class="step-list">
+                        <li class="step-item">
+                            <h3 class="step-title">一键安装（推荐）</h3>
+                            <div class="step-content">
+                                <p>打开终端（Terminal），运行以下命令：</p>
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">一键安装脚本</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code>curl -fsSL https://claude.ai/install.sh | bash</code></pre>
+                                    </div>
+                                </div>
+                                <p>脚本会自动下载并安装 Claude Code 到 <code>~/.local/bin</code> 目录。</p>
+                            </div>
+                        </li>
+
+                        <li class="step-item">
+                            <h3 class="step-title">使用 Homebrew 安装（可选）</h3>
+                            <div class="step-content">
+                                <p>如果你已经安装了 Homebrew，可以使用以下命令：</p>
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">Homebrew 安装</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code>brew install --cask claude-code</code></pre>
+                                    </div>
+                                </div>
+                                <p>使用 Homebrew 的好处是可以通过 <code>brew upgrade</code> 统一管理更新。</p>
+                            </div>
+                        </li>
+
+                        <li class="step-item">
+                            <h3 class="step-title">配置 API Key</h3>
+                            <div class="step-content">
+                                <p>在 shell 配置文件中添加环境变量。根据你使用的 shell，编辑对应的配置文件：</p>
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">~/.zshrc 或 ~/.bashrc</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code># 添加以下内容到配置文件末尾
+export ANTHROPIC_API_KEY="sk-ant-api03-your-key-here"
+
+# 如果使用中转服务
+export ANTHROPIC_BASE_URL="https://your-proxy-url.com"</code></pre>
+                                    </div>
+                                </div>
+                                <p>保存后，运行 <code>source ~/.zshrc</code> 或 <code>source ~/.bashrc</code> 使配置生效。</p>
+                            </div>
+                        </li>
+
+                        <li class="step-item">
+                            <h3 class="step-title">验证安装</h3>
+                            <div class="step-content">
+                                <p>运行以下命令验证安装：</p>
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">验证安装</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code># 查看版本
+claude --version
+
+# 测试运行
+claude "帮我创建一个 Python 脚本"
+
+# 系统诊断
+claude doctor</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <!-- Linux 端图文指引 -->
+            <section id="linux-install" class="section">
+                <h2 class="section-title">Linux 端图文指引</h2>
+                <div class="section-content">
+                    <p>Linux 系统支持所有主流发行版，包括 Ubuntu、Debian、Fedora、Arch Linux 等。</p>
+
+                    <ol class="step-list">
+                        <li class="step-item">
+                            <h3 class="step-title">一键安装</h3>
+                            <div class="step-content">
+                                <p>在终端中运行安装脚本：</p>
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">一键安装脚本</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code>curl -fsSL https://claude.ai/install.sh | bash</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="step-item">
+                            <h3 class="step-title">检查依赖（Alpine Linux）</h3>
+                            <div class="step-content">
+                                <p>如果你使用的是 Alpine Linux，需要先安装必要的依赖：</p>
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">Alpine Linux 依赖</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code># 安装依赖
+apk add libgcc libstdc++ ripgrep
+
+# 设置环境变量
+export USE_BUILTIN_RIPGREP=0</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="step-item">
+                            <h3 class="step-title">配置 API Key</h3>
+                            <div class="step-content">
+                                <p>编辑 shell 配置文件（通常是 <code>~/.bashrc</code> 或 <code>~/.profile</code>）：</p>
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">~/.bashrc</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code># 添加以下内容
+export ANTHROPIC_API_KEY="sk-ant-api03-your-key-here"
+export ANTHROPIC_BASE_URL="https://your-proxy-url.com"  # 可选</code></pre>
+                                    </div>
+                                </div>
+                                <p>保存后运行 <code>source ~/.bashrc</code> 使配置生效。</p>
+                            </div>
+                        </li>
+
+                        <li class="step-item">
+                            <h3 class="step-title">验证安装</h3>
+                            <div class="step-content">
+                                <p>运行验证命令：</p>
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">验证安装</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code># 查看版本
+claude --version
+
+# 查看安装位置
+which claude
+
+# 系统诊断
+claude doctor</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <!-- 常见问题 -->
+            <section id="faq" class="section">
+                <h2 class="section-title">常见问题</h2>
+                <div class="section-content">
+                    <h3 class="section-subtitle">❓ 安装后找不到 claude 命令？</h3>
+                    <p>这通常是 PATH 环境变量配置问题。确保 <code>~/.local/bin</code>（Linux/Mac）或 <code>%USERPROFILE%\.local\bin</code>（Windows）已添加到 PATH 中。</p>
+
+                    <h3 class="section-subtitle">❓ Windows 上提示 "bash: claude: command not found"？</h3>
+                    <p>请确保：</p>
+                    <ol>
+                        <li>已安装 Git for Windows</li>
+                        <li>使用 Git Bash 而不是 CMD 或 PowerShell 运行 claude 命令</li>
+                        <li>PATH 环境变量已正确配置</li>
+                    </ol>
+
+                    <h3 class="section-subtitle">❓ 提示 API Key 无效？</h3>
+                    <p>检查以下几点：</p>
+                    <ul>
+                        <li>确认 API Key 格式正确，以 <code>sk-ant-api03-</code> 开头</li>
+                        <li>如果使用中转服务，确认 <code>ANTHROPIC_BASE_URL</code> 配置正确</li>
+                        <li>重启终端使环境变量生效</li>
+                        <li>运行 <code>claude doctor</code> 检查配置</li>
+                    </ul>
+
+                    <h3 class="section-subtitle">❓ 如何更新 Claude Code？</h3>
+                    <p>Claude Code 支持自动更新，也可以手动触发：</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">手动更新</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <div class="code-content">
+                            <pre><code># 检查并安装更新
+claude update
+
+# 使用 Homebrew（仅 Mac）
+brew upgrade --cask claude-code</code></pre>
+                        </div>
+                    </div>
+
+                    <h3 class="section-subtitle">❓ 可以在公司内网环境使用吗？</h3>
+                    <p>可以，但需要：</p>
+                    <ul>
+                        <li>确保网络可以访问 Anthropic API（或配置代理）</li>
+                        <li>如果使用企业部署，可以配置 Amazon Bedrock 或 Google Vertex AI</li>
+                        <li>遵守公司的安全策略和代码审查流程</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 下一步 -->
+            <section id="next-steps" class="section">
+                <h2 class="section-title">下一步</h2>
+                <div class="section-content">
+                    <p>恭喜！你已经成功安装了 Claude Code。接下来可以：</p>
+
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">📖</div>
+                            <h3 class="feature-title">阅读官方文档</h3>
+                            <p class="feature-description">访问 <a href="https://code.claude.com/docs" target="_blank" style="color: var(--accent-color);">code.claude.com/docs</a> 了解更多功能和最佳实践。</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🎮</div>
+                            <h3 class="feature-title">尝试基本命令</h3>
+                            <p class="feature-description">在项目目录中运行 <code>claude</code> 开始交互，尝试各种编程任务。</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">⚙️</div>
+                            <h3 class="feature-title">自定义配置</h3>
+                            <p class="feature-description">编辑 <code>~/.claude/settings.json</code> 调整个人偏好和工作流。</p>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info" style="margin-top: 2rem;">
+                        <strong>💡 小技巧：</strong>使用 <code>claude --help</code> 查看所有可用命令，使用 <code>claude doctor</code> 诊断配置问题。
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 右侧目录导航 -->
+        <aside class="toc-sidebar">
+            <nav class="toc-container">
+                <h3 class="toc-title">目录</h3>
+                <ul class="toc-list">
+                    <li class="toc-item">
+                        <a href="#intro" class="toc-link">项目介绍</a>
+                    </li>
+                    <li class="toc-item">
+                        <a href="#demo" class="toc-link">效果演示</a>
+                    </li>
+                    <li class="toc-item">
+                        <a href="#features" class="toc-link">核心特性</a>
+                    </li>
+                    <li class="toc-item">
+                        <a href="#api-config" class="toc-link">AI 模型配置方法</a>
+                    </li>
+                    <li class="toc-item">
+                        <a href="#windows-install" class="toc-link">Windows 端图文指引</a>
+                        <ul class="toc-sublist">
+                            <li class="toc-item"><a href="#windows-install" class="toc-link">安装 Git for Windows</a></li>
+                            <li class="toc-item"><a href="#windows-install" class="toc-link">安装 Claude Code</a></li>
+                            <li class="toc-item"><a href="#windows-install" class="toc-link">配置环境变量</a></li>
+                            <li class="toc-item"><a href="#windows-install" class="toc-link">配置 API Key</a></li>
+                            <li class="toc-item"><a href="#windows-install" class="toc-link">验证安装</a></li>
+                        </ul>
+                    </li>
+                    <li class="toc-item">
+                        <a href="#macos-install" class="toc-link">MacOS 端图文指引</a>
+                        <ul class="toc-sublist">
+                            <li class="toc-item"><a href="#macos-install" class="toc-link">一键安装</a></li>
+                            <li class="toc-item"><a href="#macos-install" class="toc-link">Homebrew 安装</a></li>
+                            <li class="toc-item"><a href="#macos-install" class="toc-link">配置 API Key</a></li>
+                            <li class="toc-item"><a href="#macos-install" class="toc-link">验证安装</a></li>
+                        </ul>
+                    </li>
+                    <li class="toc-item">
+                        <a href="#linux-install" class="toc-link">Linux 端图文指引</a>
+                        <ul class="toc-sublist">
+                            <li class="toc-item"><a href="#linux-install" class="toc-link">一键安装</a></li>
+                            <li class="toc-item"><a href="#linux-install" class="toc-link">检查依赖</a></li>
+                            <li class="toc-item"><a href="#linux-install" class="toc-link">配置 API Key</a></li>
+                            <li class="toc-item"><a href="#linux-install" class="toc-link">验证安装</a></li>
+                        </ul>
+                    </li>
+                    <li class="toc-item">
+                        <a href="#faq" class="toc-link">常见问题</a>
+                    </li>
+                    <li class="toc-item">
+                        <a href="#next-steps" class="toc-link">下一步</a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+    </div>
+
+    <!-- 统计脚本 -->
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+    <!-- 悬浮横幅脚本 -->
+    <script src="/js/floating-banner.js"></script>
+
+    <!-- 交互脚本 -->
+    <script>
+        // 复制代码功能
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const code = codeBlock.querySelector('code').textContent;
+
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '已复制！';
+                button.style.background = '#10b981';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('复制失败:', err);
+                button.textContent = '复制失败';
+                setTimeout(() => {
+                    button.textContent = '复制';
+                }, 2000);
+            });
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 目录高亮和滚动监听
+        const sections = document.querySelectorAll('.section');
+        const tocLinks = document.querySelectorAll('.toc-link');
+
+        function highlightToc() {
+            let currentSection = '';
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + currentSection) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', highlightToc);
+        window.addEventListener('load', highlightToc);
+
+        // 滚动动画
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // 为特性卡片添加滚动动画
+        document.querySelectorAll('.feature-card').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = `all 0.6s ease ${index * 0.1}s`;
+            observer.observe(card);
+        });
+
+        // 为代码块添加滚动动画
+        document.querySelectorAll('.code-block').forEach((block) => {
+            block.style.opacity = '0';
+            block.style.transform = 'translateY(30px)';
+            block.style.transition = 'all 0.6s ease';
+            observer.observe(block);
+        });
+    </script>
