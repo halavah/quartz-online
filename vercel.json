@@ -32,15 +32,6 @@
       ]
     },
     {
-      "source": "/public/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
       "source": "/(.*)\\.(?:jpg|jpeg|gif|png|svg|ico|webp|avif)",
       "headers": [
         {
@@ -77,12 +68,6 @@
       "source": "/home",
       "destination": "/",
       "permanent": true
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/sitemap.xml",
-      "destination": "/api/sitemap"
     }
   ],
   "git": {
