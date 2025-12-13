@@ -4,8 +4,9 @@ import "./globals.css";
 import articlesData from "../data/articles.json";
 
 const inter = Inter({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   variable: "--font-inter",
+  display: "swap",
 });
 
 const { config } = articlesData;

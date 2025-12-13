@@ -97,7 +97,7 @@ export default function ArticleIframe({ htmlFilePath, title }: ArticleIframeProp
           加载中...
         </h2>
         <p style={{ color: 'var(--text-secondary)' }}>
-          正在加载��章内容
+          请耐心等待
         </p>
       </div>
     );
