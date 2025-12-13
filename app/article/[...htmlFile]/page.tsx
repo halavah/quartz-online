@@ -37,28 +37,33 @@ export default async function ArticlePage({ params }: { params: Promise<{ htmlFi
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--dark-bg)' }}>
       {/* Header with back navigation */}
-      <header className="sticky top-0 z-50 backdrop-blur-lg" style={{
+      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg" style={{
         background: 'rgba(10, 14, 39, 0.8)',
         borderBottom: '1px solid var(--border-color)'
       }}>
-        <div className="w-full px-8 py-4 max-w-6xl mx-auto">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 hover:gap-4 transition-all" style={{
+        <Link
+          href="/"
+          className="block w-full"
+          style={{
+            textDecoration: 'none'
+          }}
+        >
+          <div className="w-full px-8 py-4 max-w-6xl mx-auto">
+            <div className="inline-flex items-center gap-2 hover:gap-4 transition-all" style={{
               color: 'var(--text-secondary)',
               fontWeight: 500
-            }}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            <span>返回 {config.siteName}</span>
-          </Link>
-        </div>
+            }}>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              <span>返回 {config.siteName}</span>
+            </div>
+          </div>
+        </Link>
       </header>
 
       {/* Article content */}
-      <main style={{ position: 'relative' }}>
+      <main style={{ position: 'relative', marginTop: '60px' }}>
         {article.htmlFile ? (
           <ArticleIframe htmlFilePath={article.htmlFile} title={article.title} />
         ) : (
