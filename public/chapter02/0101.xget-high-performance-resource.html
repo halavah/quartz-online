@@ -7,6 +7,19 @@
     <meta name="description" content="Xget是一个超高性能、安全的一站式开发者资源加速引擎，性能远超传统加速器，支持GitHub、npm、PyPI等多个平台的统一加速体验">
     <meta name="keywords" content="Xget,开发者加速,GitHub加速,npm镜像,PyPI镜像,Cloudflare Workers,资源加速">
 
+    <!-- Preload key fonts -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" as="style">
+
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="//busuanzi.ibruce.info">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <style>
         * {
             margin: 0;
@@ -30,11 +43,225 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;
             color: var(--text-color);
             background: var(--dark-bg);
             overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Dark mode toggle button */
+        .dark-mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .dark-mode-toggle i {
+            font-size: 1.2rem;
+            color: var(--text-color);
+        }
+
+        /* Back to top button */
+        #back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--gradient-primary);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        #back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #back-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Reading progress bar */
+        .reading-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            z-index: 9999;
+            transition: width 0.1s ease;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            --primary-color: #60A5FA;
+            --secondary-color: #93C5FD;
+            --accent-color: #F472B6;
+            --dark-bg: #000000;
+            --card-bg: #111827;
+            --text-color: #F9FAFB;
+            --text-secondary: #D1D5DB;
+            --border-color: #374151;
+        }
+
+        body.dark-mode .hero-section {
+            background: linear-gradient(135deg, #000000 0%, #111827 50%, #000000 100%);
+        }
+
+        body.dark-mode .feature-card {
+            background: #111827;
+            border-color: #374151;
+        }
+
+        body.dark-mode .code-showcase {
+            background: #111827;
+            border-color: #374151;
+        }
+
+        body.dark-mode .code-header {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        body.dark-mode .example-card {
+            background: #111827;
+            border-color: #374151;
+        }
+
+        body.dark-mode .example-header {
+            background: rgba(0, 102, 255, 0.2);
+        }
+
+        body.dark-mode .footer {
+            background: #000000;
+        }
+
+        body.dark-mode .platform-badge {
+            background: #111827;
+            border-color: #374151;
+        }
+
+        body.dark-mode .metric-card {
+            background: #111827;
+            border-color: #374151;
+        }
+
+        body.dark-mode .highlight-item {
+            background: #111827;
+        }
+
+        body.dark-mode .highlight-item:hover {
+            background: var(--gradient-primary);
+        }
+
+        /* Enhanced focus states for accessibility */
+        *:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        button:focus,
+        a:focus,
+        input:focus,
+        textarea:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* Skip to main content link for screen readers */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--primary-color);
+            color: white;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 10000;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Print styles */
+        @media print {
+            .hero-actions,
+            .dark-mode-toggle,
+            #back-to-top,
+            .reading-progress,
+            .copy-btn,
+            .footer-stats {
+                display: none !important;
+            }
+
+            body {
+                background: white !important;
+                color: black !important;
+                font-size: 12pt;
+                line-height: 1.4;
+            }
+
+            .hero-section {
+                background: white !important;
+                color: black !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .hero-title {
+                font-size: 24pt;
+                color: black !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .feature-card,
+            .example-card,
+            .code-showcase {
+                break-inside: avoid;
+                border: 1px solid #ccc;
+                margin-bottom: 1rem;
+            }
+
+            .section {
+                padding: 1rem 0;
+            }
+
+            a[href^="http"]:after {
+                content: " (" attr(href) ")";
+                font-size: 0.8em;
+                color: #666;
+            }
         }
 
         /* 英雄区域 */
@@ -334,13 +561,63 @@
 
         .code-content pre {
             margin: 0;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
             font-size: 0.9rem;
             line-height: 1.6;
+            position: relative;
         }
 
         .code-content code {
             color: var(--secondary-color);
+            display: block;
+            overflow-x: auto;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 0.5rem;
+        }
+
+        /* Enhanced code syntax highlighting */
+        .code-content code .comment {
+            color: #6A9955;
+            font-style: italic;
+        }
+
+        .code-content code .keyword {
+            color: #569CD6;
+            font-weight: 600;
+        }
+
+        .code-content code .string {
+            color: #CE9178;
+        }
+
+        .code-content code .number {
+            color: #B5CEA8;
+        }
+
+        .code-content code .variable {
+            color: #9CDCFE;
+        }
+
+        .code-content code .function {
+            color: #DCDCAA;
+        }
+
+        /* Code line numbers */
+        .code-content pre[data-line-numbers] {
+            padding-left: 3.5rem;
+        }
+
+        .code-content .line-numbers {
+            position: absolute;
+            left: 0;
+            top: 1rem;
+            width: 3rem;
+            text-align: right;
+            color: #6B7280;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            user-select: none;
         }
 
         /* 使用示例 */
@@ -508,6 +785,21 @@
     </style>
 </head>
 <body>
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="skip-link">跳转到主要内容</a>
+
+    <!-- Reading progress bar -->
+    <div class="reading-progress" id="reading-progress"></div>
+
+    <!-- Dark mode toggle button -->
+    <button class="dark-mode-toggle" id="dark-mode-toggle" aria-label="切换深色模式">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Back to top button -->
+    <button id="back-to-top" aria-label="返回顶部">
+        <i class="fas fa-arrow-up"></i>
+    </button>
     <!-- 英雄区域 -->
     <header class="hero-section">
         <div class="hero-container">
@@ -548,7 +840,7 @@
     </header>
 
     <!-- 主要内容 -->
-    <main class="main-content">
+    <main class="main-content" id="main-content">
         <!-- 项目概述 -->
         <section class="section">
             <div class="section-header">
@@ -1128,6 +1420,56 @@ npm run deploy
 
     <!-- 交互脚本 -->
     <script>
+        // Dark mode toggle
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const darkModeIcon = darkModeToggle.querySelector('i');
+
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            darkModeIcon.classList.replace('fa-moon', 'fa-sun');
+        }
+
+        darkModeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+
+            // Update icon
+            darkModeIcon.classList.replace(isDarkMode ? 'fa-moon' : 'fa-sun', isDarkMode ? 'fa-sun' : 'fa-moon');
+
+            // Save preference
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+        });
+
+        // Reading progress bar
+        function updateReadingProgress() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('reading-progress').style.width = scrolled + '%';
+        }
+
+        window.addEventListener('scroll', updateReadingProgress);
+
+        // Back to top button
+        const backToTopButton = document.getElementById('back-to-top');
+
+        window.addEventListener('scroll', () => {
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                backToTopButton.classList.add('show');
+            } else {
+                backToTopButton.classList.remove('show');
+            }
+        });
+
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
         // 代码复制功能
         function copyCode(button) {
             const codeBlock = button.closest('.code-showcase').querySelector('code');
@@ -1138,13 +1480,26 @@ npm run deploy
                 button.textContent = '已复制!';
                 button.style.background = 'var(--success-color)';
 
+                // Announce to screen readers
+                const announcement = document.createElement('div');
+                announcement.setAttribute('aria-live', 'polite');
+                announcement.setAttribute('class', 'sr-only');
+                announcement.textContent = '代码已复制到剪贴板';
+                document.body.appendChild(announcement);
+                setTimeout(() => announcement.remove(), 1000);
+
                 setTimeout(() => {
                     button.textContent = originalText;
                     button.style.background = 'var(--primary-color)';
                 }, 2000);
             }).catch(err => {
                 console.error('复制失败:', err);
-                alert('复制失败，请手动复制');
+                button.textContent = '复制失败';
+                button.setAttribute('aria-label', '复制失败，请手动复制');
+                setTimeout(() => {
+                    button.textContent = '复制';
+                    button.removeAttribute('aria-label');
+                }, 2000);
             });
         }
 
@@ -1158,6 +1513,8 @@ npm run deploy
                         behavior: 'smooth',
                         block: 'start'
                     });
+                    // Update focus for accessibility
+                    target.focus({ preventScroll: true });
                 }
             });
         });
@@ -1172,12 +1529,58 @@ npm run deploy
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('animate-fade-in');
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
                 }
             });
         }, observerOptions);
 
-        document.querySelectorAll('.feature-card, .example-card, .metric-card').forEach(el => {
+        // 为所有卡片添加初始状态和动画
+        document.querySelectorAll('.feature-card, .example-card, .metric-card, .platform-badge').forEach((el, index) => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = `all 0.6s ease ${index * 0.1}s`;
             observer.observe(el);
+        });
+
+        // Add animation to hero elements
+        window.addEventListener('load', () => {
+            const heroElements = document.querySelectorAll('.hero-badge, .hero-title, .hero-subtitle, .hero-stats, .hero-actions');
+            heroElements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = `all 0.8s ease ${index * 0.15}s`;
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, 100);
+            });
+        });
+
+        // Keyboard navigation support
+        document.addEventListener('keydown', (e) => {
+            // Press 'T' to go to top
+            if (e.key === 't' || e.key === 'T') {
+                if (!e.target.matches('input, textarea')) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+            // Press 'D' to toggle dark mode
+            if (e.key === 'd' || e.key === 'D') {
+                if (!e.target.matches('input, textarea')) {
+                    darkModeToggle.click();
+                }
+            }
+        });
+
+        // Add hover effect to platform badges
+        document.querySelectorAll('.platform-badge').forEach(badge => {
+            badge.addEventListener('mouseenter', () => {
+                badge.style.transform = 'translateY(-3px) scale(1.05)';
+            });
+            badge.addEventListener('mouseleave', () => {
+                badge.style.transform = 'translateY(0) scale(1)';
+            });
         });
     </script>
 </body>

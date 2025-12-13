@@ -7,6 +7,18 @@
     <meta name="description" content="Claude Code 推出原生安装方式，使用 Bun 编译成单一可执行文件，无需 Node.js 依赖，支持 Windows、macOS、Linux 全平台，启动速度提升 4 倍。">
     <meta name="keywords" content="Claude Code, 原生安装, Native Installation, Bun, Node.js, AI 编程, 命令行工具, Windows, macOS, Linux">
 
+    <!-- Preload key fonts -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" as="style">
+
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="//busuanzi.ibruce.info">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <style>
         * {
             margin: 0;
@@ -28,10 +40,217 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             line-height: 1.7;
             color: var(--text-color);
             background: var(--background-color);
+            scroll-behavior: smooth;
+        }
+
+        /* Dark mode toggle button */
+        .dark-mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .dark-mode-toggle i {
+            font-size: 1.2rem;
+            color: var(--text-color);
+        }
+
+        /* Back to top button */
+        #back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--gradient-primary);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        #back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #back-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Reading progress bar */
+        .reading-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            z-index: 9999;
+            transition: width 0.1s ease;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            --primary-color: #9CA3AF;
+            --secondary-color: #D1D5DB;
+            --accent-color: #60A5FA;
+            --background-color: #111827;
+            --text-color: #F9FAFB;
+            --border-color: #374151;
+            --code-bg: #1F2937;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .hero-section {
+            background: linear-gradient(135deg, #1F2937 0%, #374151 100%);
+        }
+
+        body.dark-mode .feature-card {
+            background: #1F2937;
+            border-color: #374151;
+        }
+
+        body.dark-mode .code-block {
+            background: #111827;
+        }
+
+        body.dark-mode .code-header {
+            background: #374151;
+        }
+
+        body.dark-mode .comparison-table th {
+            background: #374151;
+        }
+
+        body.dark-mode .comparison-table tr:hover {
+            background: #1F2937;
+        }
+
+        body.dark-mode .tab-btn {
+            background: #1F2937;
+            color: var(--text-color);
+            border-color: var(--border-color);
+        }
+
+        body.dark-mode .tab-btn.active {
+            background: var(--gradient-primary);
+        }
+
+        body.dark-mode .tab-btn:hover:not(.active) {
+            background: #374151;
+        }
+
+        body.dark-mode .footer {
+            background: #0F172A;
+        }
+
+        /* Enhanced focus states for accessibility */
+        *:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        button:focus,
+        a:focus,
+        input:focus,
+        textarea:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* Skip to main content link for screen readers */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--primary-color);
+            color: white;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 10000;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Print styles */
+        @media print {
+            .hero-actions,
+            .dark-mode-toggle,
+            #back-to-top,
+            .reading-progress,
+            .copy-btn,
+            .tab-buttons,
+            .footer-stats {
+                display: none !important;
+            }
+
+            body {
+                background: white !important;
+                color: black !important;
+                font-size: 12pt;
+                line-height: 1.4;
+            }
+
+            .hero-section {
+                background: white !important;
+                color: black !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .hero-title {
+                font-size: 24pt;
+                color: black !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .feature-card {
+                break-inside: avoid;
+                border: 1px solid #ccc;
+                margin-bottom: 1rem;
+            }
+
+            .section {
+                padding: 1rem 0;
+            }
+
+            a[href^="http"]:after {
+                content: " (" attr(href) ")";
+                font-size: 0.8em;
+                color: #666;
+            }
         }
 
         /* 英雄区域 */
@@ -275,13 +494,63 @@
         .code-content pre {
             margin: 0;
             color: #e2e8f0;
-            font-family: 'Courier New', monospace;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
             font-size: 0.95rem;
             line-height: 1.6;
+            position: relative;
         }
 
         .code-content code {
             color: #e2e8f0;
+            display: block;
+            overflow-x: auto;
+            padding: 1rem;
+            background: var(--code-bg);
+            border-radius: 0.5rem;
+        }
+
+        /* Enhanced code syntax highlighting */
+        .code-content code .comment {
+            color: #6A9955;
+            font-style: italic;
+        }
+
+        .code-content code .keyword {
+            color: #569CD6;
+            font-weight: 600;
+        }
+
+        .code-content code .string {
+            color: #CE9178;
+        }
+
+        .code-content code .number {
+            color: #B5CEA8;
+        }
+
+        .code-content code .variable {
+            color: #9CDCFE;
+        }
+
+        .code-content code .function {
+            color: #DCDCAA;
+        }
+
+        /* Code line numbers */
+        .code-content pre[data-line-numbers] {
+            padding-left: 3.5rem;
+        }
+
+        .code-content .line-numbers {
+            position: absolute;
+            left: 0;
+            top: 1rem;
+            width: 3rem;
+            text-align: right;
+            color: #6B7280;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            user-select: none;
         }
 
         /* 安装步骤 */
@@ -424,6 +693,21 @@
     </style>
 </head>
 <body>
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="skip-link">跳转到主要内容</a>
+
+    <!-- Reading progress bar -->
+    <div class="reading-progress" id="reading-progress"></div>
+
+    <!-- Dark mode toggle button -->
+    <button class="dark-mode-toggle" id="dark-mode-toggle" aria-label="切换深色模式">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Back to top button -->
+    <button id="back-to-top" aria-label="返回顶部">
+        <i class="fas fa-arrow-up"></i>
+    </button>
     <!-- 英雄区域 -->
     <header class="hero-section">
         <div class="container">
@@ -460,7 +744,7 @@
     </header>
 
     <!-- 主要内容 -->
-    <main class="main-content">
+    <main class="main-content" id="main-content">
         <div class="container">
             <!-- 概述部分 -->
             <section class="section">
@@ -1253,6 +1537,56 @@ claude --help</code></pre>
 
     <!-- 交互脚本 -->
     <script>
+        // Dark mode toggle
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const darkModeIcon = darkModeToggle.querySelector('i');
+
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            darkModeIcon.classList.replace('fa-moon', 'fa-sun');
+        }
+
+        darkModeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+
+            // Update icon
+            darkModeIcon.classList.replace(isDarkMode ? 'fa-moon' : 'fa-sun', isDarkMode ? 'fa-sun' : 'fa-moon');
+
+            // Save preference
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+        });
+
+        // Reading progress bar
+        function updateReadingProgress() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('reading-progress').style.width = scrolled + '%';
+        }
+
+        window.addEventListener('scroll', updateReadingProgress);
+
+        // Back to top button
+        const backToTopButton = document.getElementById('back-to-top');
+
+        window.addEventListener('scroll', () => {
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                backToTopButton.classList.add('show');
+            } else {
+                backToTopButton.classList.remove('show');
+            }
+        });
+
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
         // 标签页切换
         function switchTab(tabName) {
             // 隐藏所有标签页内容
@@ -1271,7 +1605,9 @@ claude --help</code></pre>
             document.getElementById(tabName).classList.add('active');
 
             // 激活对应的按钮
-            event.target.classList.add('active');
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
         }
 
         // 复制代码功能
@@ -1284,6 +1620,14 @@ claude --help</code></pre>
                 button.textContent = '已复制！';
                 button.style.background = '#10b981';
 
+                // Announce to screen readers
+                const announcement = document.createElement('div');
+                announcement.setAttribute('aria-live', 'polite');
+                announcement.setAttribute('class', 'sr-only');
+                announcement.textContent = '代码已复制到剪贴板';
+                document.body.appendChild(announcement);
+                setTimeout(() => announcement.remove(), 1000);
+
                 setTimeout(() => {
                     button.textContent = originalText;
                     button.style.background = '';
@@ -1291,8 +1635,10 @@ claude --help</code></pre>
             }).catch(err => {
                 console.error('复制失败:', err);
                 button.textContent = '复制失败';
+                button.setAttribute('aria-label', '复制失败，请手动复制');
                 setTimeout(() => {
                     button.textContent = '复制';
+                    button.removeAttribute('aria-label');
                 }, 2000);
             });
         }
@@ -1307,6 +1653,8 @@ claude --help</code></pre>
                         behavior: 'smooth',
                         block: 'start'
                     });
+                    // Update focus for accessibility
+                    target.focus({ preventScroll: true });
                 }
             });
         });
@@ -1340,6 +1688,36 @@ claude --help</code></pre>
             block.style.transform = 'translateY(30px)';
             block.style.transition = 'all 0.6s ease';
             observer.observe(block);
+        });
+
+        // Add animation to hero elements
+        window.addEventListener('load', () => {
+            const heroElements = document.querySelectorAll('.hero-badge, .hero-title, .hero-subtitle, .hero-stats, .hero-actions');
+            heroElements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = `all 0.8s ease ${index * 0.15}s`;
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, 100);
+            });
+        });
+
+        // Keyboard navigation support
+        document.addEventListener('keydown', (e) => {
+            // Press 'T' to go to top
+            if (e.key === 't' || e.key === 'T') {
+                if (!e.target.matches('input, textarea')) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+            // Press 'D' to toggle dark mode
+            if (e.key === 'd' || e.key === 'D') {
+                if (!e.target.matches('input, textarea')) {
+                    darkModeToggle.click();
+                }
+            }
         });
     </script>
 </body>
