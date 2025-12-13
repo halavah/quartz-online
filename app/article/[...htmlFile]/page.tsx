@@ -1,10 +1,9 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import articlesData from '@/data/articles.json';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
+import ArticleIframe from './ArticleIframe';
 
-export async function generateStaticParams() {
+export function generateStaticParams() {
   const params = articlesData.articles.map((article) => {
     // Convert htmlFile path to route params array
     // Remove .html extension and split by /
@@ -15,9 +14,6 @@ export async function generateStaticParams() {
       htmlFile: pathParts
     };
   });
-
-  // Debug log
-  console.log('Generated static params:', params);
 
   return params;
 }
@@ -36,17 +32,6 @@ export default async function ArticlePage({ params }: { params: Promise<{ htmlFi
 
   if (!article) {
     notFound();
-  }
-
-  // Load external HTML file if it exists
-  let htmlContent = '';
-  if (article.htmlFile) {
-    try {
-      const htmlPath = join(process.cwd(), 'public', article.htmlFile);
-      htmlContent = await readFile(htmlPath, 'utf-8');
-    } catch (error) {
-      console.error(`Failed to load HTML file: ${article.htmlFile}`, error);
-    }
   }
 
   return (
@@ -74,8 +59,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ htmlFi
 
       {/* Article content */}
       <main style={{ position: 'relative' }}>
-        {htmlContent ? (
-          <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+        {article.htmlFile ? (
+          <ArticleIframe htmlFilePath={article.htmlFile} title={article.title} />
         ) : (
           <div className="w-full text-center py-32">
             <div className="text-6xl mb-4">📝</div>
