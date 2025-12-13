@@ -9,9 +9,16 @@ import Navbar from './components/Navbar';
 export default function Home() {
   const { config, articles } = articlesData;
 
-  // 分类筛选
+  // 分类筛选 - 从 articles 中自动提取所有唯一分类
   const [selectedCategory, setSelectedCategory] = useState('全部');
-  const categories = ['全部', 'AI工具', '开发工具', '技术趋势', '前端框架'];
+  const categories = useMemo(() => {
+    const uniqueCategories = new Set<string>();
+    articles.forEach((article: any) => {
+      const cat = article.category || '开发工具';
+      uniqueCategories.add(cat);
+    });
+    return ['全部', ...Array.from(uniqueCategories).sort()];
+  }, [articles]);
 
   // 计算每个分类的文章数量
   const categoryCounts = useMemo(() => {
