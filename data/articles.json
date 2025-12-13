@@ -6,76 +6,58 @@
   },
   "articles": [
     {
-      "title": "Xget - 超高性能开发者资源加速引擎",
-      "description": "探索 Xget 如何通过智能加速和资源优化，为开发者提供极速的资源访问体验。",
-      "htmlFile": "chapter01/0101.xget-high-performance-resource-acceleration.html",
-      "category": "开发工具"
+      "title": "Claude Code Windows 系统完整安装指南",
+      "description": "在 Windows 系统上安装 Claude Code 的完整指南，包括 Git Bash 配置、三种安装方式和完整的环境配置。",
+      "htmlFile": "chapter01/0101.windows-installation.html",
+      "category": "安装指南"
+    },
+    {
+      "title": "Claude Code macOS 系统完整安装指南",
+      "description": "在 macOS 系统上安装 Claude Code 的完整指南，包括 Shell 脚本、Homebrew、手动下载和 npm 四种安装方式。",
+      "htmlFile": "chapter01/0102.macos-installation.html",
+      "category": "安装指南"
+    },
+    {
+      "title": "Claude Code Linux/WSL2 系统完整安装指南",
+      "description": "在 Linux 和 WSL2 系统上安装 Claude Code 的完整指南，支持 Ubuntu、Debian、Fedora、Arch Linux 等多个发行版。",
+      "htmlFile": "chapter01/0103.linux-wsl2-installation.html",
+      "category": "安装指南"
     },
     {
       "title": "Claude Code 原生安装指南",
       "description": "详细讲解如何在各种平台上安装和配置 Claude Code，打造智能开发环境。",
-      "htmlFile": "chapter01/0102.claude-code-native-installation.html",
+      "htmlFile": "chapter01/0201.claude-code-native-installation.html",
+      "category": "安装指南"
+    },
+    {
+      "title": "Xget - 超高性能开发者资源加速引擎",
+      "description": "探索 Xget 如何通过智能加速和资源优化，为开发者提供极速的资源访问体验。",
+      "htmlFile": "chapter02/0101.xget-high-performance-resource.html",
       "category": "开发工具"
     },
     {
       "title": "Bytebot - AI 桌面代理",
       "description": "了解 Bytebot 如何作为 AI 桌面助手，提升你的工作效率和自动化体验。",
-      "htmlFile": "chapter01/0103.bytebot-ai-desktop-agent.html",
+      "htmlFile": "chapter02/0102.bytebot-ai-desktop-agent.html",
       "category": "AI工具"
     },
     {
       "title": "Onyx - 开源 AI 平台",
       "description": "深入探索 Onyx 开源 AI 平台的架构设计和应用场景。",
-      "htmlFile": "chapter01/0104.onyx-opensource-ai-platform.html",
+      "htmlFile": "chapter02/0103.onyx-opensource-ai-platform.html",
       "category": "AI工具"
     },
     {
       "title": "TrendRadar - 热点监控工具",
       "description": "使用 TrendRadar 实时追踪技术热点，掌握最新动态和趋势。",
-      "htmlFile": "chapter01/0105.trendradar-trend-monitoring-tool.html",
+      "htmlFile": "chapter02/0104.trendradar-trend-monitoring-tool.html",
       "category": "技术趋势"
     },
     {
       "title": "Tracy Profiler - 性能分析工具",
       "description": "深度解析 Tracy Profiler 的功能特性，掌握性能优化的利器。",
-      "htmlFile": "chapter01/0106.tracy-profiler-performance-analysis.html",
+      "htmlFile": "chapter02/0105.tracy-profiler-performance-analysis.html",
       "category": "开发工具"
-    },
-    {
-      "title": "Web3 趋势 2025",
-      "description": "展望 Web3 在 2025 年的发展趋势，了解去中心化的未来方向。",
-      "htmlFile": "chapter02/0101.web3-trends-2025.html",
-      "category": "技术趋势"
-    },
-    {
-      "title": "React 服务端组件",
-      "description": "深入理解 React Server Components (RSC) 的核心概念和最佳实践。",
-      "htmlFile": "chapter02/0102.react-server-components.html",
-      "category": "前端框架"
-    },
-    {
-      "title": "TypeScript 高级类型",
-      "description": "掌握 TypeScript 高级类型系统，编写更安全、更灵活的代码。",
-      "htmlFile": "chapter02/0103.typescript-advanced-types.html",
-      "category": "前端框架"
-    },
-    {
-      "title": "Next.js 15 特性",
-      "description": "全面解析 Next.js 15 的新特性和改进，优化全栈开发体验。",
-      "htmlFile": "chapter02/0104.nextjs15-new-features.html",
-      "category": "前端框架"
-    },
-    {
-      "title": "AI 开发工具完全指南",
-      "description": "对比和分析主流 AI 开发工具，选择最适合你的编程助手。",
-      "htmlFile": "chapter02/0105.ai-development-tools.html",
-      "category": "开发工具"
-    },
-    {
-      "title": "Claude Code 安装教程",
-      "description": "详细介绍 Claude Code 的安装步骤和配置方法，帮助开发者快速上手 AI 编程助手。",
-      "htmlFile": "chapter03/0101.claudecode-install.html",
-      "category": "教程"
     }
   ]
 }
