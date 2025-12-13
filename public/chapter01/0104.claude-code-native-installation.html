@@ -341,6 +341,117 @@
                 font-size: 13px;
             }
         }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .main-content {
+                padding: 2rem 1.5rem;
+                gap: 2rem;
+            }
+
+            .hero-section {
+                padding: 3rem 1.5rem 2rem;
+            }
+
+            .hero-title {
+                font-size: 2.2rem;
+            }
+
+            .toc-sidebar {
+                width: 280px;
+            }
+
+            .prerequisites-grid,
+            .feature-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+                padding: 1.5rem;
+            }
+
+            .hero-section {
+                padding: 2rem 1rem;
+            }
+
+            .hero-title {
+                font-size: 1.8rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .toc-sidebar {
+                width: 100%;
+                margin-bottom: 2rem;
+                position: static;
+                border-radius: 0.75rem;
+            }
+
+            .toc-sidebar ul {
+                columns: 1;
+            }
+
+            .install-methods,
+            .installation-cards,
+            .prerequisites-grid,
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .code-block {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .code-block code {
+                white-space: pre-wrap;
+                word-break: break-all;
+            }
+
+            .config-form {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.6rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            h3 {
+                font-size: 1.3rem;
+            }
+
+            .install-card,
+            .feature-card {
+                padding: 1.5rem;
+            }
+
+            .config-form {
+                padding: 1rem;
+            }
+
+            .feature-list li {
+                padding: 0.75rem;
+            }
+
+            .code-block {
+                padding: 0.75rem;
+            }
+        }
     </style>
 </head>
 <body>

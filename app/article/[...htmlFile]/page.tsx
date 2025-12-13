@@ -41,7 +41,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ htmlFi
         background: 'rgba(10, 14, 39, 0.8)',
         borderBottom: '1px solid var(--border-color)'
       }}>
-        <div className="w-full px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+        <div className="w-full px-6 py-4 flex items-center justify-between">
           {/* Left: Back button */}
           <Link
             href="/"
@@ -64,58 +64,50 @@ export default async function ArticlePage({ params }: { params: Promise<{ htmlFi
               href="https://api.nekoapi.com/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 sm:gap-2 md:gap-3 transition-opacity hover:opacity-80"
+              className="inline-flex items-center gap-3 transition-opacity hover:opacity-80"
               style={{
                 textDecoration: 'none'
               }}
             >
               {/* API Icon */}
-              <svg className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: 'var(--text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
 
-              {/* 移动端只显示图标和按钮 */}
-              <span className="hidden xs:inline sm:inline">
-                <span style={{
-                  color: 'var(--text-secondary)',
-                  fontSize: '0.75rem sm:text-sm',
-                  fontWeight: 500
-                }}>
-                  API中转站
-                </span>
+              <span style={{
+                color: 'var(--text-secondary)',
+                fontSize: '0.875rem',
+                fontWeight: 500
+              }}>
+                API中转站
               </span>
 
-              <span className="hidden sm:inline">
-                <span style={{
-                  color: 'var(--text-secondary)',
-                  fontSize: '0.7rem sm:text-xs',
-                  opacity: 0.8
-                }}>
-                  260+
-                </span>
+              <span style={{
+                color: 'var(--text-secondary)',
+                fontSize: '0.75rem',
+                opacity: 0.8
+              }}>
+                260+AI大模型
               </span>
 
-              <span className="hidden md:inline">
-                <span style={{
-                  color: 'var(--text-secondary)',
-                  fontSize: '0.7rem',
-                  opacity: 0.8
-                }}>
-                  0.95
-                </span>
+              <span style={{
+                color: 'var(--text-secondary)',
+                fontSize: '0.75rem',
+                opacity: 0.8
+              }}>
+                0.95一刀
               </span>
 
               <span style={{
                 color: 'white',
-                fontSize: '0.7rem sm:text-sm',
+                fontSize: '0.875rem',
                 fontWeight: 600,
-                padding: '0.25rem 0.5rem sm:px-3 sm:py-2',
+                padding: '0.375rem 0.875rem',
                 background: 'linear-gradient(90deg, #4F46E5 0%, #7C3AED 100%)',
-                borderRadius: '0.25rem sm:rounded-md',
-                boxShadow: '0 1px 4px rgba(79, 70, 229, 0.3)',
-                whiteSpace: 'nowrap'
+                borderRadius: '0.375rem',
+                boxShadow: '0 2px 8px rgba(79, 70, 229, 0.3)'
               }}>
-                进入
+                立即进入
               </span>
             </a>
           </div>
