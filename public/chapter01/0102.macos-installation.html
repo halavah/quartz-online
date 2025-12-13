@@ -801,6 +801,32 @@
         </aside>
     </div>
 
+    <footer style="border-top: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); margin-top: 5rem;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 2rem; text-align: center;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                <!-- 版权信息 -->
+                <div style="font-size: 0.875rem; color: var(--text-secondary);" id="copyright-text"></div>
+                <!-- 备案号 -->
+                <div style="font-size: 0.875rem; color: #6b7280;" id="beian-number"></div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // Load config from articles.json
+    fetch('/data/articles.json')
+        .then(response => response.json())
+        .then(data => {
+            const { beianNumber, copyrightText } = data.config;
+
+            document.getElementById('copyright-text').textContent = copyrightText || '© 2025 Halavah\'s Tech. All rights reserved.';
+            if (beianNumber) {
+                document.getElementById('beian-number').textContent = beianNumber;
+            }
+        })
+        .catch(error => console.error('Failed to load config:', error));
+    </script>
+
     <script>
     // Smooth scroll and active link tracking
     document.querySelectorAll('.toc-sidebar a').forEach(link => {
