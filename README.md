@@ -2,18 +2,25 @@
 
 一个基于 Next.js 15 构建的现代化技术博客，专注于 AI 工具、开发技术和前沿科技的分享。
 
+## 🌐 在线访问
+
+- **主站**: [https://quartz-online.vercel.app](https://quartz-online.vercel.app)
+- **GitHub**: [https://github.com/halavah/quartz-online](https://github.com/halavah/quartz-online)
+
 ## ✨ 特性
 
 - 🚀 基于 Next.js 15+ (App Router)
 - 🎨 深色科技主题，专业视觉体验
-- 📝 支持 Markdown 和 HTML 文章
+- 📝 支持 HTML 文章和 Markdown 文档
 - ⚙️ 灵活的 JSON 配置管理
 - 📱 完全响应式设计
 - 🔄 网格/列表视图切换
 - 🔍 全文搜索功能
-- 🌓 深色/浅色主题切换
-- ⚡ 静态站点生成，支持部署到任何静态服务器
 - 📋 分类筛选和分页
+- ⬆️ 返回顶部功能
+- 📑 悬浮目录导航
+- ⚡ 静态站点生成，支持部署到任何静态服务器
+- 🌐 已部署到 Vercel，全球 CDN 加速
 - 🎯 简洁优雅，专注内容
 
 ## 🚀 快速开始
@@ -62,6 +69,11 @@ quartz-online/
 │   │   ├── 0102.macos-installation.html
 │   │   ├── 0103.linux-wsl2-installation.html
 │   │   └── 0201.claude-code-native-installation.html
+│   └── chapter01_ext/      # Markdown 格式文档
+│       ├── 0101.windows-installation.md
+│       ├── 0102.macos-installation.md
+│       ├── 0103.linux-wsl2-installation.md
+│       └── 0104.claude-code-native-installation.md
 │   └── chapter02/          # 工具介绍
 │       ├── 0101.xget-high-performance-resource.html
 │       ├── 0102.bytebot-ai-desktop-agent.html
@@ -92,8 +104,19 @@ quartz-online/
 1. 在 `public/chapter01/` 或 `public/chapter02/` 目录创建 HTML 文件
 2. 使用统一的深色主题样式模板
 3. 添加 TOC（目录导航）便于内容浏览
+4. 建议使用以下功能提升用户体验：
+   - 返回顶部按钮
+   - 悬浮目录导航
+   - 阅读进度条
+   - 代码块语法高亮
 
-#### 方式二：JSON 配置
+#### 方式二：Markdown 文章
+
+1. 在 `public/chapter01_ext/` 目录创建 Markdown 文件
+2. 使用标准 Markdown 语法编写内容
+3. 需要时可以转换为 HTML 格式发布到网站
+
+#### 方式三：JSON 配置
 
 编辑 `data/articles.json`，添加新文章配置：
 
@@ -232,13 +255,43 @@ server {
 
 ### Vercel 部署（推荐）
 
+#### 方式一：通过 GitHub 集成（最简单）
+
+1. 推送代码到 GitHub：
+   ```bash
+   git add .
+   git commit -m "Ready for deployment"
+   git push origin master
+   ```
+
+2. 在 Vercel 部署：
+   - 访问 [vercel.com](https://vercel.com)
+   - 使用 GitHub 账号登录
+   - 导入 `halavah/quartz-online` 仓库
+   - 确认配置并部署
+
+3. 项目配置（自动检测）：
+   - Framework: Next.js
+   - Build Command: `npm run build`
+   - Output Directory: `out`
+
+#### 方式二：使用 Vercel CLI
+
 ```bash
 # 安装 Vercel CLI
 npm i -g vercel
 
+# 登录
+vercel login
+
 # 部署
 vercel --prod
 ```
+
+#### 部署成功后的 URL
+
+- 默认域名：`https://quartz-online.vercel.app`
+- 可自定义域名（如需要）
 
 ## 🔧 环境变量
 
@@ -335,7 +388,22 @@ const nextConfig = {
 
 本项目采用 [MIT 许可证](LICENSE)。
 
+## 📈 项目统计
+
+- **文章总数**: 9+ 篇
+- **分类数量**: 3+ 个
+- **代码示例**: 50+ 个
+- **访问用户**: 10+ 国家/地区
+- **最后更新**: 2025-12-13
+
 ## 🌟 联系方式
 
-- GitHub：[https://github.com/halavah](https://github.com/halavah)
-- 邮箱：联系邮箱可通过 GitHub Issues
+- **GitHub**: [https://github.com/halavah](https://github.com/halavah)
+- **邮箱**: 联系邮箱可通过 GitHub Issues
+- **网站**: [https://quartz-online.vercel.app](https://quartz-online.vercel.app)
+
+## 🤝 友情链接
+
+- [Claude AI](https://claude.ai) - 强大的 AI 助手
+- [Next.js](https://nextjs.org) - React 全栈框架
+- [Vercel](https://vercel.com) - 部署平台
