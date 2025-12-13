@@ -85,7 +85,6 @@
       "destination": "/api/sitemap"
     }
   ],
-  "regions": ["hkg1", "sin1"],
   "git": {
     "deploymentEnabled": {
       "main": true,
