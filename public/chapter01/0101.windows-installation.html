@@ -285,6 +285,42 @@
             }
         }
 
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+        }
+
+        .back-to-top:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .back-to-top.show {
+            display: flex;
+        }
+
+        .back-to-top svg {
+            width: 16px;
+            height: 16px;
+        }
+
         @media (max-width: 768px) {
             .hero-title {
                 font-size: 2rem;
@@ -297,10 +333,25 @@
             .main-content {
                 padding: 2rem 1rem;
             }
+
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 16px;
+                font-size: 13px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Back to top button -->
+    <button class="back-to-top" id="backToTop">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 15l-6-6-6 6"/>
+        </svg>
+        <span>返回顶部</span>
+    </button>
+
     <div class="hero-section">
         <div class="hero-container">
             <h1 class="hero-title">Claude Code Windows 系统完整安装指南</h1>
@@ -794,6 +845,26 @@
 
     document.querySelectorAll('section[id]').forEach(section => {
         observer.observe(section);
+    });
+
+    // Back to top button functionality
+    const backToTop = document.getElementById('backToTop');
+
+    // Show/hide button based on scroll position
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            backToTop.classList.add('show');
+        } else {
+            backToTop.classList.remove('show');
+        }
+    });
+
+    // Smooth scroll to top when button is clicked
+    backToTop.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     });
     </script>
 </body>

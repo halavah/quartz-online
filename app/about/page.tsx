@@ -15,11 +15,9 @@ export default function AboutPage() {
       {/* Hero */}
       <section className="py-20" style={{ background: 'linear-gradient(135deg, rgba(0, 102, 255, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%)' }}>
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <h1 className="text-5xl font-black mb-4" style={{
-            background: 'var(--gradient-primary)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
-          }}>关于我们</h1>
+          <h1 className="text-5xl font-black mb-4 bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">
+            关于我们
+          </h1>
           <p className="text-xl" style={{ color: 'var(--text-secondary)' }}>致力于分享前沿技术，提升开发效率</p>
         </div>
       </section>
@@ -86,12 +84,12 @@ export default function AboutPage() {
 
           {/* CTA */}
           <div className="text-center py-8">
-            <Link href="/articles" className="inline-block px-8 py-3 rounded-lg font-semibold transition-all hover:scale-105" style={{
+            <Link href="/" className="inline-block px-8 py-3 rounded-lg font-semibold transition-all hover:scale-105" style={{
               background: 'var(--gradient-primary)',
               color: 'white',
               boxShadow: '0 10px 30px rgba(0, 102, 255, 0.3)'
             }}>
-              浏览所有文章
+              返回首页浏览文章
             </Link>
           </div>
         </div>

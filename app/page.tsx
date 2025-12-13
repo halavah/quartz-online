@@ -76,11 +76,9 @@ export default function Home() {
       {/* Hero */}
       <section className="py-20" style={{ background: 'linear-gradient(135deg, rgba(0, 102, 255, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%)' }}>
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <h1 className="text-5xl font-black mb-4" style={{
-            background: 'var(--gradient-primary)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
-          }}>技术分享平台</h1>
+          <h1 className="text-5xl font-black mb-4 bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">
+            技术分享平台
+          </h1>
           <p className="text-xl" style={{ color: 'var(--text-secondary)' }}>{config.siteDescription}</p>
         </div>
       </section>

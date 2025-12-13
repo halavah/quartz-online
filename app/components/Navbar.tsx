@@ -85,27 +85,22 @@ export default function Navbar({ siteName, githubUrl, articles = [] }: NavbarPro
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="text-2xl font-black" style={{
-              background: 'var(--gradient-primary)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}>
+            <div className="text-2xl font-black bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">
               {siteName}
             </div>
           </Link>
 
           {/* 右侧：导航链接 + 工具栏 */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 md:gap-6 flex-wrap">
   
             {/* 广告横幅 - 可关闭 */}
             {bannerVisible && (
-              <div className="hidden lg:block animate-fade-in">
+              <div className="animate-fade-in order-first lg:order-none w-full lg:w-auto mb-2 lg:mb-0">
                 <a
                   href={articlesData.config.adLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="relative px-4 py-1.5 rounded-md text-sm font-medium group block cursor-pointer"
+                  className="relative block px-3 py-1.5 rounded-md text-xs md:text-sm font-medium cursor-pointer"
                   style={{
                     background: 'linear-gradient(135deg, #ff6b00 0%, #ff9500 100%)',
                     color: 'white',
@@ -114,20 +109,23 @@ export default function Navbar({ siteName, githubUrl, articles = [] }: NavbarPro
                     boxShadow: '0 2px 10px rgba(255, 107, 0, 0.3)'
                   }}
                 >
-                  <span>🔥 限时优惠：AI编程助手 Claude Code 正版授权，立享85折优惠码：HALAVAH2025</span>
+                  <span className="hidden sm:inline">🔥 限时优惠：Claude Code 正版授权，立享85折</span>
+                  <span className="sm:hidden">🔥 限时优惠85折</span>
                   <button
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
                       setBannerVisible(false);
                     }}
-                    className="ml-3 p-1 rounded-full bg-white/20 hover:bg-white transition-all"
+                    className="ml-2 inline-flex items-center justify-center p-1 rounded-full bg-white/20 hover:bg-white transition-all"
                     style={{
                       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                      backdropFilter: 'blur(4px)'
+                      backdropFilter: 'blur(4px)',
+                      width: '20px',
+                      height: '20px'
                     }}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="white" strokeWidth={2.5} viewBox="0 0 24 24">
+                    <svg className="w-3 h-3" fill="none" stroke="white" strokeWidth={3} viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
