@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import articlesData from '@/data/articles.json';
 
 interface Article {
   title: string;
@@ -23,6 +24,7 @@ export default function Navbar({ siteName, githubUrl, articles = [] }: NavbarPro
   const [mounted, setMounted] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [bannerVisible, setBannerVisible] = useState(true);
 
   // 初始化主题
   useEffect(() => {
@@ -95,37 +97,43 @@ export default function Navbar({ siteName, githubUrl, articles = [] }: NavbarPro
 
           {/* 右侧：导航链接 + 工具栏 */}
           <div className="flex items-center gap-6">
-            {/* 导航链接 */}
-            <div className="hidden md:flex items-center gap-6">
-              <Link
-                href="/"
-                className="text-base font-medium hover:text-blue-400 transition-colors"
-                style={{ color: isActive('/') ? 'var(--text-color)' : 'var(--text-secondary)' }}
-              >
-                首页
-              </Link>
-              <Link
-                href="/articles"
-                className="text-base font-medium hover:text-blue-400 transition-colors"
-                style={{ color: isActive('/articles') ? 'var(--text-color)' : 'var(--text-secondary)' }}
-              >
-                文章
-              </Link>
-              <Link
-                href="/categories"
-                className="text-base font-medium hover:text-blue-400 transition-colors"
-                style={{ color: isActive('/categories') ? 'var(--text-color)' : 'var(--text-secondary)' }}
-              >
-                分类
-              </Link>
-              <Link
-                href="/about"
-                className="text-base font-medium hover:text-blue-400 transition-colors"
-                style={{ color: isActive('/about') ? 'var(--text-color)' : 'var(--text-secondary)' }}
-              >
-                关于
-              </Link>
-            </div>
+  
+            {/* 广告横幅 - 可关闭 */}
+            {bannerVisible && (
+              <div className="hidden lg:block animate-fade-in">
+                <a
+                  href={articlesData.config.adLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="relative px-4 py-1.5 rounded-md text-sm font-medium group block cursor-pointer"
+                  style={{
+                    background: 'linear-gradient(135deg, #ff6b00 0%, #ff9500 100%)',
+                    color: 'white',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 2px 10px rgba(255, 107, 0, 0.3)'
+                  }}
+                >
+                  <span>🔥 限时优惠：AI编程助手 Claude Code 正版授权，立享85折优惠码：HALAVAH2025</span>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setBannerVisible(false);
+                    }}
+                    className="ml-3 p-1 rounded-full bg-white/20 hover:bg-white transition-all"
+                    style={{
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                      backdropFilter: 'blur(4px)'
+                    }}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="white" strokeWidth={2.5} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </a>
+              </div>
+            )}
 
             {/* 分割线 */}
             <div className="hidden md:block" style={{
