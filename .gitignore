@@ -22,24 +22,6 @@ pids
 coverage/
 *.lcov
 
-# nyc test coverage
-.nyc_output
-
-# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
-.grunt
-
-# Bower dependency directory (https://bower.io/)
-bower_components
-
-# node-waf configuration
-.lock-wscript
-
-# Compiled binary addons (https://nodejs.org/api/addons.html)
-build/Release
-
-# Dependency directories
-jspm_packages/
-
 # TypeScript cache
 *.tsbuildinfo
 
@@ -78,14 +60,10 @@ jspm_packages/
 .cache
 .parcel-cache
 
-# Next.js build output
-.next
-
 # Nuxt.js build / generate output
 .nuxt
 
 # Storybook build outputs
-.out
 .storybook-out
 
 # Temporary folders
@@ -140,37 +118,9 @@ Desktop.ini
 .Trash-*
 .nfs*
 
-# Package managers
-package-lock.json
+# Package managers (keep package-lock.json for Vercel)
 yarn.lock
 pnpm-lock.yaml
-
-# Runtime data
-pids
-*.pid
-*.seed
-
-# Coverage directory used by tools like istanbul
-coverage/
-
-# Grunt intermediate storage
-.grunt
-
-# Compiled binary addons
-build/Release
-
-# Users Environment Variables
-.lock-wscript
-
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-
-# IDE - WebStorm
-.idea/
 
 # Backup files
 *.bak
