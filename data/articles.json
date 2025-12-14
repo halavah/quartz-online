@@ -28,9 +28,15 @@
     },
     {
       "title": "Claude Code 原生安装指南",
-      "description": "详细讲解如何在各种平台上安装和配置 Claude Code，打造智能开发环境。",
+      "description": "详细��解如何在各种平台上安装和配置 Claude Code，打造智能开发环境。",
       "htmlFile": "chapter01/0104.claude-code-native-installation.html",
       "category": "安装指南"
+    },
+    {
+      "title": "Vibe Coding 之 Claude Code 常用命令指南",
+      "description": "10分钟掌握Claude Code所有常用命令，附一份Claude Code命令自查表，包括基础命令、实用技巧和提问技巧。",
+      "htmlFile": "chapter01/0105.claude-code-command-guide.html",
+      "category": "常用命令"
     },
     {
       "title": "Xget - 超高性能开发者资源加速引擎",
