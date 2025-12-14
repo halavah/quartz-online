@@ -578,4 +578,4 @@ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 ```
 
-**简单来说**：你可以自由使用、修改、分发本项目，甚至用���商业用途，只需保留版权声明即可。
+**简单来说**：你可以自由使用、修改、分发本项目，甚至用商业用途，只需保留版权声明即可。
