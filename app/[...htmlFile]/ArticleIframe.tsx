@@ -32,17 +32,6 @@ export default function ArticleIframe({ htmlFilePath, title }: ArticleIframeProp
       }
       setIsLoading(false);
       setHasError(false);
-
-      // Try to adjust height
-      try {
-        const iframeDoc = iframe.contentDocument;
-        if (iframeDoc) {
-          const height = iframeDoc.documentElement.scrollHeight;
-          iframe.style.height = `${height}px`;
-        }
-      } catch (error) {
-        console.log('Cannot adjust iframe height:', error);
-      }
     };
 
     const handleError = () => {
@@ -115,7 +104,7 @@ export default function ArticleIframe({ htmlFilePath, title }: ArticleIframeProp
         src={`/${htmlFilePath}`}
         style={{
           width: '100%',
-          minHeight: 'calc(100vh - 60px)',
+          height: 'calc(100vh - 60px)',
           border: 'none',
           display: isLoading ? 'none' : 'block',
           background: 'var(--dark-bg)'

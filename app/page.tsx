@@ -175,7 +175,7 @@ export default function Home() {
                 return (
                   <Link
                     key={article.htmlFile}
-                    href={`/article/${article.htmlFile.replace('.html', '')}`}
+                    href={`/${article.htmlFile.replace('.html', '')}`}
                     className="group block"
                   >
                     <article style={{
@@ -262,7 +262,7 @@ export default function Home() {
                 return (
                   <Link
                     key={article.htmlFile}
-                    href={`/article/${article.htmlFile.replace('.html', '')}`}
+                    href={`/${article.htmlFile.replace('.html', '')}`}
                     className="block group"
                   >
                     <div className="p-6 rounded-lg transition-all hover:scale-[1.02] hover:shadow-xl" style={{
