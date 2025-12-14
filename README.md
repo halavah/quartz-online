@@ -1,5 +1,3 @@
-# 🚀 Quartz Online
-
 **高性能 Next.js 技术博客模板 | 专为中国国内访问优化**
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.5.9-black?style=flat&logo=next.js)](https://nextjs.org/)
