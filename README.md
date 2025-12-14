@@ -12,7 +12,7 @@
 
 *一个现代化、高性能的技术博客模板，内置 Cloudflare CDN 优化，专为中国国内访问设计*
 
-[!演示页面](./app/readme.png)
+![演示页面](./app/readme.png)
 
 ---
 
