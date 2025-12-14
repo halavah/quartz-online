@@ -512,7 +512,7 @@ npm run lint:fix
    ```tsx
    <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`} />
    ```
-</details>
+   </details>
 
 <details>
 <summary><b>Q: 如何启用评论系统？</b></summary>
@@ -551,31 +551,3 @@ npm run lint:fix
 如果这个项目对你有帮助，请给一个 ⭐ Star 支持一下！
 
 [![Star History Chart](https://api.star-history.com/svg?repos=halavah/quartz-online&type=Date)](https://star-history.com/#halavah/quartz-online&Date)
-
----
-
-## 📄 License
-
-本项目采用 [MIT License](LICENSE) 开源协议。
-
-```
-MIT License
-
-Copyright (c) 2025 Halavah
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-```
-
-**简单来说**：你可以自由使用、修改、分发本项目，甚至用商业用途，只需保留版权声明即可。
