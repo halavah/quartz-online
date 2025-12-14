@@ -1,5 +1,3 @@
-<div align="center">
-
 # 🚀 Quartz Online
 
 **高性能 Next.js 技术博客模板 | 专为中国国内访问优化**
