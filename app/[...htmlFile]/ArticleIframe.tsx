@@ -18,12 +18,13 @@ export default function ArticleIframe({ htmlFilePath, title }: ArticleIframeProp
     if (!iframe) return;
 
     // Set a timeout to force stop loading if it takes too long
+    // 减少到3秒，因为已经有HTML预加载优化
     loadTimeoutRef.current = setTimeout(() => {
       if (isLoading) {
         console.warn('Iframe load timeout, forcing display');
         setIsLoading(false);
       }
-    }, 5000); // 5 seconds timeout
+    }, 3000); // 3 seconds timeout (优化后从5s减少到3s)
 
     const handleLoad = () => {
       console.log('Iframe loaded successfully');
@@ -102,6 +103,7 @@ export default function ArticleIframe({ htmlFilePath, title }: ArticleIframeProp
       <iframe
         ref={iframeRef}
         src={`/${htmlFilePath}`}
+        loading="eager"
         style={{
           width: '100%',
           height: 'calc(100vh - 60px)',

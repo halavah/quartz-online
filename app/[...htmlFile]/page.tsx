@@ -1,7 +1,12 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Script from 'next/script';
 import articlesData from '@/data/articles.json';
 import ArticleIframe from './ArticleIframe';
+
+// 强制静态生成，提升性能
+export const dynamic = 'force-static';
+export const revalidate = false; // 永久缓存
 
 export function generateStaticParams() {
   const params = articlesData.articles.map((article) => {
@@ -12,6 +17,28 @@ export function generateStaticParams() {
     };
   });
   return params;
+}
+
+// 生成元数据，包含HTML预加载
+export async function generateMetadata({ params }: { params: Promise<{ htmlFile: string[] }> }) {
+  const { htmlFile } = await params;
+  const decodedPathParts = htmlFile.map(part => decodeURIComponent(part));
+  const htmlFilePath = `${decodedPathParts.join('/')}.html`;
+
+  const article = articlesData.articles.find((a) => a.htmlFile === htmlFilePath);
+
+  if (!article) {
+    return {};
+  }
+
+  return {
+    title: article.title,
+    description: article.description || article.title,
+    other: {
+      // HTML预加载优化 - 减少iframe加载延迟
+      'link-preload': `/${article.htmlFile}`,
+    }
+  };
 }
 
 export default async function ArticlePage({ params }: { params: Promise<{ htmlFile: string[] }> }) {
@@ -28,9 +55,13 @@ export default async function ArticlePage({ params }: { params: Promise<{ htmlFi
   }
 
   return (
-    <div style={{ backgroundColor: 'var(--dark-bg)' }}>
-      {/* Header with back navigation and ad */}
-      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg" style={{
+    <>
+      {/* HTML预加载 - 提前加载iframe内容 */}
+      <link rel="preload" href={`/${article.htmlFile}`} as="document" />
+
+      <div style={{ backgroundColor: 'var(--dark-bg)' }}>
+        {/* Header with back navigation and ad */}
+        <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg" style={{
         background: 'rgba(10, 14, 39, 0.95)',
         borderBottom: '1px solid var(--border-color)',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
@@ -128,5 +159,6 @@ export default async function ArticlePage({ params }: { params: Promise<{ htmlFi
         )}
       </main>
     </div>
+    </>
   );
 }
