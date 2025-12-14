@@ -28,7 +28,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ htmlFi
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--dark-bg)' }}>
+    <div style={{ backgroundColor: 'var(--dark-bg)' }}>
       {/* Header with back navigation and ad */}
       <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg" style={{
         background: 'rgba(10, 14, 39, 0.95)',
@@ -127,6 +127,28 @@ export default async function ArticlePage({ params }: { params: Promise<{ htmlFi
           </div>
         )}
       </main>
+
+      {/* Footer */}
+      <footer style={{
+        background: 'rgba(10, 14, 39, 0.95)',
+        borderTop: '1px solid var(--border-color)',
+        padding: '2rem 1rem',
+        textAlign: 'center'
+      }}>
+        <p style={{
+          color: 'var(--text-secondary)',
+          fontSize: '0.875rem',
+          marginBottom: '0.5rem'
+        }}>
+          {config.copyrightText}
+        </p>
+        <p style={{
+          color: 'var(--text-secondary)',
+          fontSize: '0.875rem'
+        }}>
+          {config.beianNumber}
+        </p>
+      </footer>
     </div>
   );
 }
