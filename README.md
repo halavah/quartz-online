@@ -4,7 +4,6 @@
 
 **高性能 Next.js 技术博客模板 | 专为中国国内访问优化**
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/halavah/quartz-online)
 [![Next.js](https://img.shields.io/badge/Next.js-15.5.9-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -14,83 +13,6 @@
 [**🌐 在线演示**](https://online.halavah.us/) · [**📖 文档**](./docs/) · [**🐛 报告问题**](https://github.com/halavah/quartz-online/issues) · [**✨ 功能建议**](https://github.com/halavah/quartz-online/issues/new)
 
 *一个现代化、高性能的技术博客模板，内置 Cloudflare CDN 优化，专为中国国内访问设计*
-
----
-
-<img src="https://via.placeholder.com/800x400/0a0e27/ffffff?text=Quartz+Online+Screenshot" alt="Quartz Online Preview" width="800">
-
-</div>
-
----
-
-## ✨ 核心特性
-
-<table>
-<tr>
-<td width="50%">
-
-### 🚀 **性能优化**
-- ⚡ Next.js 15 App Router
-- 📦 完全静态生成 (SSG)
-- 🔄 HTML 预加载优化
-- 💾 永久缓存策略
-- 🗜️ Brotli 压缩 (70% 体积减少)
-
-</td>
-<td width="50%">
-
-### 🌍 **中国访问优化**
-- 🚫 已移除 Google Fonts (无阻断)
-- 🇨🇳 Cloudflare CDN 优化
-- ⚡ TTFB: 300-500ms (中国用户)
-- 🎯 HTTP/3 + 0-RTT
-- 📊 90%+ 缓存命中率
-
-</td>
-</tr>
-<tr>
-<td>
-
-### 🎨 **现代化 UI**
-- 🌙 深色科技主题
-- 📱 完全响应式设计
-- 🔀 网格/列表视图切换
-- 🔍 实时全文搜索
-- 📋 智能分类筛选
-
-</td>
-<td>
-
-### 🛠️ **开发体验**
-- 📝 JSON 配置管理
-- 🏷️ TypeScript 类型安全
-- 📄 支持 HTML 文章
-- 🎯 一键 Vercel 部署
-- 📚 完整开发文档
-
-</td>
-</tr>
-</table>
-
----
-
-## 📊 性能基准
-
-```
-优化后性能指标 (中国用户访��):
-
-TTFB (首字节时间):      300-500ms    ⬇️ 60%
-首屏加载 (FCP):         800-1200ms   ⬇️ 60%
-完全加载 (Load):        1.5-2.5s     ⬇️ 55%
-资源传输 (Brotli):      8-12KB       ⬇️ 70%
-缓存命中率:             90%+         ⬆️ 50%
-
-Lighthouse 评分:
-  Performance:     95+  ✅
-  Accessibility:   92+  ✅
-  Best Practices:  95+  ✅
-  SEO:             100  ✅
-```
 
 ---
 
@@ -624,6 +546,14 @@ npm run lint:fix
 
 ---
 
+## 🌟 Star History
+
+如果这个项目对你有帮助，请给一个 ⭐ Star 支持一下！
+
+[![Star History Chart](https://api.star-history.com/svg?repos=halavah/quartz-online&type=Date)](https://star-history.com/#halavah/quartz-online&Date)
+
+---
+
 ## 📄 License
 
 本项目采用 [MIT License](LICENSE) 开源协议。
@@ -649,79 +579,3 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 ```
 
 **简单来说**：你可以自由使用、修改、分发本项目，甚至用���商业用途，只需保留版权声明即可。
-
----
-
-## 🌟 Star History
-
-如果这个项目对你有帮助，请给一个 ⭐ Star 支持一下！
-
-[![Star History Chart](https://api.star-history.com/svg?repos=halavah/quartz-online&type=Date)](https://star-history.com/#halavah/quartz-online&Date)
-
----
-
-## 📊 项目统计
-
-```
-文章总数:        9 篇
-分类数量:        4 个（安装指南、开发工具、AI工具、技术趋势）
-代码示例:        丰富完整
-文档页数:        7 个核心文档
-性能评分:        95+
-缓存命中率:      90%+
-```
-
----
-
-## 🔗 相关项目
-
-- [Next.js](https://nextjs.org/) - React 全栈框架
-- [Vercel](https://vercel.com/) - 部署平台
-- [Cloudflare](https://www.cloudflare.com/) - CDN 服务
-- [Tailwind CSS](https://tailwindcss.com/) - CSS 框架
-
----
-
-## 🤝 致谢
-
-感谢以下开源项目和服务：
-
-- [Next.js](https://nextjs.org/) - 提供强大的 React 框架
-- [Vercel](https://vercel.com/) - 提供免费的部署服务
-- [Cloudflare](https://www.cloudflare.com/) - 提供全球 CDN 加速
-- [Claude AI](https://claude.ai/) - AI 辅助开发
-
----
-
-## 📞 联系方式
-
-<table>
-<tr>
-<td align="center">
-  <a href="https://github.com/halavah">
-    <img src="https://github.com/halavah.png" width="100px;" alt=""/>
-    <br />
-    <sub><b>Halavah</b></sub>
-  </a>
-  <br />
-  <a href="https://github.com/halavah/quartz-online/commits?author=halavah" title="Code">💻</a>
-  <a href="#maintenance-halavah" title="Maintenance">🚧</a>
-</td>
-</tr>
-</table>
-
-- **Website**: [https://online.halavah.us/](https://online.halavah.us/)
-- **GitHub**: [@halavah](https://github.com/halavah)
-- **Issues**: [提交问题](https://github.com/halavah/quartz-online/issues)
-
----
-
-<div align="center">
-
-**Made with ❤️ by [Halavah](https://github.com/halavah)**
-
-如果这个项目对你有帮助，请考虑给一个 ⭐ Star！
-
-[⬆ 返回顶部](#-quartz-online)
-
-</div>
