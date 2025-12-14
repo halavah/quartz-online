@@ -28,7 +28,7 @@
     },
     {
       "title": "Claude Code 原生安装指南",
-      "description": "详细��解如何在各种平台上安装和配置 Claude Code，打造智能开发环境。",
+      "description": "详细讲解如何在各种平台上安装和配置 Claude Code，打造智能开发环境。",
       "htmlFile": "chapter01/0104.claude-code-native-installation.html",
       "category": "安装指南"
     },
