@@ -265,17 +265,20 @@ touch public/chapter02/0106.my-new-article.html
 
 ```json
 {
-  "siteName": "Halavah's Tech",
-  "siteDescription": "探索前沿技术，提升开发效率",
+  "config": {
+    "siteName": "Halavah's Tech",
+    "siteDescription": "探索前沿技术，提升开发效率",
+    "githubUrl": "https://github.com/halavah",
+    "beianNumber": "京ICP备12345678号",
+    "copyrightText": "© 2025 Halavah's Tech. All rights reserved.",
+    "adLink": "https://api.nekoapi.com"
+  },
   "articles": [
     {
-      "id": "206",
       "title": "我的新文章标题",
-      "description": "文章简介，不超过 150 字",
+      "description": "文章简介，详细描述文章内容和亮点",
       "htmlFile": "chapter02/0106.my-new-article.html",
-      "category": "AI工具",
-      "tags": ["AI", "工具", "教程"],
-      "publishDate": "2025-12-14"
+      "category": "AI工具"
     }
   ]
 }
@@ -384,16 +387,16 @@ TTFB: 800ms → 300ms (-60%)
 
 ### 环境变量 (可选)
 
-创建 `.env.local` 文件：
+网站基本配置在 `data/articles.json` 中设置（见上方"修改网站信息"）。
+
+如需额外的环境变量（如 Google Analytics），可创建 `.env.local` 文件：
 
 ```env
-# 网站配置
-NEXT_PUBLIC_SITE_NAME="我的技术博客"
-NEXT_PUBLIC_SITE_DESCRIPTION="探索前沿技术"
-NEXT_PUBLIC_AD_LINK="https://your-ad-link.com"
-
 # 分析统计 (可选)
 NEXT_PUBLIC_GA_ID="G-XXXXXXXXXX"
+
+# 其他自定义环境变量
+NEXT_PUBLIC_CUSTOM_VAR="your-value"
 ```
 
 ---
@@ -429,11 +432,17 @@ NEXT_PUBLIC_GA_ID="G-XXXXXXXXXX"
 
 ```json
 {
-  "siteName": "你的网站名称",
-  "siteDescription": "你的网站描述",
-  "beianNumber": "备案号(可选)",
-  "copyrightText": "© 2025 Your Name. All rights reserved.",
-  "adLink": "https://your-ad-link.com"
+  "config": {
+    "siteName": "你的网站名称",
+    "siteDescription": "你的网站描述",
+    "githubUrl": "https://github.com/your-username",
+    "beianNumber": "京ICP备12345678号",
+    "copyrightText": "© 2025 Your Name. All rights reserved.",
+    "adLink": "https://your-ad-link.com"
+  },
+  "articles": [
+    // 你的文章配置...
+  ]
 }
 ```
 
@@ -654,10 +663,10 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 ## 📊 项目统计
 
 ```
-文章总数:        10+
-分类数量:        3+
-代码示例:        50+
-文档页数:        8+
+文章总数:        9 篇
+分类数量:        4 个（安装指南、开发工具、AI工具、技术趋势）
+代码示例:        丰富完整
+文档页数:        7 个核心文档
 性能评分:        95+
 缓存命中率:      90%+
 ```
