@@ -117,15 +117,24 @@ export default function Navbar({ siteName, githubUrl, articles = [] }: NavbarPro
                       e.stopPropagation();
                       setBannerVisible(false);
                     }}
-                    className="ml-2 inline-flex items-center justify-center p-1 rounded-full bg-white/20 hover:bg-white transition-all"
+                    className="ml-2 inline-flex items-center justify-center p-1 rounded-full transition-all group/close"
                     style={{
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                      background: 'rgba(255, 255, 255, 0.2)',
                       backdropFilter: 'blur(4px)',
                       width: '20px',
                       height: '20px'
                     }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.9)';
+                      e.currentTarget.style.transform = 'scale(1.15)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                      e.currentTarget.style.transform = 'scale(1)';
+                    }}
+                    title="关闭"
                   >
-                    <svg className="w-3 h-3" fill="none" stroke="white" strokeWidth={3} viewBox="0 0 24 24">
+                    <svg className="w-3 h-3 group-hover/close:text-orange-600 transition-colors" fill="none" stroke="white" strokeWidth={3} viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
