@@ -29,7 +29,19 @@
 2. 配置自定义域名 (可选)
 3. 绑定 Cloudflare CDN (推荐，见[配置指南](./docs/07.Cloudflare优化.md))
 
-### 方式二：使用 GitHub Template
+### 方式二：一键部署到 Render
+
+点击下方按钮，快速部署到 Render (新加坡节点):
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/halavah/quartz-online)
+
+**部署后的配置**:
+1. 自动部署到 Render (Singapore)
+2. 免费套餐可用
+3. 自动 HTTPS 证书
+4. 支持自定义域名
+
+### 方式三：使用 GitHub Template
 
 1. 点击仓库页面右上角的 **"Use this template"** 按钮
 2. 创建你自己的仓库
@@ -42,7 +54,22 @@ npm install
 npm run dev
 ```
 
-### 方式三：手动部署
+### 方式四：Docker 部署
+
+使用 Docker 快速部署:
+
+```bash
+# 方式 1: 使用 Docker Compose (推荐)
+docker-compose up -d
+
+# 方式 2: 使用 Docker 命令
+docker build -t quartz-online .
+docker run -d -p 3000:3000 --name quartz-online quartz-online
+
+# 访问 http://localhost:3000
+```
+
+### 方式五：手动部署
 
 ```bash
 # 1. Clone 项目
@@ -268,6 +295,115 @@ git push
 ---
 
 ## ⚙️ 配置指南
+
+### Render 部署详细步骤
+
+#### 方式 1: 使用 render.yaml 自动部署 (推荐)
+
+1. Fork 本项目到你的 GitHub 账号
+2. 访问 [Render Dashboard](https://dashboard.render.com/)
+3. 点击 "New" → "Blueprint"
+4. 连接你的 GitHub 仓库
+5. Render 会自动检测 `render.yaml` 并配置服务
+6. 点击 "Apply" 开始部署
+
+#### 方式 2: 手动创建 Web Service
+
+1. 访问 [Render Dashboard](https://dashboard.render.com/)
+2. 点击 "New" → "Web Service"
+3. 连接你的 GitHub 仓库
+4. 配置如下:
+   - **Name**: `quartz-online` (或自定义名称)
+   - **Region**: `Singapore` (推荐) 或其他地区
+   - **Branch**: `master`
+   - **Runtime**: `Node`
+   - **Build Command**: `npm install && npm run build`
+   - **Start Command**: `npm start`
+5. 环境变量设置:
+   - `NODE_ENV`: `production`
+   - `NEXT_TELEMETRY_DISABLED`: `1`
+   - `NEXT_PUBLIC_SITE_URL`: 你的域名 (可选)
+6. 选择免费套餐 (Free)
+7. 点击 "Create Web Service"
+
+**部署完成后**:
+- Render 会自动分配一个 `.onrender.com` 域名
+- 支持绑定自定义域名 (Settings → Custom Domain)
+- 自动配置 HTTPS 证书
+
+### Docker 部署详细步骤
+
+#### 使用 Docker Compose (推荐)
+
+```bash
+# 1. 克隆项目
+git clone https://github.com/halavah/quartz-online.git
+cd quartz-online
+
+# 2. 启动容器
+docker-compose up -d
+
+# 3. 查看日志
+docker-compose logs -f
+
+# 4. 停止容器
+docker-compose down
+```
+
+#### 使用 Docker 命令
+
+```bash
+# 1. 构建镜像
+docker build -t quartz-online .
+
+# 2. 运行容器
+docker run -d \
+  -p 3000:3000 \
+  -e NODE_ENV=production \
+  -e NEXT_PUBLIC_SITE_URL=http://localhost:3000 \
+  --name quartz-online \
+  quartz-online
+
+# 3. 查看日志
+docker logs -f quartz-online
+
+# 4. 停止容器
+docker stop quartz-online
+
+# 5. 删除容器
+docker rm quartz-online
+```
+
+#### Docker 生产环境部署
+
+使用 Nginx 反向代理:
+
+```nginx
+# /etc/nginx/sites-available/quartz-online
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+```bash
+# 启用站点配置
+sudo ln -s /etc/nginx/sites-available/quartz-online /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+
+# 使用 Let's Encrypt 配置 HTTPS
+sudo certbot --nginx -d your-domain.com
+```
 
 ### Vercel 部署配置
 
