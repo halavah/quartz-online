@@ -5,13 +5,18 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - NODE_ENV=production
     container_name: quartz-online
     restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
       - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
     networks:
       - quartz-network
     healthcheck:
@@ -20,6 +25,15 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    # 资源限制（可选，防止容器占用过多资源）
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
 
 networks:
   quartz-network:

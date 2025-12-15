@@ -1,5 +1,5 @@
-# 使用 Node.js 18 官方镜像
-FROM node:18-alpine AS base
+# 使用 Node.js 20 官方镜像（与 .nvmrc 保持一致，Next.js 15 推荐）
+FROM node:20-alpine AS base
 
 # 安装依赖阶段
 FROM base AS deps

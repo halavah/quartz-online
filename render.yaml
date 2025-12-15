@@ -5,7 +5,7 @@ services:
     region: singapore
     plan: free
     branch: master
-    buildCommand: npm install && npm run build
+    buildCommand: npm ci && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
@@ -14,3 +14,4 @@ services:
         value: 1
       - key: NEXT_PUBLIC_SITE_URL
         sync: false
+    # Render 会自动检测 .nvmrc 文件并使用 Node 20.10.0
