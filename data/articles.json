@@ -41,31 +41,31 @@
     {
       "title": "Xget - 超高性能开发者资源加速引擎",
       "description": "探索 Xget 如何通过智能加速和资源优化，为开发者提供极速的资源访问体验。",
-      "htmlFile": "chapter02/0101.xget-high-performance-resource.html",
+      "htmlFile": "chapter03/0101.xget-high-performance-resource.html",
       "category": "开发工具"
     },
     {
       "title": "Bytebot - AI 桌面代理",
       "description": "了解 Bytebot 如何作为 AI 桌面助手，提升你的工作效率和自动化体验。",
-      "htmlFile": "chapter02/0102.bytebot-ai-desktop-agent.html",
+      "htmlFile": "chapter03/0102.bytebot-ai-desktop-agent.html",
       "category": "AI工具"
     },
     {
       "title": "Onyx - 开源 AI 平台",
       "description": "深入探索 Onyx 开源 AI 平台的架构设计和应用场景。",
-      "htmlFile": "chapter02/0103.onyx-opensource-ai-platform.html",
+      "htmlFile": "chapter03/0103.onyx-opensource-ai-platform.html",
       "category": "AI工具"
     },
     {
       "title": "TrendRadar - 热点监控工具",
       "description": "使用 TrendRadar 实时追踪技术热点，掌握最新动态和趋势。",
-      "htmlFile": "chapter02/0104.trendradar-trend-monitoring-tool.html",
+      "htmlFile": "chapter03/0104.trendradar-trend-monitoring-tool.html",
       "category": "技术趋势"
     },
     {
       "title": "Tracy Profiler - 性能分析工具",
       "description": "深度解析 Tracy Profiler 的功能特性，掌握性能优化的利器。",
-      "htmlFile": "chapter02/0105.tracy-profiler-performance-analysis.html",
+      "htmlFile": "chapter03/0105.tracy-profiler-performance-analysis.html",
       "category": "开发工具"
     }
   ]
