@@ -39,6 +39,9 @@ echo.
 echo   3. 🧹 清理 Git 跟踪     (ignore.bat)
 echo      → 根据 .gitignore 移除已跟踪的文件
 echo.
+echo   4. 📝 更新文章列表      (update-articles.bat)
+echo      → 自动扫描 HTML 文件并更新 articles.json
+echo.
 echo ═══════════════════════════════════════════════════════════
 echo.
 echo   0. 🚪 退出
@@ -46,7 +49,7 @@ echo.
 echo ═══════════════════════════════════════════════════════════
 echo.
 
-set /p choice="请选择操作 [0-3] (默认: 1): "
+set /p choice="请选择操作 [0-4] (默认: 1): "
 
 REM 如果用户直接按回车，默认选择 1
 if "%choice%"=="" set choice=1
@@ -54,6 +57,7 @@ if "%choice%"=="" set choice=1
 if "%choice%"=="1" goto DEPLOY
 if "%choice%"=="2" goto START
 if "%choice%"=="3" goto IGNORE
+if "%choice%"=="4" goto UPDATE_ARTICLES
 if "%choice%"=="0" goto EXIT
 goto INVALID
 
@@ -82,6 +86,15 @@ echo ║  执行: 清理 Git 跟踪
 echo ╚════════════════════════════════════════════════════════════╝
 echo.
 call "%BIN_DIR%\ignore.bat"
+goto WAIT
+
+:UPDATE_ARTICLES
+echo.
+echo ╔════════════════════════════════════════════════════════════╗
+echo ║  执行: 更新文章列表
+echo ╚════════════════════════════════════════════════════════════╝
+echo.
+call "%BIN_DIR%\update-articles.bat"
 goto WAIT
 
 :INVALID

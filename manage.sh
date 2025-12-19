@@ -101,6 +101,10 @@ show_menu() {
     echo -e "     ${PURPLE}→${NC} 根据 .gitignore 移除已跟踪的文件"
     echo ""
 
+    echo -e "${GREEN}  4.${NC} 📝 ${BLUE}更新文章列表${NC}      (update-articles.sh)"
+    echo -e "     ${PURPLE}→${NC} 自动扫描 HTML 文件并更新 articles.json"
+    echo ""
+
     echo -e "${PURPLE}═══════════════════════════════════════════════════════════${NC}"
     echo ""
 
@@ -119,7 +123,7 @@ main() {
         # 重置 choice 变量，避免保留上次的输入
         choice=""
 
-        echo -ne "${YELLOW}请选择操作 [0-3] (默认: 1):${NC} "
+        echo -ne "${YELLOW}请选择操作 [0-4] (默认: 1):${NC} "
         read -r choice
 
         # 如果用户直接按回车，默认选择 1
@@ -139,6 +143,11 @@ main() {
             3)
                 print_header "执行: 清理 Git 跟踪"
                 run_script "ignore.sh"
+                ;;
+
+            4)
+                print_header "执行: 更新文章列表"
+                run_script "update-articles.sh"
                 ;;
 
             0)

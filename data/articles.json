@@ -1,7 +1,7 @@
 {
   "config": {
     "siteName": "Halavah's Tech",
-    "siteDescription": "探索前沿技术，提升开发效率",
+    "siteDescription": "探索前沿技术,提升开发效率",
     "githubUrl": "https://github.com/halavah",
     "beianNumber": "京ICP备12345678号",
     "copyrightText": "© 2025 Halavah's Tech. All rights reserved.",
@@ -10,61 +10,67 @@
   "articles": [
     {
       "title": "Claude Code Windows 系统完整安装指南",
-      "description": "在 Windows 系统上安装 Claude Code 的完整指南，包括 Git Bash 配置、三种安装方式和完整的环境配置。",
+      "description": "Claude Code在Windows系统上的完整安装指南,包括Git Bash安装、PowerShell安装、npm安装和API配置",
       "htmlFile": "chapter01/0101.windows-installation.html",
       "category": "安装指南"
     },
     {
       "title": "Claude Code macOS 系统完整安装指南",
-      "description": "在 macOS 系统上安装 Claude Code 的完整指南，包括 Shell 脚本、Homebrew、手动下载和 npm 四种安装方式。",
+      "description": "Claude Code在macOS系统上的完整安装指南,包括Shell脚本安装、Homebrew安装、手动下载和npm安装",
       "htmlFile": "chapter01/0102.macos-installation.html",
       "category": "安装指南"
     },
     {
       "title": "Claude Code Linux/WSL2 系统完整安装指南",
-      "description": "在 Linux 和 WSL2 系统上安装 Claude Code 的完整指南，支持 Ubuntu、Debian、Fedora、Arch Linux 等多个发行版。",
+      "description": "Claude Code在Linux和WSL2系统上的完整安装指南,包括多种Linux发行版和WSL2的详细安装步骤",
       "htmlFile": "chapter01/0103.linux-wsl2-installation.html",
       "category": "安装指南"
     },
     {
-      "title": "Claude Code 原生安装指南",
-      "description": "详细讲解如何在各种平台上安装和配置 Claude Code，打造智能开发环境。",
+      "title": "Claude Code 原生安装完全指南",
+      "description": "Claude Code 原生安装完全指南,包括 Windows、macOS 和 Linux 系统的原生安装方式,配置方法和最佳实践",
       "htmlFile": "chapter01/0104.claude-code-native-installation.html",
       "category": "安装指南"
     },
     {
-      "title": "Vibe Coding 之 Claude Code 常用命令指南",
-      "description": "10分钟掌握Claude Code所有常用命令，附一份Claude Code命令自查表，包括基础命令、实用技巧和提问技巧。",
+      "title": "Vibe Coding 之 Claude Code 常用命令指南 - 10分钟掌握所有常用命令",
+      "description": "10分钟掌握Claude Code所有常用命令,附一份Claude Code命令自查表,包括基础命令、实用技巧和提问技巧",
       "htmlFile": "chapter01/0105.claude-code-command-guide.html",
-      "category": "常用命令"
+      "category": "安装指南"
+    },
+    {
+      "title": "Claude-Mem - Claude Code 持久化记忆系统 | AI智能记忆压缩工具",
+      "description": "Claude-Mem 是一个为 Claude Code 打造的持久化记忆压缩系统，自动捕获会话上下文并跨会话保存，让AI助手拥有真正的长期记忆能力。",
+      "htmlFile": "chapter02/0101.claude-memory.html",
+      "category": "插件工具"
     },
     {
       "title": "Xget - 超高性能开发者资源加速引擎",
-      "description": "探索 Xget 如何通过智能加速和资源优化，为开发者提供极速的资源访问体验。",
+      "description": "Xget 是基于 Cloudflare Workers 的超高性能资源加速引擎，支持 GitHub、npm、PyPI、Docker 等 40+ 平台的统一加速",
       "htmlFile": "chapter03/0101.xget-high-performance-resource.html",
       "category": "开发工具"
     },
     {
-      "title": "Bytebot - AI 桌面代理",
-      "description": "了解 Bytebot 如何作为 AI 桌面助手，提升你的工作效率和自动化体验。",
+      "title": "Bytebot - 开源AI桌面代理：让AI拥有自己的电脑",
+      "description": "Bytebot是一个开源的AI桌面代理，通过自然语言命令自动化计算机任务，在容器化的Linux桌面环境中运行。支持文件处理、多应用工作流、企业级RPA替代方案",
       "htmlFile": "chapter03/0102.bytebot-ai-desktop-agent.html",
-      "category": "AI工具"
+      "category": "开发工具"
     },
     {
-      "title": "Onyx - 开源 AI 平台",
-      "description": "深入探索 Onyx 开源 AI 平台的架构设计和应用场景。",
+      "title": "Onyx - 开源 AI 平台：多功能聊天 UI，支持任意 LLM",
+      "description": "Onyx 是一个功能丰富的、自托管聊天 UI，支持任何 LLM。内置代理、RAG、连接器等高级功能，适用于团队和企业。",
       "htmlFile": "chapter03/0103.onyx-opensource-ai-platform.html",
-      "category": "AI工具"
+      "category": "开发工具"
     },
     {
-      "title": "TrendRadar - 热点监控工具",
-      "description": "使用 TrendRadar 实时追踪技术热点，掌握最新动态和趋势。",
+      "title": "TrendRadar - 30秒部署的热点助手",
+      "description": "TrendRadar是一个30秒可部署的热点助手,聚合35+平台新闻,支持智能推送、趋势分析和AI智能分析。告别无效刷屏,只看真正关心的新闻资讯。",
       "htmlFile": "chapter03/0104.trendradar-trend-monitoring-tool.html",
-      "category": "技术趋势"
+      "category": "开发工具"
     },
     {
-      "title": "Tracy Profiler - 性能分析工具",
-      "description": "深度解析 Tracy Profiler 的功能特性，掌握性能优化的利器。",
+      "title": "Tracy Profiler - 纳秒级实时性能分析工具",
+      "description": "Tracy 是一款强大的实时性能分析工具，提供纳秒级分辨率测量能力，支持 CPU、GPU、内存分析，适用于游戏和应用程序性能优化",
       "htmlFile": "chapter03/0105.tracy-profiler-performance-analysis.html",
       "category": "开发工具"
     }
