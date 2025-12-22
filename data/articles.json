@@ -220,6 +220,30 @@
       "category": "最新动态"
     },
     {
+      "title": "Multi Session Management - 多会话并行管理策略",
+      "description": "基于实际使用经验，介绍如何在Claude Code中同时管理多个会话，提高开发效率和多任务处理能力",
+      "htmlFile": "chapter04/0404.multi-session-management.html",
+      "category": "最新动态"
+    },
+    {
+      "title": "Project Planning Methodology - AI项目规划方法论",
+      "description": "基于Claude Code的AI项目规划方法论，包括需求分析、技术选型、架构设计、团队协作等全流程指导",
+      "htmlFile": "chapter04/0405.project-planning-methodology.html",
+      "category": "最新动态"
+    },
+    {
+      "title": "Claude Skills Workflow System - Claude Skills工作流系统",
+      "description": "基于Claude Code的Skills系统实战指南，包括自定义技能开发、工作流编排、自动化任务等高级功能",
+      "htmlFile": "chapter04/0406.skills-workflow-system.html",
+      "category": "最新动态"
+    },
+    {
+      "title": "AI Product Development - AI产品开发最佳实践",
+      "description": "基于Claude Code的AI产品开发完整指南，包括产品规划、技术实现、用户体验、市场策略等全流程实战经验",
+      "htmlFile": "chapter04/0407.ai-product-development.html",
+      "category": "最新动态"
+    },
+    {
       "title": "Xget - 超高性能开发者资源加速引擎",
       "description": "Xget 是基于 Cloudflare Workers 的超高性能资源加速引擎，支持 GitHub、npm、PyPI、Docker 等 40+ 平台的统一加速",
       "htmlFile": "chapter05/0501.xget-high-performance-resource.html",
