@@ -84,37 +84,145 @@
       "title": "Claude-Mem - Claude Code 持久化记忆系统 | AI智能记忆压缩工具",
       "description": "Claude-Mem 是一个为 Claude Code 打造的持久化记忆压缩系统，自动捕获会话上下文并跨会话保存，让AI助手拥有真正的长期记忆能力。",
       "htmlFile": "chapter03/0101.claude-memory.html",
-      "category": "插件工具"
+      "category": "使用工具"
+    },
+    {
+      "title": "Claudia - Claude Code 强大GUI应用 | 可视化编程助手界面*{margin:0;padding:0;box-sizing:border-box}:root{--primary:#8b5cf6;--primary-dark:#7c3aed;--secondary:#06b6d4;--accent:#f59e0b;--background:#0f0f1a;--surface:#1a1a2e;--surface-light:#252542;--text:#e2e8f0;--text-muted:#94a3b8;--border:#334155;--gradient-primary:linear-gradient(135deg,#8b5cf6 0%,#06b6d4 100%);--gradient-hero:linear-gradient(135deg,#1a1a2e 0%,#0f0f1a 50%,#1e1b4b 100%);--glow-primary:0 0 40px rgba(139,92,246,0.3);--glow-secondary:0 0 40px rgba(6,182,212,0.2)}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;line-height:1.7;color:var(--text);background:var(--background);overflow-x:hidden}.container{width:100%;max-width:1200px;margin:0 auto;padding:0 1.5rem}.hero-section{position:relative;min-height:100vh;display:flex;align-items:center;background:var(--gradient-hero);overflow:hidden}.hero-section::before{content:"";position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 20% 80%,rgba(139,92,246,0.15) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(6,182,212,0.1) 0%,transparent 50%),radial-gradient(circle at 50% 50%,rgba(245,158,11,0.05) 0%,transparent 50%);pointer-events:none}.particles{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;pointer-events:none}.particle{position:absolute;width:4px;height:4px;background:var(--primary);border-radius:50%;opacity:0.3;animation:float 20s infinite ease-in-out}.particle:nth-child(2){left:15%;animation-delay:-3s;background:var(--secondary)}.particle:nth-child(3){left:30%;animation-delay:-6s}.particle:nth-child(4){left:45%;animation-delay:-9s;background:var(--accent)}.particle:nth-child(5){left:60%;animation-delay:-12s;background:var(--secondary)}.particle:nth-child(6){left:75%;animation-delay:-15s}.particle:nth-child(7){left:90%;animation-delay:-18s;background:var(--accent)}@keyframes float{0%,100%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:0.3}90%{opacity:0.3}100%{transform:translateY(-100vh) scale(1);opacity:0}}.hero-container{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;padding:2rem 0}.hero-content{animation:fadeInUp 0.8s ease-out}@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}.hero-badge{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);padding:0.5rem 1rem;border-radius:50px;font-size:0.875rem;color:var(--primary);margin-bottom:1.5rem}.hero-badge::before{content:"";width:8px;height:8px;background:var(--primary);border-radius:50%;animation:pulse 2s infinite}@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.2)}}.hero-title{font-size:3.5rem;font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.hero-subtitle{font-size:1.25rem;color:var(--text-muted);margin-bottom:2rem;max-width:500px}.hero-stats{display:flex;gap:2rem;margin-bottom:2rem}.stat-item{text-align:center}.stat-number{display:block;font-size:1.5rem;font-weight:700;color:var(--text)}.stat-label{font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em}.hero-actions{display:flex;gap:1rem;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.875rem 1.75rem;border:none;border-radius:12px;font-weight:600;font-size:1rem;text-decoration:none;cursor:pointer;transition:all 0.3s ease}.btn-primary{background:var(--gradient-primary);color:#fff;box-shadow:var(--glow-primary)}.btn-primary:hover{transform:translateY(-3px);box-shadow:0 10px 40px rgba(139,92,246,0.4)}.btn-secondary{background:var(--surface-light);color:var(--text);border:1px solid var(--border)}.btn-secondary:hover{background:var(--surface);border-color:var(--primary);transform:translateY(-3px)}.hero-visual{position:relative;display:flex;justify-content:center;align-items:center;animation:fadeInUp 0.8s ease-out 0.2s both}.app-showcase{position:relative;width:100%;max-width:500px;aspect-ratio:16/9;background:var(--surface-light);border-radius:16px;overflow:hidden;border:2px solid var(--primary);box-shadow:var(--glow-primary)}.app-interface{position:absolute;top:0;left:0;width:100%;height:100%;background:#1a1a2e}.app-header{display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;background:rgba(26,27,38,0.9);border-bottom:1px solid var(--primary)}.app-title{font-size:0.875rem;color:var(--primary);font-weight:600}.app-actions{display:flex;gap:0.5rem}.app-action-btn{width:30px;height:30px;background:rgba(139,92,246,0.2);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--primary);cursor:pointer;transition:all 0.2s}.app-action-btn:hover{background:var(--primary);color:#fff}.app-sidebar{position:absolute;top:0;left:0;width:200px;height:100%;background:rgba(32,33,42,0.9);border-right:1px solid var(--border)}.sidebar-section{padding:1rem;border-bottom:1px solid var(--border)}.sidebar-title{font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem}.sidebar-item{display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;color:var(--text);border-radius:6px;cursor:pointer;transition:all 0.2s}.sidebar-item:hover{background:rgba(139,92,246,0.1);color:var(--primary)}.sidebar-icon{width:20px;height:20px}.sidebar-text{font-size:0.875rem}.app-main{position:absolute;top:0;left:200px;right:0;bottom:0;background:rgba(38,39,49,0.9)}.app-chat{display:flex;flex-direction:column;height:100%}.chat-header{display:flex;align-items:center;justify-content:space-between;padding:1rem;background:rgba(45,46,59,0.9);border-bottom:1px solid var(--border)}.chat-title{font-size:0.9rem;color:var(--text);font-weight:600}.chat-messages{flex:1;overflow-y:auto;padding:1rem}.message{display:flex;gap:0.75rem;margin-bottom:1rem;padding:1rem;background:rgba(45,46,59,0.6);border-radius:12px;animation:messageSlideIn 0.3s ease-out}.message.user{align-self:flex-end}.message.assistant{align-self:flex-start}@keyframes messageSlideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}.message-avatar{width:32px;height:32px;background:var(--gradient-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}.message-avatar.assistant{background:var(--secondary-color)}.message-content{flex:1;color:var(--text);font-size:0.9rem;line-height:1.6}.chat-input{display:flex;gap:0.5rem;padding:1rem;background:rgba(45,46,59,0.9);border-top:1px solid var(--border)}.chat-input input{flex:1;background:transparent;border:none;color:var(--text);font-size:0.9rem;outline:none}.chat-input input::placeholder{color:var(--text-muted)}.chat-send-btn{width:32px;height:32px;background:var(--gradient-primary);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;transition:all 0.2s}.chat-send-btn:hover{background:var(--primary-dark)}.main-content{position:relative;z-index:1}section{padding:5rem 0}.section-header{text-align:center;margin-bottom:4rem}.section-badge{display:inline-block;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);padding:0.375rem 1rem;border-radius:50px;font-size:0.75rem;color:var(--primary);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem}.section-title{font-size:2.5rem;font-weight:700;margin-bottom:1rem;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.section-subtitle{font-size:1.125rem;color:var(--text-muted);max-width:600px;margin:0 auto}.overview-section{background:linear-gradient(180deg,var(--background) 0%,var(--surface) 100%)}.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}.overview-content h3{font-size:1.75rem;margin-bottom:1rem;color:var(--text)}.overview-content p{color:var(--text-muted);margin-bottom:1.5rem}.overview-list{list-style:none}.overview-list li{display:flex;align-items:flex-start;gap:0.75rem;margin-bottom:1rem;color:var(--text-muted)}.overview-list li::before{content:"✓";color:var(--secondary);font-weight:bold}.features-section{background:var(--surface)}.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}.feature-card{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border);position:relative;overflow:hidden}.feature-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--gradient-primary);transform:scaleX(0);transition:transform 0.3s ease}.feature-card:hover{transform:translateY(-5px);border-color:var(--primary);box-shadow:var(--glow-primary)}.feature-card:hover::before{transform:scaleX(1)}.feature-icon{width:60px;height:60px;background:rgba(139,92,246,0.1);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.75rem;margin-bottom:1.5rem}.feature-title{font-size:1.25rem;font-weight:600;margin-bottom:0.75rem;color:var(--text)}.feature-description{color:var(--text-muted);font-size:0.95rem}.installation-section{background:linear-gradient(180deg,var(--surface) 0%,var(--background) 100%)}.install-tabs{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border)}.tab-buttons{display:flex;gap:0.5rem;margin-bottom:2rem;background:var(--surface);padding:0.5rem;border-radius:12px}.tab-btn{flex:1;padding:0.875rem 1.5rem;border:none;background:transparent;color:var(--text-muted);font-weight:600;border-radius:8px;cursor:pointer;transition:all 0.3s ease}.tab-btn.active{background:var(--gradient-primary);color:#fff}.tab-btn:hover:not(.active){color:var(--text);background:rgba(139,92,246,0.1)}.tab-content.active{display:block;animation:fadeIn 0.3s ease}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.install-step{margin-bottom:1.5rem}.install-step:last-child{margin-bottom:0}.install-step h4{color:var(--text);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem}.step-number{width:28px;height:28px;background:var(--gradient-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-weight:700}.code-block{position:relative;background:#0d1117;border-radius:12px;overflow:hidden;border:1px solid var(--border)}.code-header{display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;background:#161b22;border-bottom:1px solid var(--border)}.code-lang{font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em}.copy-btn{background:var(--primary);color:#fff;border:none;padding:0.375rem 0.75rem;border-radius:6px;font-size:0.75rem;cursor:pointer;transition:all 0.2s ease}.copy-btn:hover{background:var(--primary-dark)}.code-content{padding:1rem;overflow-x:auto}.code-content pre{margin:0;font-family:"Fira Code","Monaco","Consolas",monospace;font-size:0.875rem;line-height:1.6}.code-content code{color:#e6edf3}.workflow-section{background:var(--background)}.workflow-diagram{display:flex;flex-direction:column;gap:2rem}.workflow-step{display:flex;align-items:flex-start;gap:1rem;padding:1.5rem;background:var(--surface-light);border-radius:16px;border:1px solid var(--border);position:relative}.workflow-step::before{content:"";position:absolute;top:50%;left:0;transform:translateY(-50%);width:2px;height:30px;background:var(--gradient-primary)}.workflow-step::after{content:"→";position:absolute;top:50%;right:-15px;transform:transform:translateY(-50%);color:var(--primary);font-size:1.5rem}.workflow-step:last-child::after{display:none}.step-icon{width:50px;height:50px;background:var(--gradient-primary);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;color:#fff;flex-shrink:0}.step-content{flex:1}.step-title{font-weight:600;color:var(--text);margin-bottom:0.5rem;font-size:1.1rem}.step-desc{color:var(--text-muted);font-size:0.9rem}.tech-specs{background:var(--surface);padding:4rem 2rem}.spec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem}.spec-card{background:var(--surface-light);border-radius:16px;padding:1.5rem;border:1px solid var(--border)}.spec-header{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}.spec-icon{width:40px;height:40px;background:var(--gradient-primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;color:#fff}.spec-title{font-size:1.1rem;font-weight:600;color:var(--text)}.spec-content{color:var(--text-muted);font-size:0.9rem}.spec-table{width:100%;border-collapse:collapse;margin-top:1rem}.spec-table th,.spec-table td{padding:0.75rem;text-align:left;border-bottom:1px solid var(--border)}.spec-table th{background:var(--surface);color:var(--text);font-weight:600}.spec-table td{color:var(--text-muted)}.troubleshooting-section{background:var(--surface-light)}.troubleshoot-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem}.trouble-item{background:var(--surface);border-radius:12px;padding:1.5rem;border:1px solid var(--border)}.trouble-header{display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem}.trouble-icon{width:32px;height:32px;background:var(--secondary);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem}.trouble-title{font-weight:600;color:var(--text)}.trouble-solution{color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem}.trouble-code{font-family:"Fira Code",monospace;background:rgba(0,0,0,0.8);color:#e6edf3;padding:1rem;border-radius:8px;font-size:0.875rem}.trouble-code code{color:var(--accent)}.footer{background:var(--surface);padding:3rem 0;border-top:1px solid var(--border)}.footer-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}.footer-info{color:var(--text-muted);font-size:0.9rem}.footer-info a{color:var(--primary);text-decoration:none}.footer-info a:hover{text-decoration:underline}.footer-stats{color:var(--text-muted);font-size:0.875rem}.footer-links a:hover{color:var(--primary)}@media (max-width:1024px){.hero-container{grid-template-columns:1fr;text-align:center}.hero-subtitle{margin:0 auto 2rem}.hero-stats{justify-content:center}.hero-actions{justify-content:center}.hero-visual{order:-1}.app-showcase{max-width:400px}.overview-grid,.workflow-section{grid-template-columns:1fr}.features-grid{grid-template-columns:repeat(2,1fr)}.spec-grid{grid-template-columns:1fr}}@media (max-width:768px){.hero-title{font-size:2.5rem}.section-title{font-size:2rem}.features-grid{grid-template-columns:1fr}.tab-buttons{flex-direction:column}.spec-table{overflow-x:auto}.footer-content{flex-direction:column;text-align:center}}@media (max-width:480px){.hero-title{font-size:2rem}.btn{width:100%;justify-content:center}section{padding:3rem 0}}.sf-hidden{display:none!important}",
+      "description": "default-src 'none'; font-src 'self' data:; img-src 'self' data:; style-src 'unsafe-inline'; media-src 'self' data:; script-src 'unsafe-inline' data:; object-src 'self' data:; frame-src 'self' data:;",
+      "htmlFile": "chapter03/0102.claudia-macos.html",
+      "category": "使用工具"
+    },
+    {
+      "title": "Claude Code Now - 世界最快的Claude Code启动器 | AI智能启动器",
+      "description": "Claude Code Now 是世界上最快的Claude Code启动器，提供一键启动、多API支持、文件夹快速启动等功能，让Claude Code使用更便捷",
+      "htmlFile": "chapter03/0103.claude-code-now.html",
+      "category": "使用工具"
+    },
+    {
+      "title": "Open CoreUI - Rust重写的轻量级Open WebUI | 高性能AI交互界面",
+      "description": "Open CoreUI 是使用Rust重写的轻量级Open WebUI服务端和桌面客户端，显著减少内存和资源占用，无需Docker和依赖服务",
+      "htmlFile": "chapter03/0104.open-coreui.html",
+      "category": "使用工具"
+    },
+    {
+      "title": "CC-Switch - Claude Code与Codex配置切换神器 | AI编程助手配置管理",
+      "description": "CC-Switch 是一款桌面应用，专为Claude Code和Codex设计，提供可视化配置管理、多设备同步、一键切换等功能，让AI编程助手配置更简单",
+      "htmlFile": "chapter03/0105.cc-switch.html",
+      "category": "使用工具"
+    },
+    {
+      "title": "Crush - 终端AI编程代理工具 | Charmbracelet开发的多AI路由工具",
+      "description": "Crush 是Charm公司开发的终端AI编程代理，支持多AI提供商路由、自定义API端点、OpenRouter集成，提供强大的代码生成和编程辅助功能",
+      "htmlFile": "chapter03/0106.crush.html",
+      "category": "使用工具"
+    },
+    {
+      "title": "CCUndo - Claude Code精细撤销工具 | 精细文件操作恢复系统",
+      "description": "CCUndo 为Claude Code提供精细的撤销功能，直接读取Claude Code会话文件来追踪文件操作，允许用户选择性地撤销更改，恢复到检查点状态",
+      "htmlFile": "chapter03/0107.ccundo.html",
+      "category": "使用工具"
+    },
+    {
+      "title": "CCStatusLine - Claude Code 美观状态行工具",
+      "description": "CCStatusLine 为Claude Code CLI提供美观且高度可定制的状态行，支持Powerline主题、多种配置选项、自定义颜色和小组件",
+      "htmlFile": "chapter03/0108.ccstatusline.html",
+      "category": "使用工具"
+    },
+    {
+      "title": "Claude-Triflow - 三流式代码生成框架",
+      "description": "Claude-Triflow 是一个创新的代码生成框架，通过三流式工作流（规划、编码、优化）提升代码质量和开发效率",
+      "htmlFile": "chapter03/0109.claude-triflow.html",
+      "category": "使用工具"
+    },
+    {
+      "title": "Cometix-Tab - VSCode/Cursor Tab增强工具",
+      "description": "Cometix-Tab 是Copilot++生态项目中的Tab增强工具，为VSCode和JetBrains IDE提供类似Cursor Tab的无限标签页功能，无需魔法和账号",
+      "htmlFile": "chapter03/0110.Cometix-Tab.html",
+      "category": "使用工具"
+    },
+    {
+      "title": "LanyunCodingUI - Claude Code现代化Web界面",
+      "description": "LanyunCodingUI 是Claude Code的现代化Web界面，提供直观的可视化体验、交互模式、高级功能（检查点、钩子、插件系统），被称为实测封神的编程助手",
+      "htmlFile": "chapter03/0111.lanyuncodingUI.html",
+      "category": "使用工具"
+    },
+    {
+      "title": "Claude Code Router - 智能请求路由工具",
+      "description": "Claude Code Router 是一个强大的工具，可以将Claude Code请求路由到不同的模型，支持自定义API端点、负载均衡、故障转移和请求定制",
+      "htmlFile": "chapter03/0112.claude-code-router.html",
+      "category": "使用工具"
+    },
+    {
+      "title": "Claude Code Viewer - Web可视化客户端",
+      "description": "",
+      "htmlFile": "chapter03/0113.claude-code-viewer.html",
+      "category": "使用工具"
+    },
+    {
+      "title": "CCNexus - 智能API网关",
+      "description": "",
+      "htmlFile": "chapter03/0114.ccNexus.html",
+      "category": "使用工具"
+    },
+    {
+      "title": "Claude-Mem - Claude Code 持久化记忆系统",
+      "description": "",
+      "htmlFile": "chapter03/0115.claude-mem.html",
+      "category": "使用工具"
+    },
+    {
+      "title": "BMAD Method - 多智能体协作框架",
+      "description": "",
+      "htmlFile": "chapter03/0116.BMAD-METHOD.html",
+      "category": "使用工具"
+    },
+    {
+      "title": "Graphiti MCP Server - AI知识图谱服务器",
+      "description": "",
+      "htmlFile": "chapter03/0117.graphiti-mcp-server.html",
+      "category": "使用工具"
+    },
+    {
+      "title": "Zen MCP Server - 多模型协调指挥系统",
+      "description": "",
+      "htmlFile": "chapter03/0118.zen-mcp-server.html",
+      "category": "使用工具"
+    },
+    {
+      "title": "Context Engineering Intro - AI编程助手上下文工程模板",
+      "description": "",
+      "htmlFile": "chapter03/0119.context-engineering-intro.html",
+      "category": "使用工具"
     },
     {
       "title": "Xget - 超高性能开发者资源加速引擎",
       "description": "Xget 是基于 Cloudflare Workers 的超高性能资源加速引擎，支持 GitHub、npm、PyPI、Docker 等 40+ 平台的统一加速",
-      "htmlFile": "chapter04/0101.xget-high-performance-resource.html",
-      "category": "开发工具"
+      "htmlFile": "chapter05/0101.xget-high-performance-resource.html",
+      "category": "其他"
     },
     {
       "title": "Bytebot - 开源AI桌面代理：让AI拥有自己的电脑",
       "description": "Bytebot是一个开源的AI桌面代理，通过自然语言命令自动化计算机任务，在容器化的Linux桌面环境中运行。支持文件处理、多应用工作流、企业级RPA替代方案",
-      "htmlFile": "chapter04/0102.bytebot-ai-desktop-agent.html",
-      "category": "开发工具"
+      "htmlFile": "chapter05/0102.bytebot-ai-desktop-agent.html",
+      "category": "其他"
     },
     {
       "title": "Onyx - 开源 AI 平台：多功能聊天 UI，支持任意 LLM",
       "description": "Onyx 是一个功能丰富的、自托管聊天 UI，支持任何 LLM。内置代理、RAG、连接器等高级功能，适用于团队和企业。",
-      "htmlFile": "chapter04/0103.onyx-opensource-ai-platform.html",
-      "category": "开发工具"
+      "htmlFile": "chapter05/0103.onyx-opensource-ai-platform.html",
+      "category": "其他"
     },
     {
       "title": "TrendRadar - 30秒部署的热点助手",
       "description": "TrendRadar是一个30秒可部署的热点助手,聚合35+平台新闻,支持智能推送、趋势分析和AI智能分析。告别无效刷屏,只看真正关心的新闻资讯。",
-      "htmlFile": "chapter04/0104.trendradar-trend-monitoring-tool.html",
-      "category": "开发工具"
+      "htmlFile": "chapter05/0104.trendradar-trend-monitoring-tool.html",
+      "category": "其他"
     },
     {
       "title": "Tracy Profiler - 纳秒级实时性能分析工具",
       "description": "Tracy 是一款强大的实时性能分析工具，提供纳秒级分辨率测量能力，支持 CPU、GPU、内存分析，适用于游戏和应用程序性能优化",
-      "htmlFile": "chapter04/0105.tracy-profiler-performance-analysis.html",
-      "category": "开发工具"
+      "htmlFile": "chapter05/0105.tracy-profiler-performance-analysis.html",
+      "category": "其他"
     }
   ]
 }
