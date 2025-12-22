@@ -1,0 +1,651 @@
+
+### 2.7 claude
+
+```
+01.快速开始
+    a.安装
+        a.说明
+            # 检查安装
+            claude --version
+            # 重新安装
+            npm install -g @anthropic/claude-code
+            # 检查系统状态
+            claude /doctor
+        b.说明
+            # 位置
+            /Users/troyesivens/.claude
+            # 聊天记录
+            /Users/troyesivens/.claude/projects
+            # 加速思考
+            think < think hard < think harder < ultrathink
+            # mcp配置位置
+            /Users/troyesivens/.claude.json
+            /Volumes/Samsung/software_xare/libra-boot-app/.mcp.json
+        c.临时配置
+            cd your-project-folder
+            export ANTHROPIC_AUTH_TOKEN=sk-..
+            export ANTHROPIC_BASE_URL=https://anyrouter.top
+            claude
+            -------------------------------------------------------------------------------------------------
+            export ANTHROPIC_BASE_URL="https://claude-code.pseudoyu.com/api"
+            export ANTHROPIC_AUTH_TOKEN="你的API密钥"
+            -------------------------------------------------------------------------------------------------
+            运行后，选择你喜欢的主题 + Enter，确认安全须知 + Enter，使用默认 Terminal 配置 + Enter，信任工作目录 + Enter
+        d.永久配置
+            echo -e '\n export ANTHROPIC_AUTH_TOKEN=sk-...' >> ~/.bash_profile
+            echo -e '\n export ANTHROPIC_BASE_URL=https://anyrouter.top' >> ~/.bash_profile
+            echo -e '\n export ANTHROPIC_AUTH_TOKEN=sk-...' >> ~/.bashrc
+            echo -e '\n export ANTHROPIC_BASE_URL=https://anyrouter.top' >> ~/.bashrc
+            echo -e '\n export ANTHROPIC_AUTH_TOKEN=sk-...' >> ~/.zshrc
+            echo -e '\n export ANTHROPIC_BASE_URL=https://anyrouter.top' >> ~/.zshrc
+        e.查看配置
+            printenv | grep ANTHROPIC
+        f.清除缓存（如果需要）
+            # claude
+            rm -rf ~/.claude/cache
+            # vscode
+            c:/Users/mysla/AppData/Roaming/Code/User/workspaceStorage
+    b.操作1
+        a.原生安装
+            # win
+            irm https://claude.ai/install.ps1 | iex
+            # mac、linux
+            brew install --cask claude-code
+            # mac、linux
+            curl -fsSL https://claude.ai/install.sh | bash
+        b.npm迁移原生
+            claude install
+            # win
+            C:\Users\mysla\.local\bin\claude.exe
+            # wsl
+            /home/troyekk/.local/bin/claude
+        c.官方文档
+            https://docs.claude.com/en/docs/claude-code/setup
+    c.操作2
+        a.命令1
+            /init          # 初始化项
+            /doctor        # 系统检查
+            /config        # 查看配置
+            /memory        # 项目记忆
+            /content       # 查看上下文空间
+            /resume        # 查看历史聊天记录
+            /compact       # 会话过长时压缩
+            /clear         # 切换任务时清理，频繁地调用
+            /cost          # 定期检查Token使用
+        b.mcp安装
+            # 查看1
+            /mcp
+            # 查看2
+            claude mcp list
+    d.降智3
+        a.说明
+            开始的版本对模型影响不大，属于可接受；后来失了智疯狂注入提示，大模型每次推理都被干扰、打断，每次读取代码都被附加了额外的焦虑。
+        b.回退v1.0.51
+            # 卸载
+            npm uninstall -g @anthropic-ai/claude-code
+            # 安装
+            npm install-g @anthropic-ai/claude-code@1.0.51
+            # 验证
+            claude -v
+            # 不要运行这个，它会把包更新到最新版
+            npm update -g @anthropic/claude-code
+        c.关闭更新
+            # 临时关闭
+            export DISABLE_AUTOUPDATER=1
+            # 永久关闭，放到zsh
+            export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+
+02.常见配置
+    a.Claude Code的VSCode插件升级到2.0后跳过登录
+        a.创建 ~/.claude/config.json
+            # 配置 (这个值是随便填的)
+            { "primaryApiKey": "llej" }                                               --错误，历史版本
+            -------------------------------------------------------------------------------------------------
+            { "api_key": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" }         --正确
+        b.创建 ~/.claude/settings.json
+            {
+              "enabledPlugins": {
+                "frontend-design@claude-code-plugins": true
+              },
+              "env": {
+                "ANTHROPIC_AUTH_TOKEN": "xxxxxxxxxxxxxxxxxxxxxxx.xxxxxxxxxxxxxxxxxxxx",
+                "ANTHROPIC_BASE_URL": "https://open.bigmodel.cn/api/anthropic",
+                "ANTHROPIC_DEFAULT_HAIKU_MODEL": "glm-4.5-air",
+                "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-4.6",
+                "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-4.6",
+                "ANTHROPIC_MODEL": "GLM-4.6"
+              }
+            }
+        c.点击在 settings.json 中编辑环境变量
+            "claude-code.environmentVariables": [
+              {
+                "name": "ANTHROPIC_AUTH_TOKEN",
+                "value": "你的sk密钥"
+              },
+              {
+                "name": "ANTHROPIC_BASE_URL",
+                "value": "https://open.bigmodel.cn/api/anthropic"
+              },
+            ],
+    b.GLM配置到ClaudeCode
+        a.配置层级关系
+            VSCode Extension 层面（你当前使用的）
+            文件位置：~/Library/Application Support/Code - Insiders/User/settings.json
+            配置字段：claude-code.environmentVariables
+            注意：这是 VSCode 扩展的配置，需要配合 ~/.claude/config.json 才能生效
+        b.Claude Code CLI 层面（独立的配置系统）
+            优先级从高到低：
+            .claude/settings.local.json（项目本地，git 忽略）
+            .claude/settings.json（项目共享，可提交）
+            ~/.claude/settings.json（全局用户配置）
+        c.GLM配置
+            配置参数：
+            ANTHROPIC_BASE_URL=https://open.bigmodel.cn/api/anthropic
+            ANTHROPIC_AUTH_TOKEN=你的智谱API密钥（格式如：b04049f4fef843a3999b5fc69c7cfe5d.xxx）
+            -------------------------------------------------------------------------------------------------
+            可选的模型映射：
+            ANTHROPIC_DEFAULT_HAIKU_MODEL=glm-4.5-air
+            ANTHROPIC_DEFAULT_SONNET_MODEL=glm-4.6
+            ANTHROPIC_DEFAULT_OPUS_MODEL=glm-4.6
+        d.你的配置为什么可能不生效
+            根据 CSDN 博客的发现，VSCode 扩展 2.0+ 版本需要两步配置：
+            创建 ~/.claude/config.json（触发器文件）：
+            {
+              "primaryApiKey": "任意值"
+            }
+            然后 VSCode 的 claude-code.environmentVariables 才会被读取
+    c.方案一：项目级配置（推荐）
+        a.操作
+            在项目根目录创建 .claude/settings.local.json
+        b.配置
+            {
+              "environmentVariables": [
+                {
+                  "name": "ANTHROPIC_AUTH_TOKEN",
+                  "value": "b04049f4fef843a3999b5fc69c7cfe5d.lDUHLQUbMv61LYE1"
+                },
+                {
+                  "name": "ANTHROPIC_BASE_URL",
+                  "value": "https://open.bigmodel.cn/api/anthropic"
+                },
+                {
+                  "name": "ANTHROPIC_DEFAULT_SONNET_MODEL",
+                  "value": "glm-4.6"
+                }
+              ]
+            }
+        c.优点
+            优先级最高，确保生效
+            不影响其他项目
+            自动被 git 忽略，密钥安全
+    d.方案二：修复 VSCode 扩展配置
+        a.操作
+            先创建触发器文件 ~/.claude/config.json
+            保持你现有的 VSCode settings.json 配置
+        b.VSCode settings.json 配置
+            // 扩展：ClaudeCodeCLI
+            "claude-code.environmentVariables": [
+              {
+                "name": "ANTHROPIC_AUTH_TOKEN",
+                // "value": "xxxxxxxxx",
+                // "value": "xxxxxxxxx",
+                // "value": "xxxxxxxxx",
+                "value": "xxxxxxxxx",
+                // "value": "xxxxxxxxx",
+                // "value": "xxxxxxxxx",
+                // "value": "xxxxxxxxx",
+              },
+              {
+                "name": "ANTHROPIC_BASE_URL",
+                // "value": "https://anyrouter.top",
+                // "value": "https://modelscope.cn",
+                // "value": "https://modelscope.cn",
+                "value": "https://open.bigmodel.cn",
+                // "value": "https://bailian.console.aliyun.com",
+                // "value": "https://claude-code.pseudoyu.com/api",
+                // "value": "https://platform.moonshot.cn/console"
+              }
+            ],
+        c.优点
+            全局生效，所有项目通用
+            符合你当前的配置习惯
+        d.缺点
+            需要额外的触发器文件
+            依赖 VSCode 扩展实现（可能有 bug）
+    e.方案三：Shell 环境变量
+        a.CC-Switch，在 ~/.zshrc 或 ~/.bashrc 添加
+            export ANTHROPIC_AUTH_TOKEN="b04049f4fef843a3999b5fc69c7cfe5d.lDUHLQUbMv61LYE1"
+            export ANTHROPIC_BASE_URL="https://open.bigmodel.cn/api/anthropic"
+        b.优点
+            最直接，CLI 和扩展都能识别
+        c.缺点
+            需要重启终端/VSCode
+            全局污染环境变量
+    f.20251219：配置跳过登录
+        a.您可以通过以下方式跳过登录
+            a.方法 1: 环境变量（最简单）
+                {
+                  "env": {
+                    "ANTHROPIC_API_KEY": "your_api_key_here"
+                  }
+            b.方法 2: 使用 apiKeyHelper 脚本
+                {
+                  "apiKeyHelper": "/path/to/your/key_script.sh"
+                }
+        b.官方配置文件位置
+            a.用户级设置（全局）
+                macOS/Linux: ~/.claude/settings.json
+                Windows: %USERPROFILE%\.claude\settings.json
+            b.项目级设置
+                共享配置: .claude/settings.json（提交到 Git）
+                本地配置: .claude/settings.local.json（不提交到 Git，用于个人 API key）
+
+03.常见操作
+    a.使用Terminal
+        a.引用文件
+            a.方法1：直接输入文件路径
+                @/path/to/your/file.js
+                或者
+                @src/components/Button.tsx
+            b.方法2：使用相对路径
+                @./script/01-check-database.sh
+                @worker/src/index.ts
+            c.方法3：使用项目根目录
+                @wrangler.toml
+                @README.md
+                @src/utils/helper.js
+            d.方法4：搜索特定内容
+                @function:deleteExpiredEmails
+                @class:EmailService
+        b.使用技巧
+            a.多个文件：可以用空格分隔
+                @src/App.js @src/index.css @package.json
+            b.目录：使用通配符
+                @src/components/*
+                @script/*.sh
+            c.特定行：加上行号
+                @worker/src/index.ts:100-120
+            d.类型过滤
+                @*.js @*.ts @*.tsx
+        c.智能提示
+            Claude Code 会自动补全文件路径
+            支持 Tab 键补全
+            会显示相关文件的预览
+    b.安装plugin
+        a.添加Claude Code插件市场
+            claude plugin marketplace add https://github.com/anthropics/claude-code
+            -------------------------------------------------------------------------------------------------
+            ⎿  Successfully added marketplace: claude-code-plugins
+        b.验证市场安装
+            # 查看已配置的市场
+            claude plugin marketplace list
+            -------------------------------------------------------------------------------------------------
+            预期输出
+            Configured marketplaces:
+              ❯ claude-code-plugins
+                Source: Git (https://github.com/anthropics/claude-code.git)
+        c.安装 Frontend Design 插件
+            # 安装 frontend-design 插件
+            claude plugin install frontend-design
+            -------------------------------------------------------------------------------------------------
+            ✔ Successfully installed plugin: frontend-design@claude-code-plugins
+    c.使用skills
+        a.第1步
+            在你的项目目录下创建一个 “.claude/skills”目录，如果你不想提交到 git 就把 .claude 加到 .gitignore
+            注：也可以是任意其他目录，放在“.claude/skills”目录下有个好处就是 claude code 默认能使用，不需要额外配置。
+        b.第2步
+            把你要用到 skill 复制到“.claude/skills”目录下（可以去 http://github.com/anthropics/skills 这里找现成的）
+        c.第3步
+            如果你需要用到哪个 skill，只需要手动 @ 一下相应的 skill 文件即可，比如：
+            > 请使用 @.claude/skills/artifacts-builder/SKILL.md ，创建一个 whiteboard 项目
+        d.第4步
+            也就是说只要你让 agent 去读取相应的 SKILL md 文件，就可以让 Agent 学会使用 SKILL。
+            这个方法不仅仅适用于 codex cli，也同样适用于 TRAE、Cursor、GitHub Copilot 这类 coding agent。
+            只能说 SKILL 的设计是想当超前的，而且跟 MCP 一样，并非 Claude Code 专属。
+
+04.CLI参考
+    a.常见信息
+        a.CLI命令
+            命令                                    描述                                         例子
+            claude                                  启动交互式 REPL                                claude
+            claude "query"                          使用初始提示符启动 REPL                          claude "explain this project"
+            claude -p "query"                       通过SDK查询，然后退出                          claude -p "explain this function"
+            cat file | claude -p "query"            处理管道内容                                     cat logs.txt | claude -p "explain"
+            claude -c                               继续最近的对话                                   claude -c
+            claude -c -p "query"                    通过 SDK 继续                                    claude -c -p "Check for type errors"
+            claude -r "<session-id>" "query"        通过 ID 恢复会话                               claude -r "abc123" "Finish this PR"
+            claude update                           更新至最新版本                                   claude update
+            claude mcp                              配置模型上下文协议 (MCP) 服务器                  参见Claude Code MCP 文档。
+        b.CLI标志
+            | 旗帜                             | 描述                                                                   | 例子                                                        |
+            |----------------------------------|------------------------------------------------------------------------|-------------------------------------------------------------|
+            | --add-dir                        | 添加额外的工作目录供 Claude 访问（验证每个路径是否存在于目录中）         | claude --add-dir ../apps ../lib                             |
+            | --allowedTools                   | 除了settings.json 文件之外，还应允许不提示用户许可的工具列表           | "Bash(git log:*)" "Bash(git diff:*)" "Write"                |
+            | --disallowedTools                | 除了settings.json 文件之外，还应列出应禁止使用且无需提示用户许可的工具   | "Bash(git log:*)" "Bash(git diff:*)" "Write"                |
+            | --print，-p                       | 不使用交互模式打印响应（有关编程使用的详细信息，请参阅SDK 文档）         | claude -p "query"                                           |
+            | --output-format                  | 指定打印模式的输出格式（选项：text，，json）stream-json                  | claude -p "query" --output-format json                      |
+            | --input-format                   | 指定打印模式的输入格式（选项：text，stream-json）                        | claude -p --output-format json --input-format stream-json   |
+            | --verbose                        | 启用详细日志记录，显示完整的逐个输出（有助于在打印和交互模式下进行调试） | claude --verbose                                            |
+            | --max-turns                      | 限制非交互模式下的代理轮次                                             | claude -p --max-turns 3 "query"                             |
+            | --model                          | 使用最新模型的别名（sonnet或opus）或模型的全名设置当前会话的模型       | claude --model claude-sonnet-4-20250514                     |
+            | --permission-prompt-tool         | 指定一个 MCP 工具来处理非交互模式下的权限提示                            | claude -p --permission-prompt-tool mcp_auth_tool "query"    |
+            | --resume                         | 通过 ID 或在交互模式下选择来恢复特定会话                               | claude --resume abc123 "query"                              |
+            | --continue                       | 加载当前目录中最近的对话                                                 | claude --continue                                           |
+            | --dangerously-skip-permissions   | 跳过权限提示（谨慎使用）                                                 | claude --dangerously-skip-permissions                       |
+    b.高频命令
+        a.分类1
+            a.打开当前目录下的聊天记录
+                claude --resume
+            b.继续当前目录的上一次聊天
+                claude -c
+            c.清除终端屏幕，但保留对话历史
+                control + L
+            d.为项目生成或更新文档CLAUDE.md
+                /init
+            e.给予全部权限（风险大）
+                开启聊天时赋予权限
+                claude -c --dangerously-skip-permissions
+                聊天时赋予权限
+                shift + TAB
+        b.分类2
+            a.开启plan模式（仅赋予Read权限，可用于快速了解代码库而不轻易更改）
+                两次 shift + TAB
+            b.开启思考模式
+                在提示词中加入 ultrathink 等关键字
+            c.选择模型
+                /model
+            d.引用文件
+                @ + 文件名
+            e.请求代码审查
+                /review
+        c.分类3
+            a.管道输入
+                cat file.py | claude -p "优化这段代码"
+            b.粘贴图片
+                control + v
+            c.编辑CLAUDE.md
+                /memory
+            d.开启任务结束响铃通知
+                claude config set --global preferredNotifChannel terminal_bell
+            e.退出 Claude Code 会话
+                control + D
+        d.分类4
+            a.在控制台查看每日API费用
+                npx ccusage@latest
+            b.在CC中跑Bash命令
+                ！+ Bash命令
+            c.内存快捷键 - 添加到 CLAUDE.md
+                # + 需要写入到CLAUDE.md中的规则
+    c.基础启动命令
+        a.启动方式
+            # 直接启动交互模式
+            claude
+            # 带初始问题启动
+            claude "帮我分析这个项目结构"
+            # 一次性执行并退出
+            claude -p "解释这个函数"
+            # 管道输入
+            cat file.py | claude -p "优化这段代码"
+        b.常用启动参数
+            --resume: 恢复上次会话
+            --plan: 启用计划模式（适合复杂任务）
+            --architect: 大型项目架构模式
+    d.核心Slash命令
+        a.基础管理
+            /help          # 查看帮助
+            /clear         # 清除历史记录
+            /exit          # 退出程序
+            /cost          # 查看Token使用情况
+            /doctor        # 检查系统状态
+        b.项目管理
+            /memory        # 编辑项目记忆
+            /memory view   # 查看项目记忆
+            /config        # 查看配置
+            /init          # 初始化项目文档
+        c.会话优化
+            /compact       # 压缩会话内容
+            /bug           # 报告问题
+            /terminal-setup # 终端设置
+
+05.交互模式
+    a.键盘快捷键
+        a.一般控制
+            捷径           描述                     语境
+            Ctrl+C         取消当前输入或生成         标准中断
+            Ctrl+D         退出克劳德密码会话         EOF信号
+            Ctrl+L         清除终端屏幕             保留对话历史记录
+            Up/Down arrows 浏览命令历史记录         回忆之前的输入
+            Esc+Esc        编辑上一条消息             双击修改
+        b.多行输入
+            方法           捷径           语境
+            快速逃脱       \+Enter        适用于所有终端
+            macOS 默认设置 Option+Enter    macOS 上的默认设置
+            终端设置       Shift+Enter    后/terminal-setup
+            粘贴模式       直接粘贴       对于代码块，日志
+        c.快速命令
+            捷径         描述                               笔记
+            #在开始时    内存快捷方式 - 添加到 CLAUDE.md    提示选择文件
+            /在开始时    斜线命令                           查看斜线命令
+    b.Vim模式
+        a.模式切换
+            命令  行动             从模式
+            Esc   进入正常模式     插入
+            i     在光标前插入     普通的
+            I     在行首插入       普通的
+            a     在光标后插入     普通的
+            A     在行尾插入       普通的
+            o     打开下面的线     普通的
+            O     打开上面的线     普通的
+        b.导航（正常模式）
+            命令      行动
+            h/ j/ k/l 向左/向下/向上/向右移动
+            w         下一个单词
+            e         单词结尾
+            b         上一个单词
+            0         行首
+            $         行尾
+            ^         第一个非空白字符
+            gg        输入开始
+            G         输入结束
+        c.编辑（正常模式）
+            命令         行动
+            x            删除字符
+            dd           删除行
+            D            删除至行尾
+            dw/ de/db    删除单词/到结尾/返回
+            cc           换线
+            C            更改为行尾
+            cw/ ce/cb    更改单词/到结尾/返回
+            .            重复上次更改
+
+06.斜线命令
+    a.内置斜线命令
+        | 命令                      | 目的                                       |
+        |---------------------------|--------------------------------------------|
+        | /bug                      | 报告错误（将对话发送给 Anthropic）           |
+        | /clear                    | 清除对话历史记录                           |
+        | /compact [instructions]   | 紧凑的对话，带有可选的焦点指示             |
+        | /config                   | 查看/修改配置                              |
+        | /cost                     | 显示令牌使用情况统计信息                   |
+        | /doctor                   | 检查 Claude Code 安装的健康状况              |
+        | /help                     | 获取使用帮助                               |
+        | /init                     | 使用 CLAUDE.md 指南初始化项目                |
+        | /login                    | 切换 Anthropic 帐户                        |
+        | /logout                   | 退出您的 Anthropic 帐户                    |
+        | /mcp                      | 管理 MCP 服务器连接和 OAuth 身份验证         |
+        | /memory                   | 编辑 CLAUDE.md 内存文件                    |
+        | /model                    | 选择或更改AI模型                           |
+        | /permissions              | 查看或更新权限                             |
+        | /pr_comments              | 查看拉取请求评论                           |
+        | /review                   | 请求代码审查                               |
+        | /status                   | 查看帐户和系统状态                         |
+        | /terminal-setup           | 安装换行符的 Shift+Enter 键绑定（仅限 iTerm2 和 VSCode） |
+        | /vim                      | 进入 vim 模式，交替切换插入模式和命令模式    |
+    b.自定义斜线命令
+        a.开始
+            a.说明
+                自定义斜线命令允许您将常用的提示定义为 Claude Code 可执行的 Markdown 文件。
+                命令按范围（项目特定或个人）组织，并支持通过目录结构进行命名空间管理。
+            b.句法
+                /<prefix>:<command-name> [arguments]
+            c.参数
+                范围           描述
+                <prefix>       命令范围（project针对项目特定，user针对个人）
+                <command-name> 从 Markdown 文件名派生的名称（不带.md扩展名）
+                [arguments]    传递给命令的可选参数
+        b.命令类型
+            a.项目命令：命令存储在您的存储库中并与您的团队共享。
+                位置：.claude/commands/
+                前缀：/project:
+                ---------------------------------------------------------------------------------------------
+                在下面的示例中，我们创建/project:optimize命令：
+                # Create a project command
+                mkdir -p .claude/commands
+                echo "Analyze this code for performance issues and suggest optimizations:" > .claude/commands/optimize.md
+            b.个人命令：所有项目均可使用的命令
+                位置：~/.claude/commands/
+                前缀：/user:
+                ---------------------------------------------------------------------------------------------
+                在下面的示例中，我们创建 /user:security-review命令：
+                # Create a personal command
+                mkdir -p ~/.claude/commands
+                echo "Review this code for security vulnerabilities:" > ~/.claude/commands/security-rev
+        c.特征
+            a.命名空间
+                组织子目录中的命令以创建命名空间命令。
+                结构：<prefix>:<namespace>:<command>
+                例如，文件 at.claude/commands/frontend/component.md创建命令/project:frontend:component
+            b.参数
+                使用占位符将动态值传递给命令$ARGUMENTS。
+                例如：
+                # Command definition
+                echo "Fix issue #$ARGUMENTS following our coding standards" > .claude/commands/fix-issue.md
+                # Usage
+                > /project:fix-issue 123
+        d.文件格式
+            a.命令文件必须
+                使用 Markdown 格式（.md扩展名）
+                包含提示或说明作为文件内容
+                放置在适当的命令目录中
+    c.MCP 斜线命令
+        a.开始
+            a.说明
+                MCP 服务器可以将提示符显示为斜杠命令，这些命令可在 Claude 代码中使用。这些命令是从已连接的 MCP 服务器动态发现的。
+            b.命令格式
+                /mcp__<server-name>__<prompt-name> [arguments]
+        b.特征
+            a.动态发现
+                在以下情况下，MCP 命令自动可用：
+                MCP 服务器已连接并处于活动状态
+                服务器通过 MCP 协议公开提示
+                连接过程中提示已成功检索
+            b.参数
+                MCP 提示可以接受服务器定义的参数：
+                # Without arguments
+                > /mcp__github__list_prs
+
+                # With arguments
+                > /mcp__github__pr_review 456
+                > /mcp__jira__create_issue "Bug title" high
+            c.命名约定
+                服务器和提示名称已规范化
+                空格和特殊字符变为下划线
+                为了保持一致性，名称均采用小写
+        c.管理 MCP 连接
+            a.使用该/mcp命令可以
+                查看所有已配置的 MCP 服务器
+                检查连接状态
+                使用支持 OAuth 的服务器进行身份验证
+                清除身份验证令牌
+                查看每个服务器可用的工具和提示
+
+07.全局设置
+    a.设置文件
+        a.说明
+            该settings.json文件是我们通过分层设置来配置Claude代码的官方机制：
+            用户设置在所有项目中定义~/.claude/settings.json并应用于所有项目。
+            项目设置保存在您的项目目录中：
+            .claude/settings.json对于签入源代码控制并与您的团队共享的设置
+            .claude/settings.local.json未签入的设置，适用于个人偏好和实验。Claude Code 会.claude/settings.local.json在创建时将 git 配置为忽略。
+            对于 Claude Code 的企业部署，我们还支持企业托管策略设置。这些设置优先于用户和项目设置。系统管理员可以 通过 WSL 在/Library/Application Support/ClaudeCode/policies.jsonmacOS 以及 /etc/claude-code/policies.jsonLinux 和 Windows 上部署策略。
+        b.示例
+            {
+              "permissions": {
+                "allow": [
+                  "Bash(npm run lint)",
+                  "Bash(npm run test:*)",
+                  "Read(~/.zshrc)"
+                ],
+                "deny": [
+                  "Bash(curl:*)"
+                ]
+              },
+              "env": {
+                "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+                "OTEL_METRICS_EXPORTER": "otlp"
+              }
+            }
+        c.可用设置，settings.json支持多种选项
+            | 钥匙                  | 描述                                                                                                     | 例子                                  |
+            |-----------------------|----------------------------------------------------------------------------------------------------------|---------------------------------------|
+            | apiKeyHelper          | 自定义脚本，将在 中执行/bin/sh，以生成授权值。此值通常会作为模型请求的X-Api-Key、Authorization: Bearer和标头发送Proxy-Authorization: Bearer | /bin/generate_temp_api_key.sh         |
+            | cleanupPeriodDays     | 本地保留聊天记录的时间（默认值：30 天）                                                                    | 20                                    |
+            | env                   | 将应用于每个会话的环境变量                                                                               | {"FOO": "bar"}                        |
+            | includeCoAuthoredBy   | 是否co-authored-by Claude在 git 提交和拉取请求中包含署名（默认值true：）                                   | false                                 |
+            | permissions           | allow并且键是权限规则deny列表                                                                            | {"allow": [ "Bash(npm run lint)" ]}   |
+        d.设置优先级
+            按优先顺序应用设置：
+            企业策略（请参阅IAM 文档）
+            命令行参数
+            本地项目设置
+            共享项目设置
+            用户设置
+    b.环境变量
+        a.Claude Code 支持以下环境变量来控制其行为：
+            ANTHROPIC_API_KEY                          API 密钥作为X-Api-Key标头发送，通常用于 Claude SDK（对于交互式使用，运行/login）
+            ANTHROPIC_AUTH_TOKEN                       Authorization和标题的自定义值Proxy-Authorization（您在此处设置的值将以 为前缀Bearer ）
+            ANTHROPIC_CUSTOM_HEADERS                   您想要添加到请求的自定义标头（Name: Value格式）
+            ANTHROPIC_MODEL                            要使用的自定义模型的名称（请参阅模型配置）
+            ANTHROPIC_SMALL_FAST_MODEL                 用于后台任务的 Haiku 类模型名称
+            BASH_DEFAULT_TIMEOUT_MS                    长时间运行的 bash 命令的默认超时
+            BASH_MAX_TIMEOUT_MS                        模型可以为长时间运行的 bash 命令设置的最大超时时间
+            BASH_MAX_OUTPUT_LENGTH                     bash 输出中被中间截断前的最大字符数
+            CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR   执行完每个 Bash 命令后返回到原始工作目录
+            CLAUDE_CODE_API_KEY_HELPER_TTL_MS          凭证刷新间隔（以毫秒为单位）（使用时apiKeyHelper）
+            CLAUDE_CODE_MAX_OUTPUT_TOKENS              为大多数请求设置最大输出令牌数
+            CLAUDE_CODE_USE_BEDROCK                    使用 Bedrock（参见Bedrock 和 Vertex）
+            CLAUDE_CODE_USE_VERTEX                     使用 Vertex（参见Bedrock 和 Vertex）
+            CLAUDE_CODE_SKIP_BEDROCK_AUTH              跳过 Bedrock 的 AWS 身份验证（例如使用 LLM 网关时）
+            CLAUDE_CODE_SKIP_VERTEX_AUTH               跳过 Vertex 的 Google 身份验证（例如，使用 LLM 网关时）
+            CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC   相当于设置DISABLE_AUTOUPDATER、DISABLE_BUG_COMMAND、DISABLE_ERROR_REPORTING和DISABLE_TELEMETRY
+            DISABLE_AUTOUPDATER                        设置为1禁用自动更新程序
+            DISABLE_BUG_COMMAND                        设置为1禁用/bug命令
+            DISABLE_COST_WARNINGS                      设置为1禁用成本警告消息
+            DISABLE_ERROR_REPORTING                    设置为1退出 Sentry 错误报告
+            DISABLE_NON_ESSENTIAL_MODEL_CALLS          设置为1禁用非关键路径（如风味文本）的模型调用
+            DISABLE_TELEMETRY                          设置为1退出 Statsig 遥测（请注意，Statsig 事件不包括代码、文件路径或 bash 命令等用户数据）
+            HTTP_PROXY                                 指定网络连接的 HTTP 代理服务器
+            HTTPS_PROXY                                为网络连接指定 HTTPS 代理服务器
+            MAX_THINKING_TOKENS                        强制思考模型预算
+            MCP_TIMEOUT                                MCP 服务器启动超时时间（毫秒）
+            MCP_TOOL_TIMEOUT                           MCP 工具执行的超时时间（毫秒）
+    c.配置选项
+        a.说明
+            我们正在将全局配置迁移到settings.json。
+            claude config将被弃用，取而代之的是settings.json
+            -------------------------------------------------------------------------------------------------
+            要管理您的配置，请使用以下命令：
+            列表设置：claude config list
+            查看设置：claude config get <key>
+            更改设置：claude config set <key> <value>
+            推送到设置（用于列表）：claude config add <key> <value>
+            从设置中删除（对于列表）：claude config remove <key> <value>
+            默认情况下config会更改你的项目配置。要管理全局配置，请使用--global（或-g）标志。
+        b.全局配置
+            要设置全局配置，请使用claude config set -g <key> <value>：
+            钥匙                  描述                                       例子
+            autoUpdaterStatus     启用或禁用自动更新程序（默认值enabled：）    disabled
+            preferredNotifChannel 您希望在哪里接收通知（默认值iterm2：）       iterm2，iterm2_with_bell，terminal_bell， 或者notifications_disabled
+            theme                 颜色主题                                     dark，light，light-daltonized， 或者dark-daltonized
+            verbose               是否显示完整的 bash 和命令输出（默认值false：）  true
+```

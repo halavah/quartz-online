@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code 安装与配置完全指南</title>
+    <meta name="description" content="从零开始安装Claude Code，包含各平台安装方法、环境变量配置、首次运行和故障排除">
+    <meta name="keywords" content="Claude Code,安装指南,环境配置,开发工具,故障排除">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0066ff;
+            --secondary-color: #00d4ff;
+            --accent-color: #ff6b00;
+            --dark-bg: #0a0e27;
+            --card-bg: #1a1f3a;
+            --text-color: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --border-color: #2a2f4a;
+            --success-color: #00c853;
+            --gradient-primary: linear-gradient(135deg, #0066ff 0%, #00d4ff 100%);
+            --gradient-hero: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+            --shadow-glow: 0 0 30px rgba(0, 102, 255, 0.3);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--dark-bg);
+            overflow-x: hidden;
+        }
+
+        .hero-section {
+            background: var(--gradient-hero);
+            padding: 4rem 2rem 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(0, 102, 255, 0.2);
+            color: var(--secondary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            margin-bottom: 1rem;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: flex;
+            gap: 3rem;
+            align-items: flex-start;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .subsection-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+            color: var(--text-color);
+        }
+
+        .toc-sidebar {
+            width: 280px;
+            position: sticky;
+            top: 2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+            order: 2;
+        }
+
+        .toc-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .toc-sidebar ul {
+            list-style: none;
+        }
+
+        .toc-sidebar li {
+            margin-bottom: 0.5rem;
+        }
+
+        .toc-sidebar a {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .toc-sidebar a:hover {
+            background: rgba(0, 102, 255, 0.1);
+            color: var(--primary-color);
+            transform: translateX(4px);
+        }
+
+        .toc-sidebar a.active {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 102, 255, 0.2);
+        }
+
+        .card h4 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            color: #58a6ff;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .list {
+            margin: 1rem 0 1rem 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .list li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .list li strong {
+            color: var(--text-color);
+        }
+
+        .warning-box {
+            background: rgba(255, 152, 0, 0.1);
+            border-left: 4px solid #ff9800;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+        }
+
+        .warning-box strong {
+            color: var(--text-color);
+        }
+
+        .tip-box {
+            background: rgba(0, 102, 255, 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+        }
+
+        .tip-box strong {
+            color: var(--secondary-color);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.4);
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: var(--secondary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .back-to-top svg {
+            margin-bottom: 2px;
+        }
+
+        .footer {
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .footer-container p {
+            margin: 0.5rem 0;
+        }
+
+        @media (max-width: 1024px) {
+            .toc-sidebar {
+                position: static;
+                width: 100%;
+                max-height: none;
+                order: -1;
+                margin-bottom: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .main-content {
+                padding: 2rem 1rem;
+            }
+
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-container">
+            <span class="hero-badge">安装指南</span>
+            <h1 class="hero-title">Claude Code 安装与配置完全指南</h1>
+            <p class="hero-subtitle">从零开始安装Claude Code，包含各平台安装方法、环境变量配置、首次运行和故障排除</p>
+        </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- TOC Sidebar -->
+        <nav class="toc-sidebar">
+            <h2 class="toc-title">📋 目录导航</h2>
+            <ul>
+                <li><a href="#quick-start">1. 快速开始</a></li>
+                <li><a href="#installation-methods">2. 安装方式详解</a></li>
+                <li><a href="#env-config">3. 环境变量配置</a></li>
+                <li><a href="#first-run">4. 首次运行配置</a></li>
+                <li><a href="#verification">5. 验证与故障排除</a></li>
+            </ul>
+        </nav>
+
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Section 1: 快速开始 -->
+            <section id="quick-start" class="section">
+                <h2 class="section-title">1️⃣ 快速开始</h2>
+                <p class="section-description">如果你已经迫不及待想要体验Claude Code，这里是快速安装命令：</p>
+
+                <div class="card">
+                    <div class="code-block">
+                        <code># macOS/Linux 使用 Homebrew
+brew install --cask claude-code
+
+# 或者使用官方安装脚本
+curl -fsSL https://claude.ai/install.sh | bash
+
+# Windows PowerShell
+irm https://claude.ai/install.ps1 | iex</code>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <strong>⚠️ 注意:</strong> 首次安装后需要配置API密钥才能使用，请继续阅读后续配置章节。
+                </div>
+            </section>
+
+            <!-- Section 2: 安装方式详解 -->
+            <section id="installation-methods" class="section">
+                <h2 class="section-title">2️⃣ 安装方式详解</h2>
+
+                <h3 class="subsection-title">2.1 原生安装（推荐）</h3>
+
+                <div class="card">
+                    <h4>macOS</h4>
+                    <div class="code-block">
+                        <code># 方法1: Homebrew（推荐）
+brew install --cask claude-code
+
+# 方法2: 官方脚本
+curl -fsSL https://claude.ai/install.sh | bash
+
+# 验证安装
+claude --version</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>Linux</h4>
+                    <div class="code-block">
+                        <code># 使用官方安装脚本
+curl -fsSL https://claude.ai/install.sh | bash
+
+# 添加到PATH（如果需要）
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
+# 验证安装
+claude --version</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>Windows</h4>
+                    <div class="code-block">
+                        <code># 使用PowerShell
+irm https://claude.ai/install.ps1 | iex
+
+# 验证安装
+claude --version</code>
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">2.2 NPM 安装</h3>
+
+                <div class="card">
+                    <div class="code-block">
+                        <code># 全局安装
+npm install -g @anthropic/claude-code
+
+# 验证安装
+claude --version</code>
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">2.3 从 NPM 迁移到原生安装</h3>
+
+                <div class="card">
+                    <p class="section-description">如果你之前使用 NPM 安装，可以迁移到原生版本以获得更好的性能：</p>
+                    <div class="code-block">
+                        <code># 安装原生版本
+claude install
+
+# 查看安装位置
+# Windows: C:\Users\用户名\.local\bin\claude.exe
+# Linux/macOS: ~/.local/bin/claude</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: 环境变量配置 -->
+            <section id="env-config" class="section">
+                <h2 class="section-title">3️⃣ 环境变量配置</h2>
+
+                <h3 class="subsection-title">3.1 临时配置（测试用）</h3>
+
+                <div class="card">
+                    <p class="section-description">在终端中设置，仅当前会话有效：</p>
+                    <div class="code-block">
+                        <code># 设置API密钥
+export ANTHROPIC_AUTH_TOKEN="你的API密钥"
+
+# 设置自定义API端点（可选）
+export ANTHROPIC_BASE_URL="https://your-api-endpoint.com"
+
+# 启动Claude Code
+claude</code>
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">3.2 永久配置</h3>
+
+                <div class="card">
+                    <h4>Bash</h4>
+                    <div class="code-block">
+                        <code># 添加到 ~/.bashrc
+echo 'export ANTHROPIC_AUTH_TOKEN="你的API密钥"' >> ~/.bashrc
+echo 'export ANTHROPIC_BASE_URL="https://your-api-endpoint.com"' >> ~/.bashrc
+
+# 重新加载配置
+source ~/.bashrc</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>Zsh</h4>
+                    <div class="code-block">
+                        <code># 添加到 ~/.zshrc
+echo 'export ANTHROPIC_AUTH_TOKEN="你的API密钥"' >> ~/.zshrc
+echo 'export ANTHROPIC_BASE_URL="https://your-api-endpoint.com"' >> ~/.zshrc
+
+# 重新加载配置
+source ~/.zshrc</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>Windows PowerShell</h4>
+                    <div class="code-block">
+                        <code># 添加到配置文件
+echo '$env:ANTHROPIC_AUTH_TOKEN="你的API密钥"' >> $PROFILE
+echo '$env:ANTHROPIC_BASE_URL="https://your-api-endpoint.com"' >> $PROFILE
+
+# 重新加载配置
+. $PROFILE</code>
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">3.3 查看配置</h3>
+
+                <div class="card">
+                    <div class="code-block">
+                        <code># 查看所有Anthropic相关环境变量
+printenv | grep ANTHROPIC
+
+# 或使用env命令
+env | grep ANTHROPIC</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: 首次运行配置 -->
+            <section id="first-run" class="section">
+                <h2 class="section-title">4️⃣ 首次运行配置</h2>
+
+                <h3 class="subsection-title">4.1 启动Claude Code</h3>
+
+                <div class="card">
+                    <div class="code-block">
+                        <code># 在项目目录中启动
+cd your-project
+claude</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <p class="section-description">首次启动时，Claude Code会引导你完成初始配置：</p>
+                    <ul class="list">
+                        <li><strong>选择主题</strong> - 选择你喜欢的颜色主题</li>
+                        <li><strong>确认安全须知</strong> - 阅读并确认安全使用须知</li>
+                        <li><strong>Terminal配置</strong> - 使用默认配置或自定义</li>
+                        <li><strong>信任工作目录</strong> - 授权Claude访问当前目录</li>
+                    </ul>
+                </div>
+
+                <h3 class="subsection-title">4.2 初始化项目</h3>
+
+                <div class="card">
+                    <div class="code-block">
+                        <code># 在项目根目录运行
+claude /init
+
+# 这会创建 CLAUDE.md 文件，包含项目信息</code>
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">4.3 检查系统状态</h3>
+
+                <div class="card">
+                    <div class="code-block">
+                        <code># 运行系统检查
+claude /doctor
+
+# 查看当前配置
+claude /config</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: 验证与故障排除 -->
+            <section id="verification" class="section">
+                <h2 class="section-title">5️⃣ 验证与故障排除</h2>
+
+                <h3 class="subsection-title">5.1 基础验证命令</h3>
+
+                <div class="card">
+                    <div class="code-block">
+                        <code># 检查版本
+claude --version
+
+# 检查安装状态
+claude /doctor
+
+# 测试API连接
+claude -p "Hello, Claude!"</code>
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">5.2 常见问题解决</h3>
+
+                <div class="card">
+                    <h4>问题1: 命令未找到</h4>
+                    <div class="code-block">
+                        <code># macOS/Linux
+which claude
+# 如果没有输出，添加到PATH
+export PATH="$HOME/.local/bin:$PATH"
+
+# Windows
+Get-Command claude
+# 如果没有输出，检查PATH环境变量</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>问题2: API密钥错误</h4>
+                    <div class="code-block">
+                        <code># 检查环境变量
+echo $ANTHROPIC_AUTH_TOKEN
+
+# 临时设置测试
+export ANTHROPIC_AUTH_TOKEN="正确的密钥"
+claude -p "test"</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>问题3: 网络连接问题</h4>
+                    <div class="code-block">
+                        <code># 测试API端点连接
+curl -I https://api.anthropic.com
+
+# 如果使用自定义端点
+curl -I $ANTHROPIC_BASE_URL</code>
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">5.3 清理缓存</h3>
+
+                <div class="card">
+                    <p class="section-description">如果遇到奇怪的缓存问题，可以清理缓存：</p>
+                    <div class="code-block">
+                        <code># 清理Claude Code缓存
+rm -rf ~/.claude/cache
+
+# 清理VSCode缓存（可选）
+# macOS
+rm -rf ~/Library/Application\ Support/Code/User/workspaceStorage
+# Windows
+rmdir /s "%APPDATA%\Code\User\workspaceStorage"</code>
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">5.4 日志和调试</h3>
+
+                <div class="card">
+                    <div class="code-block">
+                        <code># 启用详细日志
+claude --verbose
+
+# 查看日志文件位置
+ls ~/.claude/logs/</code>
+                    </div>
+                </div>
+
+                <div class="tip-box">
+                    <strong>💡 提示:</strong> 遇到问题时，可以先运行 `claude /doctor` 来获取系统状态信息，这通常能帮助定位问题所在。
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M7 14l5-5 5 5" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        回到顶部
+    </button>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <p id="copyright-text">© 2025 Halavah's Tech. All rights reserved.</p>
+            <p id="beian-number"></p>
+        </div>
+    </footer>
+
+    <script>
+        // 1. 加载配置文件
+        fetch('/data/articles.json')
+            .then(response => response.json())
+            .then(data => {
+                const { beianNumber, copyrightText } = data.config;
+                document.getElementById('copyright-text').textContent =
+                    copyrightText || '© 2025 Halavah\'s Tech. All rights reserved.';
+                if (beianNumber) {
+                    document.getElementById('beian-number').textContent = beianNumber;
+                }
+            })
+            .catch(error => console.error('Failed to load config:', error));
+
+        // 2. TOC 点击平滑滚动
+        document.querySelectorAll('.toc-sidebar a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 3. TOC 激活状态跟踪
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    document.querySelectorAll('.toc-sidebar a').forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${entry.target.id}`) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, {
+            rootMargin: '-100px 0px -80% 0px'
+        });
+
+        document.querySelectorAll('section[id]').forEach(section => {
+            observer.observe(section);
+        });
+
+        // 4. 回到顶部按钮
+        const backToTop = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

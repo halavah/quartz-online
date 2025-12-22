@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code 交互模式与快捷键指南</title>
+    <meta name="description" content="精通Claude Code交互模式，掌握键盘快捷键、Vim模式、多行输入和效率提升技巧">
+    <meta name="keywords" content="Claude Code,交互模式,快捷键,Vim,效率技巧,键盘操作">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0066ff;
+            --secondary-color: #00d4ff;
+            --accent-color: #ff6b00;
+            --dark-bg: #0a0e27;
+            --card-bg: #1a1f3a;
+            --text-color: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --border-color: #2a2f4a;
+            --success-color: #00c853;
+            --gradient-primary: linear-gradient(135deg, #0066ff 0%, #00d4ff 100%);
+            --gradient-hero: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--dark-bg);
+        }
+
+        .hero-section {
+            background: var(--gradient-hero);
+            padding: 4rem 2rem 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(0, 102, 255, 0.2);
+            color: var(--secondary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            margin-bottom: 1rem;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: flex;
+            gap: 3rem;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .toc-sidebar {
+            width: 280px;
+            position: sticky;
+            top: 2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+
+        .toc-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .toc-sidebar ul {
+            list-style: none;
+        }
+
+        .toc-sidebar li {
+            margin-bottom: 0.5rem;
+        }
+
+        .toc-sidebar a {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .toc-sidebar a:hover {
+            background: rgba(0, 102, 255, 0.1);
+            color: var(--primary-color);
+            transform: translateX(4px);
+        }
+
+        .toc-sidebar a.active {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 102, 255, 0.2);
+        }
+
+        .card h4 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            color: #58a6ff;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .list {
+            margin: 1rem 0 1rem 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .list li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .list li strong {
+            color: var(--text-color);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        th {
+            background: rgba(0, 102, 255, 0.1);
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(0, 102, 255, 0.05);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.4);
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: var(--secondary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .back-to-top svg {
+            margin-bottom: 2px;
+        }
+
+        .footer {
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 1024px) {
+            .toc-sidebar {
+                position: static;
+                width: 100%;
+                max-height: none;
+                order: -1;
+                margin-bottom: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            .main-content {
+                padding: 2rem 1rem;
+                flex-direction: column;
+            }
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-container">
+            <span class="hero-badge">交互指南</span>
+            <h1 class="hero-title">Claude Code 交互模式与快捷键指南</h1>
+            <p class="hero-subtitle">精通Claude Code交互模式，掌握键盘快捷键、Vim模式、多行输入和效率提升技巧</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- TOC Sidebar -->
+        <nav class="toc-sidebar">
+            <h2 class="toc-title">📋 目录导航</h2>
+            <ul>
+                <li><a href="#keyboard-shortcuts">1. 键盘快捷键大全</a></li>
+                <li><a href="#vim-mode">2. Vim模式使用</a></li>
+                <li><a href="#multiline-input">3. 多行输入技巧</a></li>
+                <li><a href="#command-history">4. 命令历史管理</a></li>
+                <li><a href="#efficiency-tips">5. 效率提升技巧</a></li>
+            </ul>
+        </nav>
+
+        <!-- Content -->
+        <div class="content-wrapper">
+            <!-- Section 1: Keyboard Shortcuts -->
+            <section id="keyboard-shortcuts" class="section">
+                <h2 class="section-title">1️⃣ 键盘快捷键大全</h2>
+
+                <div class="card">
+                    <h4>基础控制快捷键</h4>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>快捷键</th>
+                                    <th>描述</th>
+                                    <th>使用场景</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>Ctrl + C</code></td>
+                                    <td>取消当前输入或生成</td>
+                                    <td>当Claude输出过长或方向错误时立即停止</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Ctrl + D</code></td>
+                                    <td>退出Claude Code会话</td>
+                                    <td>正常结束对话</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Ctrl + L</code></td>
+                                    <td>清除终端屏幕</td>
+                                    <td>清理界面但保留对话历史</td>
+                                </tr>
+                                <tr>
+                                    <td><code>↑ / ↓</code></td>
+                                    <td>浏览命令历史</td>
+                                    <td>回忆和重用之前的输入</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Esc + Esc</code></td>
+                                    <td>编辑上一条消息</td>
+                                    <td>快速修改刚发送的内容</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>特殊功能快捷键</h4>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>快捷键</th>
+                                    <th>功能</th>
+                                    <th>说明</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>#</code> (行首)</td>
+                                    <td>内存快捷方式</td>
+                                    <td>快速添加内容到CLAUDE.md</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/</code> (行首)</td>
+                                    <td>斜线命令</td>
+                                    <td>查看和执行斜线命令</td>
+                                </tr>
+                                <tr>
+                                    <td><code>@</code></td>
+                                    <td>文件引用</td>
+                                    <td>引用项目中的文件</td>
+                                </tr>
+                                <tr>
+                                    <td><code>!</code></td>
+                                    <td>Shell命令</td>
+                                    <td>执行系统命令</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Tab</code></td>
+                                    <td>自动补全</td>
+                                    <td>补全文件路径和命令</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>多行输入</h4>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>快捷键</th>
+                                    <th>平台</th>
+                                    <th>描述</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>\ + Enter</code></td>
+                                    <td>所有平台</td>
+                                    <td>通用多行输入方式</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Option + Enter</code></td>
+                                    <td>macOS</td>
+                                    <td>macOS默认多行输入</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Shift + Enter</code></td>
+                                    <td>配置后</td>
+                                    <td>需要先运行 <code>/terminal-setup</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Vim Mode -->
+            <section id="vim-mode" class="section">
+                <h2 class="section-title">2️⃣ Vim模式使用</h2>
+
+                <div class="card">
+                    <h4>模式切换</h4>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>命令</th>
+                                    <th>功能</th>
+                                    <th>从模式</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>Esc</code></td>
+                                    <td>进入普通模式</td>
+                                    <td>插入模式</td>
+                                </tr>
+                                <tr>
+                                    <td><code>i</code></td>
+                                    <td>在光标前插入</td>
+                                    <td>普通模式</td>
+                                </tr>
+                                <tr>
+                                    <td><code>I</code></td>
+                                    <td>在行首插入</td>
+                                    <td>普通模式</td>
+                                </tr>
+                                <tr>
+                                    <td><code>a</code></td>
+                                    <td>在光标后插入</td>
+                                    <td>普通模式</td>
+                                </tr>
+                                <tr>
+                                    <td><code>A</code></td>
+                                    <td>在行尾插入</td>
+                                    <td>普通模式</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>导航命令（普通模式）</h4>
+                    <div class="code-block">
+                        <code># 基础移动
+h/ j/ k/l  # 向左/向下/向上/向右移动
+
+# 词级导航
+w  # 下一个单词
+e  # 单词结尾
+b  # 上一个单词
+
+# 行级导航
+0  # 行首
+$  # 行尾
+gg # 文件开头
+G  # 文件结尾</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>编辑命令（普通模式）</h4>
+                    <div class="code-block">
+                        <code># 删除操作
+x    # 删除当前字符
+dd   # 删除当前行
+D    # 删除到行尾
+
+# 修改操作
+cc   # 替换整行
+cw   # 修改当前单词
+C    # 修改到行尾
+
+# 撤销和重做
+u    # 撤销上一步操作
+.    # 重复上一次修改</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Multiline Input -->
+            <section id="multiline-input" class="section">
+                <h2 class="section-title">3️⃣ 多行输入技巧</h2>
+
+                <div class="card">
+                    <h4>启用多行输入</h4>
+                    <div class="code-block">
+                        <code># 方法1：反斜杠换行
+帮我分析这段代码的性能问题： \
+function findUser(id) { \
+    for (let i = 0; i < users.length; i++) { \
+        if (users[i].id === id) { \
+            return users[i]; \
+        } \
+    } \
+} \
+
+# 方法2：配置Shift+Enter
+claude /terminal-setup
+
+# 方法3：直接粘贴
+直接复制粘贴代码块</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>多行输入最佳实践</h4>
+                    <div class="code-block">
+                        <code># 分析复杂代码结构
+请分析这个类的设计模式：
+class UserService {
+    constructor(database, logger, validator) {
+        this.db = database;
+        this.logger = logger;
+        this.validator = validator;
+    }
+
+    async createUser(userData) {
+        if (!this.validator.isValid(userData)) {
+            throw new Error('Invalid user data');
+        }
+        // ...
+    }
+}</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Command History -->
+            <section id="command-history" class="section">
+                <h2 class="section-title">4️⃣ 命令历史管理</h2>
+
+                <div class="card">
+                    <h4>基础导航</h4>
+                    <div class="code-block">
+                        <code># 使用方向键
+↑  # 上一个命令
+↓  # 下一个命令
+
+# 在历史中搜索
+Ctrl + R  # 反向搜索历史
+Ctrl + S  # 正向搜索历史</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>历史搜索</h4>
+                    <div class="code-block">
+                        <code># 开始搜索
+Ctrl + R
+
+# 输入搜索内容
+(reverse-i-search)`claude`: claude /init</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>历史持久化</h4>
+                    <div class="code-block">
+                        <code># 在 ~/.zshrc 或 ~/.bashrc 中添加
+export HISTSIZE=10000
+export HISTFILESIZE=50000
+export HISTCONTROL=ignoredups</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Efficiency Tips -->
+            <section id="efficiency-tips" class="section">
+                <h2 class="section-title">5️⃣ 效率提升技巧</h2>
+
+                <div class="card">
+                    <h4>快速输入技巧</h4>
+                    <div class="code-block">
+                        <code># Tab补全
+@src/comp<Tab>  # 补全为 @src/components/
+
+# 命令补全
+/term<Tab>      # 补全为 /terminal-setup</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>别名和函数</h4>
+                    <div class="code-block">
+                        <code># 在 ~/.zshrc 中创建别名
+alias cc='claude'
+alias cci='claude /init'
+alias ccr='claude /review'</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>批量操作技巧</h4>
+                    <div class="code-block">
+                        <code># 批量重命名
+> 将 @src/components/ 下所有组件文件重命名为PascalCase
+
+# 批量添加类型注解
+> 为 @src/utils/ 中所有函数添加TypeScript类型</code>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Back to Top -->
+    <button class="back-to-top" id="backToTop">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M7 14l5-5 5 5" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        回到顶部
+    </button>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <p id="copyright-text">© 2025 Halavah's Tech. All rights reserved.</p>
+            <p id="beian-number"></p>
+        </div>
+    </footer>
+
+    <script>
+        fetch('/data/articles.json')
+            .then(response => response.json())
+            .then(data => {
+                const { beianNumber, copyrightText } = data.config;
+                document.getElementById('copyright-text').textContent =
+                    copyrightText || '© 2025 Halavah\'s Tech. All rights reserved.';
+                if (beianNumber) {
+                    document.getElementById('beian-number').textContent = beianNumber;
+                }
+            })
+            .catch(error => console.error('Failed to load config:', error));
+
+        document.querySelectorAll('.toc-sidebar a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    document.querySelectorAll('.toc-sidebar a').forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${entry.target.id}`) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, { rootMargin: '-100px 0px -80% 0px' });
+
+        document.querySelectorAll('section[id]').forEach(section => {
+            observer.observe(section);
+        });
+
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
