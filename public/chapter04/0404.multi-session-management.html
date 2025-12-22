@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi Session Management - 多会话并行管理策略</title>
+    <meta name="description" content="基于实际使用经验，介绍如何在Claude Code中同时管理多个会话，提高开发效率和多任务处理能力">
+    <style>
+        :root {
+            --primary-color: #06b6d4;
+            --secondary-color: #8b5cf6;
+            --accent-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --info-color: #3b82f6;
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --border-color: #475569;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --gradient-session: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        /* 背景粒子效果 */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        /* 头部样式 */
+        .hero-header {
+            background: var(--gradient-session);
+            padding: 4rem 2rem 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 3rem;
+        }
+
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 8s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 导航目录 */
+        .toc-container {
+            max-width: 1200px;
+            margin: 0 auto 3rem;
+            padding: 0 2rem;
+        }
+
+        .toc-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .toc-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.3);
+            border-color: var(--primary-color);
+        }
+
+        .toc-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .toc-item {
+            padding: 0.8rem 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .toc-item:hover {
+            background: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .toc-item a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc-item:hover a {
+            color: var(--text-primary);
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        /* 区块样式 */
+        .section {
+            margin-bottom: 4rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        .section:nth-child(1) { animation-delay: 0.1s; }
+        .section:nth-child(2) { animation-delay: 0.2s; }
+        .section:nth-child(3) { animation-delay: 0.3s; }
+        .section:nth-child(4) { animation-delay: 0.4s; }
+        .section:nth-child(5) { animation-delay: 0.5s; }
+        .section:nth-child(6) { animation-delay: 0.6s; }
+        .section:nth-child(7) { animation-delay: 0.7s; }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+            padding-left: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* 痛点卡片 */
+        .pain-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .pain-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .pain-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--error-color);
+        }
+
+        .pain-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.2);
+        }
+
+        .pain-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .pain-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .pain-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* 价值卡片 */
+        .value-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .value-card {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .value-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .value-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
+            border-color: var(--accent-color);
+        }
+
+        .value-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .value-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .value-description {
+            color: var(--text-muted);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 会话可视化 */
+        .session-visualization {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .session-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .session-card.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.4);
+            transform: scale(1.02);
+        }
+
+        .session-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .session-card.active::before {
+            left: 100%;
+        }
+
+        .session-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .session-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .session-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            animation: pulse 2s infinite;
+        }
+
+        .session-status.inactive {
+            background: var(--text-muted);
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .session-content {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .session-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .session-tag {
+            padding: 0.3rem 0.8rem;
+            background: var(--bg-tertiary);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+
+        .session-tag.primary {
+            background: var(--primary-color);
+            color: var(--text-primary);
+            border-color: var(--primary-color);
+        }
+
+        /* 方法卡片 */
+        .method-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .method-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .method-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+            border-color: var(--secondary-color);
+        }
+
+        .method-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .method-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--secondary-color);
+            color: var(--text-primary);
+            border-radius: 50%;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .method-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .method-description {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        /* 代码块 */
+        .code-block {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .code-title {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .copy-btn {
+            background: var(--primary-color);
+            color: var(--text-primary);
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-color);
+            transform: scale(1.05);
+        }
+
+        .copy-btn.copied {
+            background: var(--accent-color);
+        }
+
+        pre {
+            color: var(--text-secondary);
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        /* 配置框 */
+        .config-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .config-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .config-content {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 角色卡片 */
+        .roles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .role-card {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .role-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--info-color);
+        }
+
+        .role-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.3);
+        }
+
+        .role-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .role-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .role-expertise {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .role-model {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: var(--info-color);
+            color: var(--text-primary);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* 资源监控卡片 */
+        .resource-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .resource-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .resource-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .resource-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .resource-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--warning-color);
+        }
+
+        .resource-bar {
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .resource-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), var(--primary-color));
+            border-radius: 4px;
+            transition: width 1s ease;
+            position: relative;
+        }
+
+        .resource-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        /* 工作流程时间线 */
+        .workflow-timeline {
+            position: relative;
+            padding: 2rem 0;
+            margin: 2rem 0;
+        }
+
+        .workflow-timeline::before {
+            content: '';
+            position: absolute;
+            left: 2rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 4rem;
+            margin-bottom: 2rem;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 1.5rem;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            border: 2px solid var(--bg-secondary);
+        }
+
+        .timeline-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            transform: translateX(5px);
+            border-color: var(--primary-color);
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* 统计数据 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(139, 92, 246, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* 快速操作按钮 */
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .action-btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--primary-color);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .action-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(6, 182, 212, 0.4);
+        }
+
+        .action-btn.secondary {
+            background: var(--secondary-color);
+        }
+
+        .action-btn.accent {
+            background: var(--accent-color);
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .session-visualization {
+                grid-template-columns: 1fr;
+            }
+
+            .method-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .roles-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .workflow-timeline::before {
+                left: 1rem;
+            }
+
+            .timeline-item {
+                padding-left: 2.5rem;
+            }
+
+            .timeline-dot {
+                left: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- 头部 -->
+    <header class="hero-header">
+        <h1 class="hero-title">Multi Session Management</h1>
+        <p class="hero-subtitle">多会话并行管理策略，让AI开发更加高效</p>
+    </header>
+
+    <!-- 导航目录 -->
+    <div class="toc-container">
+        <div class="toc-card">
+            <h2 class="toc-title">📋 课程目录</h2>
+            <div class="toc-grid">
+                <div class="toc-item">
+                    <a href="#section-1">1. 多会话管理概述</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-2">2. VS Code多开策略</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-3">3. Claude Code多实例</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-4">4. 会话管理技巧</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-5">5. 多会话协作模式</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-6">6. 资源优化</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-7">7. 最佳实践</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="container">
+        <!-- 统计数据 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">3x</div>
+                <div class="stat-label">开发效率提升</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">5+</div>
+                <div class="stat-label">并发会话支持</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">80%</div>
+                <div class="stat-label">时间节省</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">99%</div>
+                <div class="stat-label">任务隔离成功率</div>
+            </div>
+        </div>
+
+        <!-- 第1节：多会话管理概述 -->
+        <section id="section-1" class="section">
+            <div class="section-header">
+                <h2 class="section-title">1. 多会话管理概述</h2>
+                <p class="section-subtitle">了解单会话限制和多会话的巨大价值</p>
+            </div>
+
+            <h3 style="color: var(--error-color); margin-bottom: 1.5rem;">😫 传统开发痛点</h3>
+
+            <div class="pain-points">
+                <div class="pain-card">
+                    <div class="pain-icon">⚡</div>
+                    <div class="pain-title">无法并行处理</div>
+                    <div class="pain-description">同时只能处理一个任务，无法充分利用开发时间</div>
+                </div>
+                <div class="pain-card">
+                    <div class="pain-icon">🔄</div>
+                    <div class="pain-title">上下文切换困难</div>
+                    <div class="pain-description">不同任务间需要频繁切换，影响专注度</div>
+                </div>
+                <div class="pain-card">
+                    <div class="pain-icon">📊</div>
+                    <div class="pain-title">状态管理复杂</div>
+                    <div class="pain-description">每个任务的状态需要单独维护，容易出错</div>
+                </div>
+                <div class="pain-card">
+                    <div class="pain-icon">⏰</div>
+                    <div class="pain-title">效率低下</div>
+                    <div class="pain-description">串行处理导致时间浪费，项目进度缓慢</div>
+                </div>
+            </div>
+
+            <h3 style="color: var(--accent-color); margin: 2rem 0 1.5rem;">✨ 多会话价值</h3>
+
+            <div class="value-cards">
+                <div class="value-card">
+                    <div class="value-icon">⚡</div>
+                    <div class="value-title">并行开发</div>
+                    <div class="value-description">同时处理多个功能模块，大幅提升开发速度</div>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">🛡️</div>
+                    <div class="value-title">任务隔离</div>
+                    <div class="value-description">避免不同任务间的干扰，保证代码质量</div>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">💎</div>
+                    <div class="value-title">资源优化</div>
+                    <div class="value-description">充分利用系统资源，避免硬件浪费</div>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">🎯</div>
+                    <div class="value-title">专注度提升</div>
+                    <div class="value-description">每个会话专注特定任务，提高工作质量</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第2节：VS Code多开策略 -->
+        <section id="section-2" class="section">
+            <div class="section-header">
+                <h2 class="section-title">2. VS Code多开策略</h2>
+                <p class="section-subtitle">掌握VS Code多窗口和分屏技巧</p>
+            </div>
+
+            <div class="method-cards">
+                <div class="method-card">
+                    <div class="method-header">
+                        <div class="method-number">1</div>
+                        <div class="method-title">同一项目多窗口</div>
+                    </div>
+                    <div class="method-description">
+                        在多个VS Code窗口中打开同一项目，实现并行开发
+                    </div>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">快捷键操作</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre># 1. 在VS Code中打开项目
+code /path/to/project
+
+# 2. 使用快捷键打开新窗口
+Ctrl+Shift+N (Windows/Linux)
+Cmd+Shift+N (macOS)
+
+# 3. 在新窗口中打开相同项目
+code /path/to/project</pre>
+                    </div>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-header">
+                        <div class="method-number">2</div>
+                        <div class="method-title">分屏显示</div>
+                    </div>
+                    <div class="method-description">
+                        使用VS Code的分屏功能，在同一窗口中查看多个文件
+                    </div>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">分屏快捷键</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre># VS Code分屏快捷键
+Ctrl+\ (Windows/Linux)
+Cmd+\ (macOS)
+
+# 或使用菜单
+View → Editor Layout → Split Editor</pre>
+                    </div>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-header">
+                        <div class="method-number">3</div>
+                        <div class="method-title">标签页管理</div>
+                    </div>
+                    <div class="method-description">
+                        拖拽标签页到新窗口，实现灵活的窗口管理
+                    </div>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">拖拽操作</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre># 拖拽标签页到新窗口
+# 右键点击标签页 → Move to New Window</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第3节：Claude Code多实例 -->
+        <section id="section-3" class="section">
+            <div class="section-header">
+                <h2 class="section-title">3. Claude Code多实例</h2>
+                <p class="section-subtitle">启动和管理多个Claude Code实例</p>
+            </div>
+
+            <!-- 会话可视化 -->
+            <div class="session-visualization">
+                <div class="session-card active">
+                    <div class="session-header">
+                        <div class="session-title">
+                            <span class="session-status"></span>
+                            Session 1: 前端开发
+                        </div>
+                    </div>
+                    <div class="session-content">
+                        正在处理React组件开发和UI优化任务
+                    </div>
+                    <div class="session-tags">
+                        <span class="session-tag primary">Active</span>
+                        <span class="session-tag">React</span>
+                        <span class="session-tag">CSS</span>
+                        <span class="session-tag">UI/UX</span>
+                    </div>
+                </div>
+
+                <div class="session-card active">
+                    <div class="session-header">
+                        <div class="session-title">
+                            <span class="session-status"></span>
+                            Session 2: 后端API
+                        </div>
+                    </div>
+                    <div class="session-content">
+                        开发RESTful API接口和数据库集成
+                    </div>
+                    <div class="session-tags">
+                        <span class="session-tag primary">Active</span>
+                        <span class="session-tag">Node.js</span>
+                        <span class="session-tag">Express</span>
+                        <span class="session-tag">MongoDB</span>
+                    </div>
+                </div>
+
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-title">
+                            <span class="session-status inactive"></span>
+                            Session 3: 文档编写
+                        </div>
+                    </div>
+                    <div class="session-content">
+                        API文档和技术规格说明书撰写
+                    </div>
+                    <div class="session-tags">
+                        <span class="session-tag">Inactive</span>
+                        <span class="session-tag">Markdown</span>
+                        <span class="session-tag">Documentation</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="config-box">
+                <h3 class="config-title">
+                    <span>⚙️</span>
+                    多实例启动配置
+                </h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">别名设置</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <pre># 设置不同模式的别名
+alias claude="claude --dangerously-skip-permissions"
+alias claude_fast="claude --model think"
+alias claude_deep="claude --model think-harder"
+alias claude_ultra="claude --model ultrathink"
+
+# 使用别名启动
+claude_fast      # 快速响应
+claude_deep      # 深度思考
+claude_ultra      # 极限思考</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第4节：会话管理技巧 -->
+        <section id="section-4" class="section">
+            <div class="section-header">
+                <h2 class="section-title">4. 会话管理技巧</h2>
+                <p class="section-subtitle">高效的会话命名和上下文管理策略</p>
+            </div>
+
+            <div class="quick-actions">
+                <button class="action-btn">创建新会话</button>
+                <button class="action-btn secondary">保存上下文</button>
+                <button class="action-btn accent">切换会话</button>
+            </div>
+
+            <div class="config-box">
+                <h3 class="config-title">
+                    <span>🏷️</span>
+                    会话命名策略
+                </h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">命名规则示例</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <pre># 会话命名规则
+# 格式：项目_模块_任务
+
+session_name="myapp_user-auth_component"
+
+# 具体示例
+session_names=(
+    "webapp_frontend_login"
+    "webapp_backend_auth"
+    "webapp_database_users"
+    "webapp_api_endpoints"
+    "webapp_documentation"
+)</pre>
+                </div>
+            </div>
+
+            <div class="workflow-timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">📋 查看所有活跃会话</div>
+                        <div class="timeline-description">使用 <code>/claude list-sessions</code> 查看当前运行的所有会话</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">🔄 切换到特定会话</div>
+                        <div class="timeline-description">使用 <code>/claude switch-session "session_name"</code> 在不同会话间切换</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">💾 保存会话状态</div>
+                        <div class="timeline-description">使用 <code>/claude save-session --name "session_name"</code> 保存当前状态</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">📂 恢复会话状态</div>
+                        <div class="timeline-description">使用 <code>/claude load-session --name "session_name"</code> 恢复保存的会话</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第5节：多会话协作模式 -->
+        <section id="section-5" class="section">
+            <div class="section-header">
+                <h2 class="section-title">5. 多会话协作模式</h2>
+                <p class="section-subtitle">左右互博和角色分配的高级协作技巧</p>
+            </div>
+
+            <div class="roles-grid">
+                <div class="role-card">
+                    <div class="role-icon">🎨</div>
+                    <div class="role-name">前端专家</div>
+                    <div class="role-expertise">React, Vue, Angular, CSS</div>
+                    <div class="role-model">think-hard</div>
+                </div>
+                <div class="role-card">
+                    <div class="role-icon">⚙️</div>
+                    <div class="role-name">后端专家</div>
+                    <div class="role-expertise">Node.js, Python, Java, Database</div>
+                    <div class="role-model">think-harder</div>
+                </div>
+                <div class="role-card">
+                    <div class="role-icon">🗄️</div>
+                    <div class="role-name">数据库专家</div>
+                    <div class="role-expertise">SQL, NoSQL, Performance</div>
+                    <div class="role-model">think-harder</div>
+                </div>
+                <div class="role-card">
+                    <div class="role-icon">🚀</div>
+                    <div class="role-name">DevOps专家</div>
+                    <div class="role-expertise">Docker, CI/CD, Cloud</div>
+                    <div class="role-model">ultrathink</div>
+                </div>
+            </div>
+
+            <div class="config-box">
+                <h3 class="config-title">
+                    <span>🤝</span>
+                    左右互博协作示例
+                </h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">协作命令</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <pre># 在实例1中生成方案
+请为用户认证功能设计技术方案，包括前后端架构
+
+# 将方案传递给实例2进行审查
+请审查以下技术方案，提出改进建议：
+[方案内容]
+
+# 在实例2中分析完并给出反馈
+这是对技术方案的审查意见：[审查结果]
+
+# 在实例1中根据反馈调整方案
+请根据以下审查意见调整技术方案：
+[审查意见]</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第6节：资源优化 -->
+        <section id="section-6" class="section">
+            <div class="section-header">
+                <h2 class="section-title">6. 资源优化</h2>
+                <p class="section-subtitle">内存、CPU和网络资源的高效管理</p>
+            </div>
+
+            <div class="resource-cards">
+                <div class="resource-card">
+                    <div class="resource-header">
+                        <div class="resource-title">
+                            <span>💾</span>
+                            内存使用
+                        </div>
+                        <div class="resource-value">67%</div>
+                    </div>
+                    <div class="resource-bar">
+                        <div class="resource-progress" style="width: 67%;"></div>
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 0.9rem;">
+                        当前使用：2.7GB / 4GB
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-header">
+                        <div class="resource-title">
+                            <span>🖥️</span>
+                            CPU负载
+                        </div>
+                        <div class="resource-value">45%</div>
+                    </div>
+                    <div class="resource-bar">
+                        <div class="resource-progress" style="width: 45%; background: linear-gradient(90deg, var(--accent-color), var(--warning-color));"></div>
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 0.9rem;">
+                        活跃任务：3个会话在运行
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-header">
+                        <div class="resource-title">
+                            <span>🌐</span>
+                            网络连接
+                        </div>
+                        <div class="resource-value">8/10</div>
+                    </div>
+                    <div class="resource-bar">
+                        <div class="resource-progress" style="width: 80%; background: linear-gradient(90deg, var(--info-color), var(--primary-color));"></div>
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 0.9rem;">
+                        API调用：120次/分钟
+                    </div>
+                </div>
+            </div>
+
+            <div class="config-box">
+                <h3 class="config-title">
+                    <span>⚡</span>
+                    内存优化配置
+                </h3>
+                <div class="config-content">
+                    <pre>memory_optimization:
+  auto_cleanup:
+    enabled: true
+    threshold: 80%  # 内存使用超过80%时清理
+
+  context_management:
+    max_context_size: 100MB
+    auto_compress: true
+
+  cache_policy:
+    cache_size: 50MB
+    ttl: 1800  # 30分钟</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第7节：最佳实践 -->
+        <section id="section-7" class="section">
+            <div class="section-header">
+                <h2 class="section-title">7. 最佳实践</h2>
+                <p class="section-subtitle">环境配置、工作流程和团队协作的建议</p>
+            </div>
+
+            <div class="config-box">
+                <h3 class="config-title">
+                    <span>🌅</span>
+                    每日会话规划
+                </h3>
+                <div class="config-content">
+                    <pre>morning_sessions:
+  - "daily_planning"    # 每日规划
+  - "code_review"       # 代码审查
+  - "documentation"    # 文档更新
+
+development_sessions:
+  - "feature_development" # 功能开发
+  - "bug_fixing"       # Bug修复
+  - "refactoring"      # 重构优化
+
+afternoon_sessions:
+  - "testing"           # 测试验证
+  - "deployment"       # 部署准备
+  - "optimization"     # 性能优化</pre>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <button class="action-btn">设置会话计划</button>
+                <button class="action-btn secondary">配置环境变量</button>
+                <button class="action-btn accent">启动团队协作</button>
+            </div>
+
+            <div class="config-box" style="margin-top: 2rem;">
+                <h3 class="config-title">
+                    <span>🏆</span>
+                    核心价值总结
+                </h3>
+                <div class="value-cards" style="margin-top: 1rem;">
+                    <div class="value-card">
+                        <div class="value-icon">⚡</div>
+                        <div class="value-title">并行开发</div>
+                        <div class="value-description">同时处理多个任务，提高开发速度</div>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">🎯</div>
+                        <div class="value-title">专业分工</div>
+                        <div class="value-description">每个会话专注特定领域，提升质量</div>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">💎</div>
+                        <div class="value-title">资源优化</div>
+                        <div class="value-description">充分利用系统资源，避免浪费</div>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">🤝</div>
+                        <div class="value-title">协作增强</div>
+                        <div class="value-description">支持复杂的协作模式和团队工作流</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // 粒子背景效果
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function createParticle() {
+            return {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                radius: Math.random() * 2 + 1,
+                opacity: Math.random() * 0.5 + 0.2
+            };
+        }
+
+        function initParticles() {
+            particles = [];
+            const particleCount = Math.min(100, (canvas.width * canvas.height) / 15000);
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(createParticle());
+            }
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(particle => {
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(6, 182, 212, ${particle.opacity})`;
+                ctx.fill();
+
+                particle.x += particle.vx;
+                particle.y += particle.vy;
+
+                if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
+                if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+            });
+
+            // 连接临近的粒子
+            particles.forEach((p1, i) => {
+                particles.slice(i + 1).forEach(p2 => {
+                    const distance = Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+                    if (distance < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = `rgba(6, 182, 212, ${0.2 * (1 - distance / 120)})`;
+                        ctx.stroke();
+                    }
+                });
+            });
+
+            requestAnimationFrame(drawParticles);
+        }
+
+        // 复制代码功能
+        function copyCode(button) {
+            const codeBlock = button.parentElement.parentElement;
+            const code = codeBlock.querySelector('pre').textContent;
+
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = '已复制';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.textContent = '复制';
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('.toc-item a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+
+                if (targetSection) {
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 会话卡片交互
+        document.querySelectorAll('.session-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // 切换活跃状态
+                this.classList.toggle('active');
+                const status = this.querySelector('.session-status');
+                status.classList.toggle('inactive');
+            });
+        });
+
+        // 快速操作按钮交互
+        document.querySelectorAll('.action-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // 创建波纹效果
+                const ripple = document.createElement('span');
+                ripple.style.position = 'absolute';
+                ripple.style.width = '20px';
+                ripple.style.height = '20px';
+                ripple.style.background = 'rgba(255,255,255,0.5)';
+                ripple.style.borderRadius = '50%';
+                ripple.style.transform = 'translate(-50%, -50%)';
+                ripple.style.pointerEvents = 'none';
+                ripple.style.animation = 'ripple 0.6s ease-out';
+
+                const rect = this.getBoundingClientRect();
+                ripple.style.left = '50%';
+                ripple.style.top = '50%';
+
+                this.appendChild(ripple);
+
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+
+        // 添加波纹动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    width: 200px;
+                    height: 200px;
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // 初始化
+        window.addEventListener('load', () => {
+            setCanvasSize();
+            initParticles();
+            drawParticles();
+
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(30px)';
+                section.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                observer.observe(section);
+            });
+        });
+
+        window.addEventListener('resize', () => {
+            setCanvasSize();
+            initParticles();
+        });
+    </script>
+</body>
+</html>

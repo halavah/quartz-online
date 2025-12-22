@@ -202,6 +202,24 @@
       "category": "使用工具"
     },
     {
+      "title": "Claude Code Advanced Usage - 高级使用技巧",
+      "description": "Claude Code的高级功能使用指南，包括插件配置、模型选择、检查点管理等实用技巧，让AI编程助手发挥最大效能",
+      "htmlFile": "chapter04/0401.claude-code-advanced-usage.html",
+      "category": "最新动态"
+    },
+    {
+      "title": "AI Plugin Integration - AI插件集成实战指南",
+      "description": "Claude Code插件生态系统的实用指南，包括MCP服务器安装、数据分析工具集成、第三方服务对接等，构建完整的AI开发工作流",
+      "htmlFile": "chapter04/0402.ai-plugin-integration.html",
+      "category": "最新动态"
+    },
+    {
+      "title": "Git Workflow Automation - Git工作流自动化实战",
+      "description": "基于Claude Code的Git工作流自动化指南，包括文件选择、提交信息生成、分支管理等，提升团队协作效率",
+      "htmlFile": "chapter04/0403.git-workflow-automation.html",
+      "category": "最新动态"
+    },
+    {
       "title": "Xget - 超高性能开发者资源加速引擎",
       "description": "Xget 是基于 Cloudflare Workers 的超高性能资源加速引擎，支持 GitHub、npm、PyPI、Docker 等 40+ 平台的统一加速",
       "htmlFile": "chapter05/0501.xget-high-performance-resource.html",

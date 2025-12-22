@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Skills Workflow System - Claude Skills工作流系统</title>
+    <meta name="description" content="基于Claude Code的Skills系统实战指南，包括自定义技能开发、工作流编排、自动化任务等高级功能">
+    <style>
+        :root {
+            --primary-color: #8b5cf6;
+            --secondary-color: #06b6d4;
+            --accent-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --info-color: #3b82f6;
+            --success-color: #059669;
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --border-color: #475569;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --gradient-skills: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        /* 背景粒子效果 */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        /* 头部样式 */
+        .hero-header {
+            background: var(--gradient-skills);
+            padding: 4rem 2rem 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 3rem;
+        }
+
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 8s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 导航目录 */
+        .toc-container {
+            max-width: 1200px;
+            margin: 0 auto 3rem;
+            padding: 0 2rem;
+        }
+
+        .toc-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .toc-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+            border-color: var(--primary-color);
+        }
+
+        .toc-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .toc-item {
+            padding: 0.8rem 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .toc-item:hover {
+            background: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .toc-item a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc-item:hover a {
+            color: var(--text-primary);
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        /* 区块样式 */
+        .section {
+            margin-bottom: 4rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        .section:nth-child(1) { animation-delay: 0.1s; }
+        .section:nth-child(2) { animation-delay: 0.2s; }
+        .section:nth-child(3) { animation-delay: 0.3s; }
+        .section:nth-child(4) { animation-delay: 0.4s; }
+        .section:nth-child(5) { animation-delay: 0.5s; }
+        .section:nth-child(6) { animation-delay: 0.6s; }
+        .section:nth-child(7) { animation-delay: 0.7s; }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+            padding-left: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* 架构图 */
+        .architecture-diagram {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .arch-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .arch-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .arch-component {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .arch-component.core {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--bg-tertiary), rgba(139, 92, 246, 0.1));
+        }
+
+        .arch-component.built-in {
+            border-color: var(--secondary-color);
+        }
+
+        .arch-component.custom {
+            border-color: var(--accent-color);
+        }
+
+        .arch-component:hover {
+            transform: translateY(-5px) scale(1.02);
+        }
+
+        .arch-component.core:hover {
+            box-shadow: 0 15px 35px rgba(139, 92, 246, 0.3);
+        }
+
+        .arch-component.built-in:hover {
+            box-shadow: 0 15px 35px rgba(6, 182, 212, 0.3);
+        }
+
+        .arch-component.custom:hover {
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.3);
+        }
+
+        .arch-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .arch-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .arch-description {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* 特性卡片 */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
+            border-color: var(--primary-color);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-description {
+            color: var(--text-muted);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 技能展示 */
+        .skills-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .skill-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-1);
+        }
+
+        .skill-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+        }
+
+        .skill-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .skill-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .skill-category {
+            padding: 0.3rem 0.8rem;
+            background: var(--primary-color);
+            color: var(--text-primary);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .skill-commands {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .command-example {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .command-example:hover {
+            background: var(--border-color);
+            transform: translateX(5px);
+        }
+
+        .command-prefix {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* 工作流可视化 */
+        .workflow-visual {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .workflow-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .workflow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .workflow-step {
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .workflow-step::after {
+            content: '';
+            position: absolute;
+            left: 24px;
+            top: 48px;
+            width: 2px;
+            height: 24px;
+            background: var(--border-color);
+        }
+
+        .workflow-step:last-child::after {
+            display: none;
+        }
+
+        .step-marker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: var(--primary-color);
+            color: var(--text-primary);
+            border-radius: 50%;
+            font-size: 1.2rem;
+            font-weight: 600;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-content {
+            flex: 1;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .step-content:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .step-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .step-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* 代码块 */
+        .code-block {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .code-title {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .copy-btn {
+            background: var(--primary-color);
+            color: var(--text-primary);
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-color);
+            transform: scale(1.05);
+        }
+
+        .copy-btn.copied {
+            background: var(--accent-color);
+        }
+
+        pre {
+            color: var(--text-secondary);
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        /* 实战案例卡片 */
+        .case-studies {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .case-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .case-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .case-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .case-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .case-description {
+            color: var(--text-muted);
+        }
+
+        .case-features {
+            list-style: none;
+        }
+
+        .case-feature {
+            display: flex;
+            align-items: start;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .case-feature:hover {
+            transform: translateX(5px);
+            background: var(--border-color);
+        }
+
+        .feature-icon {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .feature-text {
+            flex: 1;
+            color: var(--text-secondary);
+        }
+
+        /* 统计数据 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(139, 92, 246, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .arch-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .skills-showcase {
+                grid-template-columns: 1fr;
+            }
+
+            .case-studies {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .workflow-step {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .workflow-step::after {
+                left: 50%;
+                top: 48px;
+                transform: translateX(-50%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- 头部 -->
+    <header class="hero-header">
+        <h1 class="hero-title">Claude Skills Workflow System</h1>
+        <p class="hero-subtitle">基于Claude Code的Skills系统实战指南，构建高效的AI工作流</p>
+    </header>
+
+    <!-- 导航目录 -->
+    <div class="toc-container">
+        <div class="toc-card">
+            <h2 class="toc-title">📋 课程目录</h2>
+            <div class="toc-grid">
+                <div class="toc-item">
+                    <a href="#section-1">1. Skills系统概述</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-2">2. 内置Skills使用</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-3">3. 自定义Skills开发</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-4">4. 工作流编排</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-5">5. 技能集成实战</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-6">6. 高级功能应用</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-7">7. 最佳实践总结</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="container">
+        <!-- 统计数据 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">内置技能</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">自定义支持</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">3x</div>
+                <div class="stat-label">开发效率提升</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">99.9%</div>
+                <div class="stat-label">工作流成功率</div>
+            </div>
+        </div>
+
+        <!-- 第1节：Skills系统概述 -->
+        <section id="section-1" class="section">
+            <div class="section-header">
+                <h2 class="section-title">1. Skills系统概述</h2>
+                <p class="section-subtitle">了解Claude Code Skills系统的架构和核心特性</p>
+            </div>
+
+            <div class="architecture-diagram">
+                <h3 class="arch-title">Skills系统架构</h3>
+                <div class="arch-grid">
+                    <div class="arch-component core">
+                        <div class="arch-icon">⚙️</div>
+                        <div class="arch-name">Core Engine</div>
+                        <div class="arch-description">任务解析器、技能路由器、状态管理器</div>
+                    </div>
+                    <div class="arch-component built-in">
+                        <div class="arch-icon">🔧</div>
+                        <div class="arch-name">Built-in Skills</div>
+                        <div class="arch-description">git、commit、pdf、review-pr等内置技能</div>
+                    </div>
+                    <div class="arch-component custom">
+                        <div class="arch-icon">🛠️</div>
+                        <div class="arch-name">Custom Skills</div>
+                        <div class="arch-description">用户技能、项目技能、团队技能</div>
+                    </div>
+                    <div class="arch-component core">
+                        <div class="arch-icon">🔄</div>
+                        <div class="arch-name">Workflow Orchestrator</div>
+                        <div class="arch-description">串行、并行、条件工作流编排</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔧</div>
+                    <div class="feature-title">模块化设计</div>
+                    <div class="feature-description">技能可独立开发、测试和维护</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <div class="feature-title">灵活编排</div>
+                    <div class="feature-description">支持串行、并行、条件执行</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-title">参数传递</div>
+                    <div class="feature-description">技能间数据流转和状态共享</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <div class="feature-title">错误处理</div>
+                    <div class="feature-description">完善的异常处理和重试机制</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👁️</div>
+                    <div class="feature-title">可视化管理</div>
+                    <div class="feature-description">图形化的工作流编辑器</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第2节：内置Skills使用 -->
+        <section id="section-2" class="section">
+            <div class="section-header">
+                <h2 class="section-title">2. 内置Skills使用</h2>
+                <p class="section-subtitle">掌握常用内置技能的使用方法</p>
+            </div>
+
+            <div class="skills-showcase">
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <div class="skill-name">
+                            <span>🔧</span>
+                            Git相关技能
+                        </div>
+                        <span class="skill-category">Git</span>
+                    </div>
+                    <div class="skill-commands">
+                        <div class="command-example">
+                            <span class="command-prefix">/skill git status</span>
+                            查看Git状态
+                        </div>
+                        <div class="command-example">
+                            <span class="command-prefix">/skill git checkout -b feature/new</span>
+                            创建新分支
+                        </div>
+                        <div class="command-example">
+                            <span class="command-prefix">/skill commit --message "feat: add feature"</span>
+                            智能提交代码
+                        </div>
+                        <div class="command-example">
+                            <span class="command-prefix">/skill review-pr 123</span>
+                            审查Pull Request
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <div class="skill-name">
+                            <span>📄</span>
+                            文档处理技能
+                        </div>
+                        <span class="skill-category">Document</span>
+                    </div>
+                    <div class="skill-commands">
+                        <div class="command-example">
+                            <span class="command-prefix">/skill pdf analyze document.pdf</span>
+                            分析PDF文档
+                        </div>
+                        <div class="command-example">
+                            <span class="command-prefix">/skill pdf extract-text file.pdf</span>
+                            提取PDF文本
+                        </div>
+                        <div class="command-example">
+                            <span class="command-prefix">/skill convert file.docx --to pdf</span>
+                            格式转换
+                        </div>
+                        <div class="command-example">
+                            <span class="command-prefix">/skill convert data.json --to csv</span>
+                            数据格式转换
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <div class="skill-name">
+                            <span>📋</span>
+                            项目管理技能
+                        </div>
+                        <span class="skill-category">Project</span>
+                    </div>
+                    <div class="skill-commands">
+                        <div class="command-example">
+                            <span class="command-prefix">/skill assign-task --to dev1</span>
+                            分配任务
+                        </div>
+                        <div class="command-example">
+                            <span class="command-prefix">/skill track-progress --project web</span>
+                            跟踪项目进度
+                        </div>
+                        <div class="command-example">
+                            <span class="command-prefix">/skill analyze-code --path src/</span>
+                            代码质量分析
+                        </div>
+                        <div class="command-example">
+                            <span class="command-prefix">/skill find-bugs --threshold high</span>
+                            查找代码Bug
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第3节：自定义Skills开发 -->
+        <section id="section-3" class="section">
+            <div class="section-header">
+                <h2 class="section-title">3. 自定义Skills开发</h2>
+                <p class="section-subtitle">学习如何开发自定义技能扩展系统功能</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Skill开发模板 (YAML)</span>
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                </div>
+                <pre># skill-definition.yaml
+name: "custom-analyzer"
+version: "1.0.0"
+description: "自定义数据分析技能"
+author: "Your Name"
+tags: ["analysis", "data"]
+
+# 参数定义
+parameters:
+  input_file:
+    type: string
+    required: true
+    description: "输入文件路径"
+
+  output_format:
+    type: string
+    default: "json"
+    options: ["json", "csv", "markdown"]
+    description: "输出格式"
+
+# 执行步骤
+steps:
+  - name: "load_data"
+    action: "read_file"
+    params:
+      file: "{{input_file}}"
+
+  - name: "process_data"
+    action: "run_script"
+    script: |
+      # 数据处理逻辑
+      data = load_data(input_file)
+      processed = analyze_data(data)
+      return processed
+
+  - name: "save_result"
+    action: "write_file"
+    params:
+      file: "output.{{output_format}}"
+      content: "{{steps.process_data.result}}"</pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">JavaScript Skill开发</span>
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                </div>
+                <pre>// custom-skill.js
+class CustomAnalyzer {
+  constructor(config = {}) {
+    this.config = {
+      timeout: config.timeout || 30000,
+      retries: config.retries || 3,
+      ...config
+    };
+  }
+
+  async execute(params) {
+    try {
+      // 1. 参数验证
+      this.validateParams(params);
+
+      // 2. 数据加载
+      const data = await this.loadData(params.input_file);
+
+      // 3. 数据处理
+      const result = await this.analyzeData(data, params);
+
+      // 4. 结果输出
+      await this.saveResult(result, params.output_format);
+
+      return {
+        success: true,
+        message: "分析完成",
+        output: result
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        suggestion: this.getErrorMessage(error)
+      };
+    }
+  }
+
+  validateParams(params) {
+    if (!params.input_file) {
+      throw new Error("缺少必需参数: input_file");
+    }
+  }
+
+  async analyzeData(data, params) {
+    // 自定义分析逻辑
+    const analysis = {
+      summary: this.generateSummary(data),
+      insights: this.extractInsights(data),
+      recommendations: this.generateRecommendations(data)
+    };
+
+    return analysis;
+  }
+}
+
+// 注册技能
+module.exports = {
+  name: 'custom-analyzer',
+  class: CustomAnalyzer,
+  description: '自定义数据分析技能'
+};</pre>
+            </div>
+        </section>
+
+        <!-- 第4节：工作流编排 -->
+        <section id="section-4" class="section">
+            <div class="section-header">
+                <h2 class="section-title">4. 工作流编排</h2>
+                <p class="section-subtitle">学习如何编排复杂的工作流自动化任务</p>
+            </div>
+
+            <div class="workflow-visual">
+                <h3 class="workflow-title">代码审查自动化工作流</h3>
+                <div class="workflow-steps">
+                    <div class="workflow-step">
+                        <div class="step-marker">1</div>
+                        <div class="step-content">
+                            <div class="step-name">加载变更</div>
+                            <div class="step-description">检测Git变更，获取修改的文件列表</div>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="step-marker">2</div>
+                        <div class="step-content">
+                            <div class="step-name">并行分析</div>
+                            <div class="step-description">同时执行代码质量分析、安全扫描、测试检查</div>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="step-marker">3</div>
+                        <div class="step-content">
+                            <div class="step-name">聚合结果</div>
+                            <div class="step-description">汇总所有分析结果，生成综合报告</div>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="step-marker">4</div>
+                        <div class="step-content">
+                            <div class="step-name">通知团队</div>
+                            <div class="step-description">发送审查报告给相关团队成员</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">YAML工作流定义</span>
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                </div>
+                <pre># workflow.yaml
+name: "code-review-automation"
+version: "1.0.0"
+description: "自动化代码审查工作流"
+
+# 全局变量
+variables:
+  project_path: "./src"
+  review_threshold: 80
+  notification_channel: "#code-review"
+
+# 工作流步骤
+steps:
+  - name: "load_changes"
+    skill: "git"
+    action: "diff"
+    params:
+      path: "{{project_path}}"
+      target_branch: "main"
+    output:
+      changed_files: "files"
+
+  - name: "analyze_code"
+    skill: "custom-analyzer"
+    params:
+      input_files: "{{steps.load_changes.output.files}}"
+      analysis_type: "quality,security,performance"
+    parallel: true
+    output:
+      analysis_results: "results"
+
+  - name: "check_tests"
+    skill: "test-runner"
+    params:
+      files: "{{steps.load_changes.output.files}}"
+      coverage_threshold: 80
+    condition: "{{#contains steps.load_changes.output.files '*.test.js'}}"
+    output:
+      test_results: "tests"
+
+  - name: "generate_report"
+    skill: "report-generator"
+    params:
+      analysis: "{{steps.analyze_code.output.results}}"
+      tests: "{{steps.check_tests.output.tests}}"
+      template: "code-review-template"
+    output:
+      report_file: "report"
+
+  - name: "notify_team"
+    skill: "notification"
+    params:
+      channel: "{{notification_channel}}"
+      message: "代码审查完成，报告已生成: {{steps.generate_report.output.report_file}}"
+    on_error: "continue"</pre>
+            </div>
+        </section>
+
+        <!-- 第5节：技能集成实战 -->
+        <section id="section-5" class="section">
+            <div class="section-header">
+                <h2 class="section-title">5. 技能集成实战</h2>
+                <p class="section-subtitle">真实的技能集成案例和应用场景</p>
+            </div>
+
+            <div class="case-studies">
+                <div class="case-card">
+                    <div class="case-header">
+                        <h3 class="case-title">🚀 自动化代码发布</h3>
+                        <p class="case-description">完整的CI/CD自动化发布流程</p>
+                    </div>
+                    <ul class="case-features">
+                        <li class="case-feature">
+                            <div class="feature-icon">✅</div>
+                            <div class="feature-text">预发布检查：代码质量、测试、安全、文档</div>
+                        </li>
+                        <li class="case-feature">
+                            <div class="feature-icon">🏷️</div>
+                            <div class="feature-text">自动版本管理：智能版本号升级和更新</div>
+                        </li>
+                        <li class="case-feature">
+                            <div class="feature-icon">📋</div>
+                            <div class="feature-text">变更日志生成：自动生成发布说明</div>
+                        </li>
+                        <li class="case-feature">
+                            <div class="feature-icon">🎯</div>
+                            <div class="feature-text">多环境部署：支持staging和production环境</div>
+                        </li>
+                        <li class="case-feature">
+                            <div class="feature-icon">🔔</div>
+                            <div class="feature-text">团队通知：Slack、邮件等多渠道通知</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="case-card">
+                    <div class="case-header">
+                        <h3 class="case-title">📊 智能数据分析</h3>
+                        <p class="case-description">端到端的数据分析和报告生成</p>
+                    </div>
+                    <ul class="case-features">
+                        <li class="case-feature">
+                            <div class="feature-icon">📥</div>
+                            <div class="feature-text">多源数据摄入：数据库、API、文件等多种数据源</div>
+                        </li>
+                        <li class="case-feature">
+                            <div class="feature-icon">🧹</div>
+                            <div class="feature-text">智能数据清洗：去重、缺失值处理、数据验证</div>
+                        </li>
+                        <li class="case-feature">
+                            <div class="feature-icon">🔬</div>
+                            <div class="feature-text">探索性分析：统计分析、相关性、异常检测</div>
+                        </li>
+                        <li class="case-feature">
+                            <div class="feature-icon">🤖</div>
+                            <div class="feature-text">机器学习：聚类、预测、分类等ML模型</div>
+                        </li>
+                        <li class="case-feature">
+                            <div class="feature-icon">📈</div>
+                            <div class="feature-text">可视化报告：图表生成和仪表板创建</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第6节：高级功能应用 -->
+        <section id="section-6" class="section">
+            <div class="section-header">
+                <h2 class="section-title">6. 高级功能应用</h2>
+                <p class="section-subtitle">版本管理、技能共享、监控等高级特性</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <div class="feature-title">技能版本管理</div>
+                    <div class="feature-description">
+                        <strong>语义化版本控制</strong><br>
+                        向后兼容性保证<br>
+                        自动迁移脚本
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏪</div>
+                    <div class="feature-title">技能市场共享</div>
+                    <div class="feature-description">
+                        <strong>团队技能库</strong><br>
+                        技能评级和评论<br>
+                        依赖管理
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-title">监控和日志</div>
+                    <div class="feature-description">
+                        <strong>性能指标监控</strong><br>
+                        结构化日志<br>
+                        健康检查
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <div class="feature-title">安全和权限</div>
+                    <div class="feature-description">
+                        <strong>技能访问控制</strong><br>
+                        参数验证<br>
+                        安全扫描
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">技能监控配置</span>
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                </div>
+                <pre># skill-monitoring.yaml
+monitoring:
+  metrics:
+    execution_time:
+      enabled: true
+      alert_threshold: "5m"
+      history_retention: "30d"
+
+    success_rate:
+      enabled: true
+      alert_threshold: "<95%"
+      window: "24h"
+
+    error_rate:
+      enabled: true
+      alert_threshold: ">5%"
+      window: "1h"
+
+  logging:
+    level: "INFO"
+    format: "json"
+    outputs:
+      - type: "file"
+        path: "/var/log/skills/{{skill_name}}.log"
+        rotation: "daily"
+        retention: "30d"
+      - type: "slack"
+        webhook: "${SLACK_WEBHOOK_URL}"
+        channel: "#skill-alerts"
+        level: "ERROR"</pre>
+            </div>
+        </section>
+
+        <!-- 第7节：最佳实践总结 -->
+        <section id="section-7" class="section">
+            <div class="section-header">
+                <h2 class="section-title">7. 最佳实践总结</h2>
+                <p class="section-subtitle">开发规范、团队协作和故障排除指南</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚙️</div>
+                    <div class="feature-title">技能设计原则</div>
+                    <div class="feature-description">
+                        <strong>单一职责</strong> - 每个技能专注一个功能<br>
+                        <strong>幂等性</strong> - 多次执行结果一致<br>
+                        <strong>可观测</strong> - 充分的日志和监控
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-title">性能优化技巧</div>
+                    <div class="feature-description">
+                        <strong>缓存策略</strong> - 缓存重复计算结果<br>
+                        <strong>并行处理</strong> - 多线程/异步处理<br>
+                        <strong>批量操作</strong> - 减少系统开销
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤝</div>
+                    <div class="feature-title">团队协作规范</div>
+                    <div class="feature-description">
+                        <strong>命名规范</strong> - 清晰描述性命名<br>
+                        <strong>文档要求</strong> - README、CHANGELOG、示例<br>
+                        <strong>代码规范</strong> - 统一编码标准
+                    </div>
+                </div>
+            </div>
+
+            <div class="workflow-visual">
+                <h3 class="workflow-title">故障排除流程</h3>
+                <div class="workflow-steps">
+                    <div class="workflow-step">
+                        <div class="step-marker">🔍</div>
+                        <div class="step-content">
+                            <div class="step-name">检查技能日志</div>
+                            <div class="step-description">查看详细的执行日志和错误信息</div>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="step-marker">✓</div>
+                        <div class="step-content">
+                            <div class="step-name">验证输入参数</div>
+                            <div class="step-description">确认参数类型、格式和值是否正确</div>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="step-marker">⚡</div>
+                        <div class="step-content">
+                            <div class="step-name">测试独立功能</div>
+                            <div class="step-description">单独测试技能的各个功能模块</div>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="step-marker">💾</div>
+                        <div class="step-content">
+                            <div class="step-name">检查资源使用</div>
+                            <div class="step-description">监控内存、CPU、磁盘等资源状况</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="features-grid" style="margin-top: 2rem;">
+                <div class="feature-card" style="text-align: center; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));">
+                    <div class="feature-title" style="color: var(--text-primary); font-size: 1.3rem;">🎯 核心价值</div>
+                    <div class="feature-description" style="color: var(--text-primary);">
+                        模块化设计 • 灵活编排 • 易于扩展 • 企业级特性
+                    </div>
+                </div>
+                <div class="feature-card" style="text-align: center; background: linear-gradient(135deg, var(--accent-color), var(--success-color));">
+                    <div class="feature-title" style="color: var(--text-primary); font-size: 1.3rem;">🚀 实施建议</div>
+                    <div class="feature-description" style="color: var(--text-primary);">
+                        从简单开始 • 逐步完善 • 团队协作 • 持续监控
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // 粒子背景效果
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function createParticle() {
+            return {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                radius: Math.random() * 2 + 1,
+                opacity: Math.random() * 0.5 + 0.2
+            };
+        }
+
+        function initParticles() {
+            particles = [];
+            const particleCount = Math.min(100, (canvas.width * canvas.height) / 15000);
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(createParticle());
+            }
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(particle => {
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(139, 92, 246, ${particle.opacity})`;
+                ctx.fill();
+
+                particle.x += particle.vx;
+                particle.y += particle.vy;
+
+                if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
+                if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+            });
+
+            // 连接临近的粒子
+            particles.forEach((p1, i) => {
+                particles.slice(i + 1).forEach(p2 => {
+                    const distance = Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+                    if (distance < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = `rgba(139, 92, 246, ${0.2 * (1 - distance / 120)})`;
+                        ctx.stroke();
+                    }
+                });
+            });
+
+            requestAnimationFrame(drawParticles);
+        }
+
+        // 复制代码功能
+        function copyCode(button) {
+            const codeBlock = button.parentElement.parentElement;
+            const code = codeBlock.querySelector('pre').textContent;
+
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = '已复制';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.textContent = '复制';
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('.toc-item a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+
+                if (targetSection) {
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 架构组件交互
+        document.querySelectorAll('.arch-component').forEach(component => {
+            component.addEventListener('click', function() {
+                // 创建波纹效果
+                const ripple = document.createElement('div');
+                ripple.style.position = 'absolute';
+                ripple.style.width = '20px';
+                ripple.style.height = '20px';
+                ripple.style.background = 'rgba(255,255,255,0.5)';
+                ripple.style.borderRadius = '50%';
+                ripple.style.transform = 'translate(-50%, -50%)';
+                ripple.style.pointerEvents = 'none';
+                ripple.style.animation = 'ripple 0.6s ease-out';
+
+                const rect = this.getBoundingClientRect();
+                ripple.style.left = '50%';
+                ripple.style.top = '50%';
+
+                this.appendChild(ripple);
+
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+
+        // 添加波纹动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    width: 200px;
+                    height: 200px;
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // 初始化
+        window.addEventListener('load', () => {
+            setCanvasSize();
+            initParticles();
+            drawParticles();
+
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(30px)';
+                section.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                observer.observe(section);
+            });
+        });
+
+        window.addEventListener('resize', () => {
+            setCanvasSize();
+            initParticles();
+        });
+    </script>
+</body>
+</html>
