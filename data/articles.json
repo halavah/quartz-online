@@ -33,87 +33,87 @@
       "category": "安装指南"
     },
     {
-      "title": "Vibe Coding 之 Claude Code 常用命令指南 - 10分钟掌握所有常用命令",
-      "description": "10分钟掌握Claude Code所有常用命令,附一份Claude Code命令自查表,包括基础命令、实用技巧和提问技巧",
-      "htmlFile": "chapter01/0105.claude-code-command-guide.html",
+      "title": "Claude Code 安装与配置完全指南",
+      "description": "从零开始安装Claude Code，包含各平台安装方法、环境变量配置、首次运行和故障排除",
+      "htmlFile": "chapter01/0105.claude-code-installation-guide.html",
       "category": "安装指南"
     },
     {
-      "title": "Claude Code 安装与配置完全指南",
-      "description": "从零开始安装Claude Code，包含各平台安装方法、环境变量配置、首次运行和故障排除",
-      "htmlFile": "chapter01/0106.claude-code-installation-guide.html",
-      "category": "安装指南"
+      "title": "Claude Code 常用命令指南 - 10分钟掌握所有常用命令",
+      "description": "10分钟掌握Claude Code所有常用命令,附一份Claude Code命令自查表,包括基础命令、实用技巧和提问技巧",
+      "htmlFile": "chapter02/0101.claude-code-command-guide.html",
+      "category": "使用技巧"
     },
     {
       "title": "Claude Code 高级配置技巧",
       "description": "深入Claude Code配置，包含VSCode插件配置、GLM模型配置、多环境管理和企业级部署",
-      "htmlFile": "chapter01/0107.claude-code-advanced-config.html",
-      "category": "安装指南"
+      "htmlFile": "chapter02/0102.claude-code-advanced-config.html",
+      "category": "使用技巧"
     },
     {
       "title": "Claude Code 实用操作手册",
       "description": "掌握Claude Code的核心操作技巧，包含文件引用、插件管理、Skills系统和实战工作流",
-      "htmlFile": "chapter01/0108.claude-code-operation-manual.html",
-      "category": "安装指南"
+      "htmlFile": "chapter02/0103.claude-code-operation-manual.html",
+      "category": "使用技巧"
     },
     {
       "title": "Claude Code CLI 完全指南",
       "description": "深入掌握Claude Code命令行工具，包含CLI命令大全、高频命令分类、启动参数和自动化技巧",
-      "htmlFile": "chapter01/0109.claude-code-cli-guide.html",
-      "category": "安装指南"
+      "htmlFile": "chapter02/0104.claude-code-cli-guide.html",
+      "category": "使用技巧"
     },
     {
       "title": "Claude Code 交互模式与快捷键指南",
       "description": "精通Claude Code交互模式，掌握键盘快捷键、Vim模式、多行输入和效率提升技巧",
-      "htmlFile": "chapter01/0110.claude-code-interaction-guide.html",
-      "category": "安装指南"
+      "htmlFile": "chapter02/0105.claude-code-interaction-guide.html",
+      "category": "使用技巧"
     },
     {
       "title": "Claude Code 斜线命令详解",
       "description": "全面掌握Claude Code斜线命令，包含内置命令、自定义命令创建、MCP命令和命令命名空间管理",
-      "htmlFile": "chapter01/0111.claude-code-slash-commands.html",
-      "category": "安装指南"
+      "htmlFile": "chapter02/0106.claude-code-slash-commands.html",
+      "category": "使用技巧"
     },
     {
       "title": "Claude Code 全局配置与设置",
       "description": "全面掌握Claude Code配置系统，包含settings.json配置、环境变量、企业部署策略和最佳实践",
-      "htmlFile": "chapter01/0112.claude-code-global-settings.html",
-      "category": "安装指南"
+      "htmlFile": "chapter02/0107.claude-code-global-settings.html",
+      "category": "使用技巧"
     },
     {
       "title": "Claude-Mem - Claude Code 持久化记忆系统 | AI智能记忆压缩工具",
       "description": "Claude-Mem 是一个为 Claude Code 打造的持久化记忆压缩系统，自动捕获会话上下文并跨会话保存，让AI助手拥有真正的长期记忆能力。",
-      "htmlFile": "chapter02/0101.claude-memory.html",
+      "htmlFile": "chapter03/0101.claude-memory.html",
       "category": "插件工具"
     },
     {
       "title": "Xget - 超高性能开发者资源加速引擎",
       "description": "Xget 是基于 Cloudflare Workers 的超高性能资源加速引擎，支持 GitHub、npm、PyPI、Docker 等 40+ 平台的统一加速",
-      "htmlFile": "chapter03/0101.xget-high-performance-resource.html",
+      "htmlFile": "chapter04/0101.xget-high-performance-resource.html",
       "category": "开发工具"
     },
     {
       "title": "Bytebot - 开源AI桌面代理：让AI拥有自己的电脑",
       "description": "Bytebot是一个开源的AI桌面代理，通过自然语言命令自动化计算机任务，在容器化的Linux桌面环境中运行。支持文件处理、多应用工作流、企业级RPA替代方案",
-      "htmlFile": "chapter03/0102.bytebot-ai-desktop-agent.html",
+      "htmlFile": "chapter04/0102.bytebot-ai-desktop-agent.html",
       "category": "开发工具"
     },
     {
       "title": "Onyx - 开源 AI 平台：多功能聊天 UI，支持任意 LLM",
       "description": "Onyx 是一个功能丰富的、自托管聊天 UI，支持任何 LLM。内置代理、RAG、连接器等高级功能，适用于团队和企业。",
-      "htmlFile": "chapter03/0103.onyx-opensource-ai-platform.html",
+      "htmlFile": "chapter04/0103.onyx-opensource-ai-platform.html",
       "category": "开发工具"
     },
     {
       "title": "TrendRadar - 30秒部署的热点助手",
       "description": "TrendRadar是一个30秒可部署的热点助手,聚合35+平台新闻,支持智能推送、趋势分析和AI智能分析。告别无效刷屏,只看真正关心的新闻资讯。",
-      "htmlFile": "chapter03/0104.trendradar-trend-monitoring-tool.html",
+      "htmlFile": "chapter04/0104.trendradar-trend-monitoring-tool.html",
       "category": "开发工具"
     },
     {
       "title": "Tracy Profiler - 纳秒级实时性能分析工具",
       "description": "Tracy 是一款强大的实时性能分析工具，提供纳秒级分辨率测量能力，支持 CPU、GPU、内存分析，适用于游戏和应用程序性能优化",
-      "htmlFile": "chapter03/0105.tracy-profiler-performance-analysis.html",
+      "htmlFile": "chapter04/0105.tracy-profiler-performance-analysis.html",
       "category": "开发工具"
     }
   ]
