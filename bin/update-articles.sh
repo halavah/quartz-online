@@ -46,7 +46,7 @@ extract_metadata() {
         category="使用工具"
     elif [[ "$relative_path" == chapter04/* ]]; then
         category="最新动态"
-    elif [[ "$relative_path" == chapter04/* ]]; then
+    elif [[ "$relative_path" == chapter05/* ]]; then
         category="网络工具"
     else
         category="其他"

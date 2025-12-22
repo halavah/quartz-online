@@ -15,6 +15,39 @@ export default function Home() {
     (config as any).defaultViewMode === 'list' ? 'list' : 'table'
   );
 
+  // 中文拼音首字母排序函数
+  const sortByPinyin = (categories: string[]): string[] => {
+    const pinyinMap: Record<string, string> = {
+      '安': 'A',
+      '其': 'Q',
+      '使': 'S'
+    };
+
+    return categories.sort((a, b) => {
+      // 获取每个分类的第一个字的拼音首字母
+      const getFirstLetter = (str: string): string => {
+        const firstChar = str.charAt(0);
+        return pinyinMap[firstChar] || firstChar.toUpperCase();
+      };
+
+      const letterA = getFirstLetter(a);
+      const letterB = getFirstLetter(b);
+
+      // 按字母顺序排序
+      if (letterA < letterB) return -1;
+      if (letterA > letterB) return 1;
+
+      // 相同首字母时的排序规则
+      if (letterA === letterB) {
+        // 对于"使用技巧"和"使用工具"，保持固定顺序
+        if (a === '使用技巧') return -1;
+        if (b === '使用技巧') return 1;
+      }
+
+      return 0;
+    });
+  };
+
   // 分类筛选 - 从 articles 中自动提取所有唯一分类
   const [selectedCategory, setSelectedCategory] = useState('全部');
   const categories = useMemo(() => {
@@ -23,7 +56,10 @@ export default function Home() {
       const cat = article.category || '开发工具';
       uniqueCategories.add(cat);
     });
-    return ['全部', ...Array.from(uniqueCategories).sort()];
+    const categoryArray = Array.from(uniqueCategories);
+    const sortedCategories = sortByPinyin(categoryArray);
+    // 确保"全部"始终在最前面，然后按拼音排序其他分类
+    return ['全部', ...sortedCategories];
   }, [articles]);
 
   // 计算每个分类的文章数量
