@@ -48,7 +48,7 @@ for /L %%c in (1,1,4) do (
     echo     "beianNumber": "京ICP备12345678号",
     echo     "copyrightText": "© 2025 Halavah's Tech. All rights reserved.",
     echo     "adLink": "https://api.nekoapi.com",
-    echo     "defaultViewMode": "list"
+    echo     "defaultViewMode": "table"
     echo   },
     echo   "articles": [
 ) > "%ARTICLES_JSON%"
