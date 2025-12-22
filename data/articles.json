@@ -5,7 +5,8 @@
     "githubUrl": "https://github.com/halavah",
     "beianNumber": "京ICP备12345678号",
     "copyrightText": "© 2025 Halavah's Tech. All rights reserved.",
-    "adLink": "https://api.nekoapi.com"
+    "adLink": "https://api.nekoapi.com",
+    "defaultViewMode": "table"
   },
   "articles": [
     {
@@ -154,44 +155,50 @@
     },
     {
       "title": "Claude Code Viewer - Web可视化客户端",
-      "description": "",
+      "description": "Claude Code Viewer 是d-kimuson开发的Web可视化客户端，提供直观的会话管理界面，支持实时交互、文件树导航、Git状态监控等功能，是Claude Code的强大可视化工具",
       "htmlFile": "chapter03/0113.claude-code-viewer.html",
       "category": "使用工具"
     },
     {
       "title": "CCNexus - 智能API网关",
-      "description": "",
+      "description": "CCNexus 是lich0821开发的智能API网关，提供多提供商负载均衡、实时状态监控、动态路由配置等功能，是现代化的API管理和流量分发解决方案",
       "htmlFile": "chapter03/0114.ccNexus.html",
       "category": "使用工具"
     },
     {
       "title": "Claude-Mem - Claude Code 持久化记忆系统",
-      "description": "",
+      "description": "Claude-Mem 是thedotmack开发的Claude Code持久化记忆系统，提供Web界面记忆管理、记忆流可视化、智能记忆检索等功能，让Claude具备长期记忆和上下文保持能力",
       "htmlFile": "chapter03/0115.claude-mem.html",
       "category": "使用工具"
     },
     {
       "title": "BMAD Method - 多智能体协作框架",
-      "description": "",
+      "description": "BMAD Method 是bmadcode开发的多智能体协作框架，提供角色定义、工作流编排、协作管理等功能，支持多个AI智能体协同完成复杂任务，是AI团队协作的完整解决方案",
       "htmlFile": "chapter03/0116.BMAD-METHOD.html",
       "category": "使用工具"
     },
     {
       "title": "Graphiti MCP Server - AI知识图谱服务器",
-      "description": "",
+      "description": "Graphiti MCP Server 是gifflet开发的AI知识图谱服务器，使用Neo4j构建知识网络，提供智能知识管理、语义检索、图谱可视化等功能，是AI代理的知识管理和检索解决方案",
       "htmlFile": "chapter03/0117.graphiti-mcp-server.html",
       "category": "使用工具"
     },
     {
       "title": "Zen MCP Server - 多模型协调指挥系统",
-      "description": "",
+      "description": "Zen MCP Server 是BeehiveInnovations开发的多模型协调指挥系统，让Claude作为指挥官协调o3、Gemini 2.5 Pro、Flash等多个模型，提供模型协调、任务分配、结果整合等功能",
       "htmlFile": "chapter03/0118.zen-mcp-server.html",
       "category": "使用工具"
     },
     {
       "title": "Context Engineering Intro - AI编程助手上下文工程模板",
-      "description": "",
+      "description": "Context Engineering Intro 是coleam00开发的上下文工程模板，为AI编程助手提供工程化上下文，取代传统的提示词工程，让AI写代码质量提升10倍，提供系统化管理和团队协作功能",
       "htmlFile": "chapter03/0119.context-engineering-intro.html",
+      "category": "使用工具"
+    },
+    {
+      "title": "SuperClaude Framework - 增强Claude开发框架",
+      "description": "SuperClaude Framework 是通过专用命令、认知角色和开发方法论来增强Claude Code的综合框架，提供系统化的AI编程开发体验，让AI扮演不同专业角色进行协作开发",
+      "htmlFile": "chapter03/0120.SuperClaude_Framework.html",
       "category": "使用工具"
     },
     {

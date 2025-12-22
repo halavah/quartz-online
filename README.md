@@ -220,7 +220,8 @@ touch public/chapter02/0106.my-new-article.html
     "githubUrl": "https://github.com/halavah",
     "beianNumber": "京ICP备12345678号",
     "copyrightText": "© 2025 Halavah's Tech. All rights reserved.",
-    "adLink": "https://api.nekoapi.com"
+    "adLink": "https://api.nekoapi.com",
+    "defaultViewMode": "table"
   },
   "articles": [
     {
@@ -230,6 +231,22 @@ touch public/chapter02/0106.my-new-article.html
       "category": "AI工具"
     }
   ]
+}
+```
+
+**🆕 新增功能：首页视图模式配置**
+
+系统支持两种首页文章展示模式，通过 `data/articles.json` 中的 `defaultViewMode` 配置控制：
+
+- **`"table"`** - 表格视图：以表格形式展示文章，信息密度高，适合技术文档类内容
+- **`"list"`** - 列表视图：以卡片形式展示文章，视觉效果好，适合博客类内容
+
+```json
+{
+  "config": {
+    // ... 其他配置
+    "defaultViewMode": "table"  // 或 "list"
+  }
 }
 ```
 

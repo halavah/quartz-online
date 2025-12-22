@@ -86,7 +86,8 @@ cat > "$ARTICLES_JSON" << 'EOF'
     "githubUrl": "https://github.com/halavah",
     "beianNumber": "京ICP备12345678号",
     "copyrightText": "© 2025 Halavah's Tech. All rights reserved.",
-    "adLink": "https://api.nekoapi.com"
+    "adLink": "https://api.nekoapi.com",
+    "defaultViewMode": "table"
   },
   "articles": [
 EOF
