@@ -182,9 +182,9 @@ export default function Home() {
         </div>
 
         {/* 文章网格/列表 */}
-        <div className={`${viewMode === 'table' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'} mb-12`}>
+        <div className={`${viewMode === 'table' ? 'w-full' : 'space-y-4'} mb-12`}>
           {currentArticles.length === 0 ? (
-            <div className="col-span-full text-center py-20">
+            <div className="text-center py-20">
               <div className="text-7xl mb-6">🔍</div>
               <h3 className="text-3xl font-bold mb-3" style={{ color: 'var(--text-color)' }}>
                 未找到匹配的文章
