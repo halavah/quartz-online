@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCUndo - Claude Code精细撤销工具 | 精细文件操作恢复系统</title>
+    <meta name="description" content="CCUndo 为Claude Code提供精细的撤销功能，直接读取Claude Code会话文件来追踪文件操作，允许用户选择性地撤销更改，恢复到检查点状态">
+    <meta name="keywords" content="CCUndo,Claude Code,撤销工具,文件恢复,会话管理,检查点,RonitSachdev,精细化操作">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}:root{--primary-color:#06b6d4;--primary-dark:#0891b2;--secondary-color:#0891b2;--accent-color:#ef4444;--success-color:#10b981;--background-color:#0f0f1a;--surface-color:#1a1a2e;--surface-light:#252542;--text-color:#e2e8f0;--text-muted:#94a3b8;--border-color:#334155;--gradient-primary:linear-gradient(135deg,#06b6d4 0%,#0891b2 100%);--gradient-hero:linear-gradient(135deg,#1a1a2e 0%,#0f0f1a 50%,#1e1b4b 100%);--gradient-accent:linear-gradient(135deg,#ef4444 0%,#dc2626 100%);--glow-primary:0 0 40px rgba(6,182,212,0.3);--glow-secondary:0 0 40px rgba(8,145,178,0.2);--glow-accent:0 0 40px rgba(239,68,68,0.3)}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;line-height:1.7;color:var(--text-color);background:var(--background-color);overflow-x:hidden}.container{width:100%;max-width:1200px;margin:0 auto;padding:0 1.5rem}.hero-section{position:relative;min-height:100vh;display:flex;align-items:center;background:var(--gradient-hero);overflow:hidden}.hero-section::before{content:"";position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 20% 80%,rgba(6,182,212,0.15) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(8,145,178,0.1) 0%,transparent 50%),radial-gradient(circle at 50% 50%,rgba(239,68,68,0.05) 0%,transparent 50%);pointer-events:none}.particles{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;pointer-events:none}.particle{position:absolute;width:4px;height:4px;background:var(--primary-color);border-radius:50%;opacity:0.3;animation:float 15s infinite ease-in-out}.particle:nth-child(2){left:20%;animation-delay:-2s;background:var(--secondary-color)}.particle:nth-child(3){left:40%;animation-delay:-4s}.particle:nth-child(4){left:60%;animation-delay:-6s;background:var(--accent-color)}.particle:nth-child(5){left:80%;animation-delay:-8s;background:var(--secondary-color)}.particle:nth-child(6){left:10%;animation-delay:-10s}.particle:nth-child(7){left:70%;animation-delay:-12s;background:var(--accent-color)}.particle:nth-child(8){left:90%;animation-delay:-14s}@keyframes float{0%,100%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:0.3}90%{opacity:0.3}100%{transform:translateY(-100vh) scale(1);opacity:0}}.hero-container{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;padding:2rem 0}.hero-content{animation:fadeInUp 0.8s ease-out}@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}.hero-badge{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.3);padding:0.5rem 1rem;border-radius:50px;font-size:0.875rem;color:var(--primary-color);margin-bottom:1.5rem}.hero-badge::before{content:"";width:8px;height:8px;background:var(--primary-color);border-radius:50%;animation:pulse 2s infinite}@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.2)}}.hero-title{font-size:3.5rem;font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.hero-subtitle{font-size:1.25rem;color:var(--text-muted);margin-bottom:2rem;max-width:500px}.hero-stats{display:flex;gap:2rem;margin-bottom:2rem}.stat-item{text-align:center}.stat-number{display:block;font-size:1.5rem;font-weight:700;color:var(--text-color)}.stat-label{font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em}.hero-actions{display:flex;gap:1rem;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.875rem 1.75rem;border:none;border-radius:12px;font-weight:600;font-size:1rem;text-decoration:none;cursor:pointer;transition:all 0.3s ease}.btn-primary{background:var(--gradient-primary);color:white;box-shadow:var(--glow-primary)}.btn-primary:hover{transform:translateY(-3px);box-shadow:0 10px 40px rgba(6,182,212,0.4)}.btn-secondary{background:var(--surface-light);color:var(--text-color);border:1px solid var(--border-color)}.btn-secondary:hover{background:var(--surface-color);border-color:var(--primary-color);transform:translateY(-3px)}.hero-visual{position:relative;display:flex;justify-content:center;align-items:center;animation:fadeInUp 0.8s ease-out 0.2s both}.undo-diagram{position:relative;width:100%;max-width:450px;aspect-ratio:1}.timeline-container{position:absolute;width:100%;height:100%;border-radius:20px;background:var(--surface-light);border:1px solid var(--border-color);overflow:hidden}.timeline{position:relative;width:100%;height:100%;padding:1rem}.timeline-line{position:absolute;left:20px;top:0;bottom:0;width:2px;background:var(--primary-color);opacity:0.3}.timeline-dot{position:absolute;width:12px;height:12px;background:var(--primary-color);border-radius:50%;border:2px solid var(--surface-light);z-index:2}.timeline-dot:nth-child(1){top:20%}.timeline-dot:nth-child(2){top:40%}.timeline-dot:nth-child(3){top:60%}.timeline-dot:nth-child(4){top:80%}.timeline-event{position:absolute;left:35px;background:var(--surface-color);border:1px solid var(--border-color);border-radius:8px;padding:0.75rem;margin-bottom:0.5rem;font-size:0.75rem;color:var(--text-color);max-width:200px;z-index:1;transition:all 0.3s ease}.timeline-event:hover{background:var(--primary-color);color:white;border-color:var(--primary-color);transform:scale(1.05)}.timeline-event-1{top:18%}.timeline-event-2{top:38%}.timeline-event-3{top:58%}.timeline-event-4{top:78%}.timeline-arrow{position:absolute;left:20px;animation:slideArrow 2s infinite ease-in-out}@keyframes slideArrow{0%{transform:translateY(0)}50%{transform:translateY(10px)}100%{transform:translateY(0)}}.main-content{position:relative;z-index:1}section{padding:5rem 0}.section-header{text-align:center;margin-bottom:4rem}.section-badge{display:inline-block;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.3);padding:0.375rem 1rem;border-radius:50px;font-size:0.75rem;color:var(--primary-color);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem}.section-title{font-size:2.5rem;font-weight:700;margin-bottom:1rem;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.section-subtitle{font-size:1.125rem;color:var(--text-muted);max-width:600px;margin:0 auto}.overview-section{background:linear-gradient(180deg,var(--background-color) 0%,var(--surface-color) 100%)}.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}.overview-content h3{font-size:1.75rem;margin-bottom:1rem;color:var(--text-color)}.overview-content p{color:var(--text-muted);margin-bottom:1.5rem}.overview-list{list-style:none}.overview-list li{display:flex;align-items:flex-start;gap:0.75rem;margin-bottom:1rem;color:var(--text-muted)}.overview-list li::before{content:"✓";color:var(--secondary-color);font-weight:bold}.workflow-diagram{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.workflow-step{display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--surface-color);border-radius:12px;margin-bottom:0.75rem;border:1px solid var(--border-color);transition:all 0.3s ease}.workflow-step:hover{border-color:var(--primary-color);transform:translateX(5px)}.workflow-step:last-child{margin-bottom:0}.step-icon{width:40px;height:40px;background:var(--gradient-primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0}.step-content{flex:1}.step-title{font-weight:600;color:var(--text-color);font-size:0.9rem}.step-desc{font-size:0.8rem;color:var(--text-muted)}.step-arrow{text-align:center;color:var(--primary-color);font-size:1.25rem;margin:0.5rem 0}.features-section{background:var(--surface-color)}.features-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem}.feature-card{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color);position:relative;overflow:hidden}.feature-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--gradient-primary);transform:scaleX(0);transition:transform 0.3s ease}.feature-card:hover{transform:translateY(-5px);border-color:var(--primary-color);box-shadow:var(--glow-primary)}.feature-card:hover::before{transform:scaleX(1)}.feature-icon{width:60px;height:60px;background:rgba(6,182,212,0.1);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.75rem;margin-bottom:1.5rem}.feature-title{font-size:1.25rem;font-weight:600;margin-bottom:0.75rem;color:var(--text-color)}.feature-description{color:var(--text-muted);font-size:0.95rem}.feature-list{margin-top:1rem;list-style:none}.feature-list li{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;color:var(--text-muted);font-size:0.875rem}.feature-list li::before{content:"→";color:var(--secondary-color);font-weight:bold}.installation-section{background:var(--background-color)}.install-tabs{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.tab-buttons{display:flex;gap:0.5rem;margin-bottom:2rem;background:var(--surface-color);padding:0.5rem;border-radius:12px}.tab-btn{flex:1;padding:0.875rem 1.5rem;border:none;background:transparent;color:var(--text-muted);font-weight:600;border-radius:8px;cursor:pointer;transition:all 0.3s ease}.tab-btn.active{background:var(--gradient-primary);color:white}.tab-btn:hover:not(.active){color:var(--text-color);background:rgba(6,182,212,0.1)}.tab-content{display:none}.tab-content.active{display:block;animation:fadeIn 0.3s ease}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.install-step{margin-bottom:1.5rem}.install-step:last-child{margin-bottom:0}.install-step h4{color:var(--text-color);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem}.step-number{width:28px;height:28px;background:var(--gradient-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-weight:700}.code-block{position:relative;background:#0d1117;border-radius:12px;overflow:hidden;border:1px solid var(--border-color)}.code-header{display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;background:#161b22;border-bottom:1px solid var(--border-color)}.code-lang{font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em}.copy-btn{background:var(--primary-color);color:white;border:none;padding:0.375rem 0.75rem;border-radius:6px;font-size:0.75rem;cursor:pointer;transition:all 0.2s ease}.copy-btn:hover{background:var(--primary-dark)}.code-content{padding:1rem;overflow-x:auto}.code-content pre{margin:0;font-family:"Fira Code","Monaco","Consolas",monospace;font-size:0.875rem;line-height:1.6}.code-content code{color:#e6edf3}.usage-section{background:linear-gradient(180deg,var(--surface-color) 0%,var(--background-color) 100%)}.usage-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.usage-features{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.usage-features h3{font-size:1.5rem;margin-bottom:1.5rem;color:var(--text-color)}.usage-item{display:flex;align-items:flex-start;gap:1rem;padding:1rem;background:var(--surface-color);border-radius:12px;margin-bottom:0.75rem;border:1px solid var(--border-color);transition:all 0.3s ease}.usage-item:hover{border-color:var(--primary-color);transform:translateX(5px)}.usage-item:last-child{margin-bottom:0}.usage-icon{width:36px;height:36px;background:rgba(8,145,178,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.usage-item-title{font-weight:600;color:var(--text-color);margin-bottom:0.25rem;font-size:0.95rem}.usage-item-desc{font-size:0.85rem;color:var(--text-muted)}.usage-examples{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.usage-examples h3{font-size:1.5rem;margin-bottom:1.5rem;color:var(--text-color)}.command-example{background:var(--surface-color);border-radius:10px;padding:1rem;margin-bottom:0.75rem;font-family:"Fira Code",monospace;font-size:0.875rem;color:var(--text-color)}.command-example strong{color:var(--secondary-color)}.checkpoint-section{background:var(--surface-color)}.checkpoint-features{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.checkpoint-features h3{font-size:1.5rem;margin-bottom:1.5rem;color:var(--text-color)}.checkpoint-step{display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--surface-color);border-radius:12px;margin-bottom:0.75rem;border:1px solid var(--border-color);transition:all 0.3s ease}.checkpoint-step:hover{border-color:var(--primary-color);transform:translateX(5px)}.checkpoint-step:last-child{margin-bottom:0}.checkpoint-icon{width:36px;height:36px;background:var(--gradient-accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;color:white}.checkpoint-content{flex:1}.checkpoint-title{font-weight:600;color:var(--text-color);margin-bottom:0.25rem}.checkpoint-desc{font-size:0.875rem;color:var(--text-muted)}.advanced-section{background:var(--background-color)}.advanced-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem}.advanced-card{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.advanced-title{font-size:1.25rem;font-weight:600;color:var(--text-color);margin-bottom:1.5rem}.advanced-content{color:var(--text-muted);font-size:0.95rem;margin-bottom:1.5rem}.advanced-features{margin-top:1rem}.advanced-item{display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;padding:1rem;background:var(--surface-color);border-radius:10px;border:1px solid var(--border-color)}.advanced-item-icon{width:30px;height:30px;background:var(--gradient-primary);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;color:white}.advanced-item-content{flex:1;color:var(--text-color);font-size:0.875rem}.troubleshooting-section{background:var(--surface-color)}.troubleshooting-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem}.trouble-card{background:var(--surface-light);border-radius:16px;padding:1.5rem;border:1px solid var(--border-color)}.trouble-title{font-size:1.1rem;font-weight:600;color:var(--text-color);margin-bottom:1rem}.trouble-content{color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem}.trouble-solution{background:var(--surface-color);border-radius:8px;padding:0.75rem;border-left:3px solid var(--accent-color)}.changelog-section{background:linear-gradient(180deg,var(--background-color) 0%,var(--surface-color) 100%)}.changelog-timeline{max-width:800px;margin:0 auto}.changelog-item{display:flex;gap:1rem;padding-bottom:2rem;border-bottom:1px solid var(--border-color);margin-bottom:2rem}.changelog-item:last-child{border-bottom:none}.changelog-version{flex-shrink:0;width:120px;padding:0.5rem 1rem;background:var(--gradient-primary);color:white;border-radius:20px;font-weight:600;text-align:center}.changelog-content{flex:1}.changelog-title{font-size:1.1rem;font-weight:600;color:var(--text-color);margin-bottom:0.5rem}.changelog-features{list-style:none}.changelog-features li{display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.25rem;color:var(--text-muted);font-size:0.9rem}.footer{background:var(--surface-color);padding:3rem 0;border-top:1px solid var(--border-color)}.footer-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}.footer-info{color:var(--text-muted);font-size:0.9rem}.footer-info a{color:var(--primary-color);text-decoration:none}.footer-info a:hover{text-decoration:underline}.footer-stats{color:var(--text-muted);font-size:0.875rem}.footer-links a:hover{color:var(--primary-color)}@media (max-width:1024px){.hero-container{grid-template-columns:1fr;text-align:center}.hero-subtitle{margin:0 auto 2rem}.hero-stats{justify-content:center}.hero-actions{justify-content:center}.hero-visual{order:-1}.undo-diagram{max-width:300px}.features-grid{grid-template-columns:1fr}.overview-grid,.usage-grid,.checkpoint-section,.advanced-grid{grid-template-columns:1fr}.troubleshooting-grid{grid-template-columns:1fr}}@media (max-width:768px){.hero-title{font-size:2.5rem}.section-title{font-size:2rem}.tab-buttons{flex-direction:column}}@media (max-width:480px){.hero-title{font-size:2rem}.hero-stats{flex-wrap:wrap;gap:1rem}.btn{width:100%;justify-content:center}section{padding:3rem 0}}
+    </style>
+</head>
+<body>
+    <header class="hero-section">
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+        <div class="container">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="hero-badge">Claude Code撤销工具</div>
+                    <h1 class="hero-title">CCUndo</h1>
+                    <p class="hero-subtitle">为Claude Code提供精细的撤销功能，直接读取会话文件来追踪文件操作，允许选择性地撤销更改，恢复到检查点状态</p>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">v1.3</span>
+                            <span class="stat-label">版本</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">Node.js</span>
+                            <span class="stat-label">语言</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">MIT</span>
+                            <span class="stat-label">许可证</span>
+                        </div>
+                    </div>
+                    <div class="hero-actions">
+                        <a href="https://github.com/RonitSachdev/ccundo" target="_blank" class="btn btn-primary">
+                            <span>查看源码</span>
+                        </a>
+                        <a href="#installation" class="btn btn-secondary">
+                            <span>快速开始</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="undo-diagram">
+                        <div class="timeline-container">
+                            <div class="timeline"></div>
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-event timeline-event-1">
+                                <div class="timeline-event-content">文件修改</div>
+                            </div>
+                            <div class="timeline-arrow"></div>
+                            <div class="timeline-event timeline-event-2">
+                                <div class="timeline-event-content">代码生成</div>
+                            </div>
+                            <div class="timeline-arrow"></div>
+                            <div class="timeline-event timeline-event-3">
+                                <div class="timeline-event-content">文档更新</div>
+                            </div>
+                            <div class="timeline-arrow"></div>
+                            <div class="timeline-event timeline-event-4">
+                                <div class="timeline-event-content">测试添加</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="overview-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">项目概述</span>
+                    <h2 class="section-title">什么是 CCUndo？</h2>
+                    <p class="section-subtitle">专为Claude Code设计的精细撤销工具，解决操作不可逆问题</p>
+                </div>
+                <div class="overview-grid">
+                    <div class="overview-content">
+                        <h3>精细撤销系统</h3>
+                        <p>CCUndo 是专为 Claude Code 设计的精细撤销工具，解决了 Claude Code 缺乏原生撤销功能的问题。通过直接读取 Claude Code 的会话文件，CCUndo 能够准确追踪所有的文件操作，并为用户提供选择性撤销更改的能力。</p>
+                        <ul class="overview-list">
+                            <li>选择性撤销特定文件或操作的更改</li>
+                            <li>自动追踪 Claude Code 会话中的所有文件操作</li>
+                            <li>恢复到任意检查点状态</li>
+                            <li>即使在没有Git的项目中也能工作</li>
+                            <li>避免浪费tokens在撤销操作上</li>
+                            <li>详细记录每个操作的时间和上下文</li>
+                        </ul>
+                    </div>
+                    <div class="workflow-diagram">
+                        <h3 style="text-align:center;color:var(--text-color);margin-bottom:1.5rem;">技术架构</h3>
+                        <div class="workflow-step">
+                            <div class="step-icon">📁</div>
+                            <div class="step-content">
+                                <div class="step-title">会话文件分析</div>
+                                <div class="step-desc">解析Claude Code会话文件结构和内容</div>
+                            </div>
+                        </div>
+                        <div class="step-arrow">→</div>
+                        <div class="workflow-step">
+                            <div class="step-icon">🔍</div>
+                            <div class="step-content">
+                                <div class="step-title">操作追踪</div>
+                                <div class="step-desc">追踪文件操作和变更记录</div>
+                            </div>
+                        </div>
+                        <div class="step-arrow">→</div>
+                        <div class="workflow-step">
+                            <div class="step-icon">⏮</div>
+                            <div class="step-content">
+                                <div class="step-title">差异计算</div>
+                                <div class="step-desc">计算文件内容和差异</div>
+                            </div>
+                        </div>
+                        <div class="step-arrow">→</div>
+                        <div class="workflow-step">
+                            <div class="step-icon">📋</div>
+                            <div class="step-content">
+                                <div class="step-title">用户界面</div>
+                                <div class="step-desc">可视化操作界面和选择面板</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">核心功能</span>
+                    <h2 class="section-title">功能特性</h2>
+                    <p class="section-subtitle">全面的文件管理和撤销功能</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔄</div>
+                        <h3 class="feature-title">智能文件追踪</h3>
+                        <p class="feature-description">实时监控Claude Code的文件操作，详细记录每个文件的更改和变更对比</p>
+                        <ul class="feature-list">
+                            <li>实时监控文件操作</li>
+                            <li>详细记录每个更改</li>
+                            <li>变更前后对比显示</li>
+                            <li>精确时间戳记录</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3 class="feature-title">选择性撤销</h3>
+                        <p class="feature-description">支持文件级别、操作级别和批量撤销，部分撤销功能</p>
+                        <ul class="feature-list">
+                            <li>文件级别撤销特定文件</li>
+                            <li>操作级别撤销特定操作</li>
+                            <li>批量撤销多个文件</li>
+                            <li>部分撤销文件中的部分更改</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📋</div>
+                        <h3 class="feature-title">检查点管理</h3>
+                        <p class="feature-description">自动和手动检查点创建，快速恢复到任意状态</p>
+                        <ul class="feature-list">
+                            <li>自动创建关键时间点</li>
+                            <li>手动创建检查点</li>
+                            <li>检查点列表管理</li>
+                            <li>一键恢复功能</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🖥️</div>
+                        <h3 class="feature-title">可视化界面</h3>
+                        <p class="feature-description">清晰的界面，直观的差异对比，交互式选择操作</p>
+                        <ul class="feature-list">
+                            <li>操作历史时间线</li>
+                            <li>直观的文件差异对比</li>
+                            <li>交互式选择界面</li>
+                            <li>实时状态指示</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <h3 class="feature-title">安全保障</h3>
+                        <p class="feature-description">备份保护、确认机制、回滚保护和权限检查</p>
+                        <ul class="feature-list">
+                            <li>撤销前自动创建备份</li>
+                            <li>重要操作需要确认</li>
+                            <li>防止关键数据丢失</li>
+                            <li>文件操作权限验证</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3 class="feature-title">性能优化</h3>
+                        <p class="feature-description">快速扫描分析、智能缓存、增量处理、并行处理</p>
+                        <ul class="feature-list">
+                            <li>快速扫描会话文件</li>
+                            <li>智能缓存机制</li>
+                            <li>只分析变更部分</li>
+                            <li>并行处理操作</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="installation-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">安装指南</span>
+                    <h2 class="section-title">快速开始</h2>
+                    <p class="section-subtitle">多种安装方式，支持主流操作系统</p>
+                </div>
+                <div class="install-tabs">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" onclick="switchTab(event, 'npm-install')">npm 全局安装</button>
+                        <button class="tab-btn" onclick="switchTab(event, 'source-install')">源码编译</button>
+                        <button class="tab-btn" onclick="switchTab(event, 'local-install')">本地安装</button>
+                    </div>
+                    <div id="npm-install" class="tab-content active">
+                        <div class="install-step">
+                            <h4><span class="step-number">1</span> npm 安装</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># 使用 npm 安装
+npm install -g ccundo
+
+# 使用 yarn 安装
+yarn global add ccundo
+
+# 验证安装
+ccundo --version</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="install-step">
+                            <h4><span class="step-number">2</span> 验证安装</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># 检查 Claude Code 集成
+ccundo check-integration
+
+# 扫描当前会话
+ccundo scan
+
+# 查看操作历史
+ccundo history
+
+# 测试撤销功能
+ccundo test-undo</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="source-install" class="tab-content">
+                        <div class="install-step">
+                            <h4><span class="step-number">1</span> 前置要求</h4>
+                            <div class="config-example">
+                                <div>- Node.js: 16.0.0+</div>
+                                <div>- Git: 可选，用于额外功能</div>
+                            </div>
+                        </div>
+                        <div class="install-step">
+                            <h4><span class="step-number">2</span> 克隆仓库</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># 克隆仓库
+git clone https://github.com/RonitSachdev/ccundo.git
+cd ccundo
+
+# 安装依赖
+npm install
+
+# 全局链接
+npm link
+
+# 验证安装
+ccundo --version</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="local-install" class="tab-content">
+                        <div class="install-step">
+                            <h4><span class="step-number">1</span> 在项目目录中安装</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># 在项目目录中安装
+npm install ccundo
+
+# 使用 npx 运行
+npx ccundo
+
+# 或添加到 package.json scripts
+`````
+                                </div>
+                            </div>
+                        </div>
+                        <div class="install-step">
+                            <h4><span class="step-number">2</span> 基础配置</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># 初始化配置
+ccundo init
+
+# 设置 Claude Code 会话目录
+ccundo config set session-dir ~/.claude
+
+# 设置备份目录
+ccundo config set backup-dir ~/.ccundo/backups
+
+# 启用自动检查点
+ccundo config set auto-checkpoint true</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="usage-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">使用方法</span>
+                    <h2 class="section-title">如何使用</h2>
+                    <p class="section-subtitle">命令行和交互式界面的使用方法</p>
+                </div>
+                <div class="usage-grid">
+                    <div class="usage-features">
+                        <h3>命令行操作</h3>
+                        <div class="usage-item">
+                            <div class="usage-icon">📋</div>
+                            <div>
+                                <div class="usage-item-title">查看操作历史</div>
+                                <div class="usage-item-desc">查看所有操作历史，支持多种过滤选项</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">↩️</div>
+                            <div>
+                                <div class="usage-item-title">撤销操作</div>
+                                <div class="usage-item-desc">撤销最后一个操作，或指定特定操作ID</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">🗂️</div>
+                            <div>
+                                <div class="usage-item-title">检查点管理</div>
+                                <div class="usage-item-desc">创建、列出、恢复和删除检查点</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">🔧</div>
+                            <div>
+                                <div class="usage-item-title">批量操作</div>
+                                <div class="usage-item-desc">批量撤销多个操作或文件</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">🔍</div>
+                            <div>
+                                <div class="usage-item-title">差异查看</div>
+                                <div class="usage-item-desc">查看文件和操作差异</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">📊</div>
+                            <div>
+                                <div class="usage-item-title">报告生成</div>
+                                <div class="usage-item-desc">导出分析报告</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="usage-examples">
+                        <h3>命令示例</h3>
+                        <div class="command-example">
+                            <strong>查看操作历史：</strong><br>
+                            ccundo history<br>
+                            ccundo history --file src/main.py<br>
+                            ccundo history --since "2025-12-22T10:00:00" --until "2025-12-22T11:00:00"
+                        </div>
+                        <div class="command-example">
+                            <strong>撤销操作：</strong><br>
+                            ccundo undo<br>
+                            ccundo undo --operation-id 123<br>
+                            ccundo undo --file src/main.py<br>
+                            ccundo undo --checkpoint checkpoint-2025-12-22-10-30
+                        </div>
+                        <div class="command-example">
+                            <strong>检查点管理：</strong><br>
+                            ccundo checkpoint create "重要功能实现"<br>
+                            ccundo checkpoint list<br>
+                            ccundo checkpoint restore checkpoint-2025-12-22-10-30
+                        </div>
+                        <div class="command-example">
+                            <strong>交互式模式：</strong><br>
+                            ccundo interactive<br>
+                            # 或者简写<br>
+                            ccundo i
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="checkpoint-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">检查点管理</span>
+                    <h2 class="section-title">检查点功能</h2>
+                    <p class="section-subtitle">自动和手动检查点，状态恢复</p>
+                </div>
+                <div class="checkpoint-features">
+                    <div class="checkpoint-step">
+                        <div class="checkpoint-icon">📌</div>
+                        <div class="checkpoint-content">
+                            <div class="checkpoint-title">手动检查点</div>
+                            <div class="checkpoint-desc">根据需要创建重要状态的保存点</div>
+                        </div>
+                    </div>
+                    <div class="checkpoint-step">
+                        <div class="checkpoint-icon">🤖</div>
+                        <div class="checkpoint-content">
+                            <div class="checkpoint-title">自动检查点</div>
+                            <div class="checkpoint-desc">定时自动创建的关键状态检查点</div>
+                        </div>
+                    </div>
+                    <div class="checkpoint-step">
+                        <div class="checkpoint-icon">📜</div>
+                        <div class="checkpoint-content">
+                            <div class="checkpoint-title">检查点列表</div>
+                            <div class="checkpoint-desc">显示所有可用检查点列表</div>
+                        </div>
+                    </div>
+                    <div class="checkpoint-step">
+                        <div class="checkpoint-icon">🔄</div>
+                        <div class="checkpoint-content">
+                            <div class="checkpoint-title">恢复检查点</div>
+                            <div class="checkpoint-desc">一键恢复到指定检查点</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="advanced-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">高级功能</span>
+                    <h2 class="section-title">高级功能</h2>
+                    <p class="section-subtitle">自动化、分析和插件系统</p>
+                </div>
+                <div class="advanced-grid">
+                    <div class="advanced-card">
+                        <h3 class="advanced-title">自动化功能</h3>
+                        <p class="advanced-content">智能化的自动化管理功能，减少手动操作</p>
+                        <div class="advanced-features">
+                            <div class="advanced-item">
+                                <div class="advanced-item-icon">⏰️</div>
+                                <div class="advanced-item-content">
+                                    <div class="advanced-item-title">自动检查点</div>
+                                    <div class="advanced-item-desc">启用自动检查点功能</div>
+                                </div>
+                            </div>
+                            <div class="advanced-item">
+                                <div class="advanced-item-icon">💾</div>
+                                <div class="advanced-item-content">
+                                    <div class="advanced-item-title">智能备份</div>
+                                    <div class="advanced-item-desc">配置智能备份策略</div>
+                                </div>
+                            </div>
+                            <div class="advanced-item">
+                                <div class="advanced-item-icon">📊</div>
+                                <div class="advanced-item-content">
+                                    <div class="advanced-item-title">操作分析</div>
+                                    <div class="advanced-item-desc">生成操作统计报告</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="advanced-card">
+                        <h3 class="advanced-title">分析和报告</h3>
+                        <p class="advanced-content">深入的数据分析和性能监控功能</p>
+                        <div class="advanced-features">
+                            <div class="advanced-item">
+                                <div class="advanced-item-icon">📊</div>
+                                <div class="advanced-item-content">
+                                    <div class="advanced-item-title">操作分析</div>
+                                    <div class="advanced-item-desc">生成操作统计报告</div>
+                                </div>
+                            </div>
+                            <div class="advanced-item">
+                                <div class="advanced-item-icon">📈</div>
+                                <div class="advanced-item-content">
+                                    <div class="advanced-item-title">文件变更统计</div>
+                                    <div class="advanced-item-desc">文件变更统计</div>
+                                </div>
+                            </div>
+                            <div class="advanced-item">
+                                <div class="advanced-item-icon">⏱️</div>
+                                <div class="advanced-item-content">
+                                    <div class="advanced-item-title">时间分析报告</div>
+                                    <div class="advanced-item-desc">时间线分析报告</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="advanced-card">
+                        <h3 class="advanced-title">插件系统</h3>
+                        <p class="advanced-content">可扩展的插件系统，支持自定义功能</p>
+                        <div class="advanced-features">
+                            <div class="advanced-item">
+                                <div class="advanced-item-icon">🔌</div>
+                                <div class="advanced-item-content">
+                                    <div class="advanced-item-title">插件开发</div>
+                                    <div class="advanced-item-desc">创建自定义插件扩展</div>
+                                </div>
+                            </div>
+                            <div class="advanced-item">
+                                <div class="advanced-item-icon">🔧</div>
+                                <div class="advanced-item-content">
+                                    <div class="advanced-item-title">插件管理</div>
+                                    <div class="advanced-item-desc">安装、启用、禁用插件</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="troubleshooting-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">故障排除</span>
+                    <h2 class="section-title">常见问题</h2>
+                    <p class="section-subtitle">解决使用过程中可能遇到的问题</p>
+                </div>
+                <div class="troubleshooting-grid">
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">找不到会话文件</h3>
+                        <p class="trouble-content">检查Claude Code安装和会话目录配置</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong> 使用 --find-sessions 查找会话目录，或手动设置会话目录路径
+                        </div>
+                    </div>
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">撤销操作失败</h3>
+                        <p class="trouble-content">检查权限、验证操作ID或使用强制撤销</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong> 检查文件权限，验证操作ID，或使用 --force 参数强制撤销
+                        </div>
+                    </div>
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">检查点恢复失败</h3>
+                        <p class="trouble-content">验证检查点完整性和修复损坏数据</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong> 使用 verify 检查检查点，repair 修复损坏检查点，或从备份恢复
+                        </div>
+                    </div>
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">性能问题</h3>
+                        <p class="trouble-content">清理缓存、优化数据库或重建索引</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong> 清理缓存，优化数据库性能，重建索引
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="changelog-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">更新日志</span>
+                    <h2 class="section-title">版本历史</h2>
+                    <p class="section-subtitle">持续更新优化，不断提升用户体验</p>
+                </div>
+                <div class="changelog-timeline">
+                    <div class="changelog-item">
+                        <div class="changelog-version">v1.3.0</div>
+                        <div class="changelog-content">
+                            <div class="changelog-title">最新版本</div>
+                            <ul class="changelog-features">
+                                <li>🎉 新增交互式 TUI 界面</li>
+                                <li>✨ 支持插件系统</li>
+                                <li>🔧 改进性能和稳定性</li>
+                                <li>🐛 修复多个已知问题</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="changelog-item">
+                        <div class="changelog-version">v1.2.0</div>
+                        <div class="changelog-content">
+                            <div class="changelog-title">功能增强</div>
+                            <ul class="changelog-features">
+                                <li>🚀 新增自动检查点功能</li>
+                                <li>📊 操作分析和报告</li>
+                                <li>🔍 改进差异显示</li>
+                                <li>💾 智能备份策略</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="changelog-item">
+                        <div class="changelog-version">v1.1.0</div>
+                        <div class="changelog-content">
+                            <div class="changelog-title">基础版本</div>
+                            <ul class="changelog-features">
+                                <li>✨ 批量操作支持</li>
+                                <li>🎨 改进用户界面</li>
+                                <li>🔧 配置管理优化</li>
+                                <li>📚 完善文档</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="changelog-item">
+                        <div class="changelog-version">v1.0.0</div>
+                        <div class="changelog-content">
+                            <div class="changelog-title">首次发布</div>
+                            <ul class="changelog-features">
+                                <li>🎉 首个公开发布</li>
+                                <li>⚡ 基础撤销功能</li>
+                                <li>🔧 会话文件解析</li>
+                                <li>📋 操作历史追踪</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p>&copy; 2025 CCUndo. 开源项目，采用 <a href="https://github.com/RonitSachdev/ccundo/blob/main/LICENSE" target="_blank">MIT 许可证</a></p>
+                </div>
+                <div class="footer-stats">
+                    <p>RonitSachdev 开发 | Node.js 构建 | MIT 许可证 | 精细操作 | 检查点管理</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function switchTab(event, tabId) {
+            const buttons = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
+
+            buttons.forEach(btn => btn.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const code = codeBlock.querySelector('code').textContent;
+
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = '已复制';
+                setTimeout(() => {
+                    button.textContent = '复制';
+                }, 2000);
+            });
+        }
+
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Add parallax effect to particles
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const particles = document.querySelector('.particles');
+            particles.style.transform = `translateY(${scrolled * 0.5}px)`;
+        });
+
+        // Animate timeline dots
+        const dots = document.querySelectorAll('.timeline-dot');
+        dots.forEach((dot, index) => {
+            dot.style.animation = `pulse ${2 + index * 0.5}s infinite`;
+        });
+
+        // Animate timeline events
+        const events = document.querySelectorAll('.timeline-event');
+        events.forEach((event, index) => {
+            event.style.opacity = '0';
+            event.style.transform = 'translateX(-10px)';
+            event.style.transition = 'all 0.3s ease';
+
+            setTimeout(() => {
+                event.style.opacity = '1';
+                event.style.transform = 'translateX(0)';
+            }, (index + 1) * 200);
+        });
+
+        // Animate arrow
+        const arrow = document.querySelector('.timeline-arrow');
+        arrow.style.animation = 'slideArrow 2s infinite ease-in-out';
+    </script>
+</body>
+</html>

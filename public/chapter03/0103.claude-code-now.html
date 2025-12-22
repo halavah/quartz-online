@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code Now - 世界最快的Claude Code启动器 | AI智能启动器</title>
+    <meta name="description" content="Claude Code Now 是世界上最快的Claude Code启动器，提供一键启动、多API支持、文件夹快速启动等功能，让Claude Code使用更便捷">
+    <meta name="keywords" content="Claude Code Now,Claude Code,启动器,macOS,快速启动,API管理,效率工具,orange2ai">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}:root{--primary-color:#8b5cf6;--primary-dark:#7c3aed;--secondary-color:#06b6d4;--accent-color:#f59e0b;--success-color:#10b981;--background-color:#0f0f1a;--surface-color:#1a1a2e;--surface-light:#252542;--text-color:#e2e8f0;--text-muted:#94a3b8;--border-color:#334155;--gradient-primary:linear-gradient(135deg,#8b5cf6 0%,#06b6d4 100%);--gradient-hero:linear-gradient(135deg,#1a1a2e 0%,#0f0f1a 50%,#1e1b4b 100%);--gradient-accent:linear-gradient(135deg,#f59e0b 0%,#ef4444 100%);--glow-primary:0 0 40px rgba(139,92,246,0.3);--glow-secondary:0 0 40px rgba(6,182,212,0.2);--glow-accent:0 0 40px rgba(245,158,11,0.3)}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;line-height:1.7;color:var(--text-color);background:var(--background-color);overflow-x:hidden}.container{width:100%;max-width:1200px;margin:0 auto;padding:0 1.5rem}.hero-section{position:relative;min-height:100vh;display:flex;align-items:center;background:var(--gradient-hero);overflow:hidden}.hero-section::before{content:"";position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 20% 80%,rgba(139,92,246,0.15) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(6,182,212,0.1) 0%,transparent 50%),radial-gradient(circle at 50% 50%,rgba(245,158,11,0.05) 0%,transparent 50%);pointer-events:none}.particles{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;pointer-events:none}.particle{position:absolute;width:4px;height:4px;background:var(--primary-color);border-radius:50%;opacity:0.3;animation:float 15s infinite ease-in-out}.particle:nth-child(2){left:20%;animation-delay:-2s;background:var(--secondary-color)}.particle:nth-child(3){left:40%;animation-delay:-4s}.particle:nth-child(4){left:60%;animation-delay:-6s;background:var(--accent-color)}.particle:nth-child(5){left:80%;animation-delay:-8s;background:var(--secondary-color)}.particle:nth-child(6){left:10%;animation-delay:-10s}.particle:nth-child(7){left:70%;animation-delay:-12s;background:var(--accent-color)}.particle:nth-child(8){left:90%;animation-delay:-14s}@keyframes float{0%,100%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:0.3}90%{opacity:0.3}100%{transform:translateY(-100vh) scale(1);opacity:0}}.hero-container{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;padding:2rem 0}.hero-content{animation:fadeInUp 0.8s ease-out}@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}.hero-badge{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);padding:0.5rem 1rem;border-radius:50px;font-size:0.875rem;color:var(--primary-color);margin-bottom:1.5rem}.hero-badge::before{content:"";width:8px;height:8px;background:var(--primary-color);border-radius:50%;animation:pulse 2s infinite}@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.2)}}.hero-title{font-size:3.5rem;font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.hero-subtitle{font-size:1.25rem;color:var(--text-muted);margin-bottom:2rem;max-width:500px}.hero-stats{display:flex;gap:2rem;margin-bottom:2rem}.stat-item{text-align:center}.stat-number{display:block;font-size:1.5rem;font-weight:700;color:var(--text-color)}.stat-label{font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em}.hero-actions{display:flex;gap:1rem;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.875rem 1.75rem;border:none;border-radius:12px;font-weight:600;font-size:1rem;text-decoration:none;cursor:pointer;transition:all 0.3s ease}.btn-primary{background:var(--gradient-primary);color:white;box-shadow:var(--glow-primary)}.btn-primary:hover{transform:translateY(-3px);box-shadow:0 10px 40px rgba(139,92,246,0.4)}.btn-secondary{background:var(--surface-light);color:var(--text-color);border:1px solid var(--border-color)}.btn-secondary:hover{background:var(--surface-color);border-color:var(--primary-color);transform:translateY(-3px)}.hero-visual{position:relative;display:flex;justify-content:center;align-items:center;animation:fadeInUp 0.8s ease-out 0.2s both}.launcher-diagram{position:relative;width:100%;max-width:450px;aspect-ratio:1}.launch-core{position:absolute;inset:35%;background:var(--gradient-primary);border-radius:20px;display:flex;align-items:center;justify-content:center;box-shadow:var(--glow-primary);animation:rotate 30s linear infinite}.launch-icon{font-size:3rem;animation:counter-rotate 30s linear infinite}@keyframes rotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}@keyframes counter-rotate{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}.launch-node{position:absolute;width:50px;height:50px;background:var(--surface-light);border:2px solid var(--primary-color);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;box-shadow:var(--glow-primary);transition:all 0.3s ease}.launch-node:hover{transform:scale(1.1);background:var(--primary-color);color:white}.launch-node:nth-child(2){top:0;left:50%;transform:translateX(-50%);animation:float 8s infinite ease-in-out}.launch-node:nth-child(3){top:50%;right:0;transform:translateY(-50%);animation:float 8s infinite ease-in-out 2s}.launch-node:nth-child(4){bottom:0;left:50%;transform:translateX(-50%);animation:float 8s infinite ease-in-out 4s}.launch-node:nth-child(5){top:50%;left:0;transform:translateY(-50%);animation:float 8s infinite ease-in-out 6s}.main-content{position:relative;z-index:1}section{padding:5rem 0}.section-header{text-align:center;margin-bottom:4rem}.section-badge{display:inline-block;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);padding:0.375rem 1rem;border-radius:50px;font-size:0.75rem;color:var(--primary-color);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem}.section-title{font-size:2.5rem;font-weight:700;margin-bottom:1rem;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.section-subtitle{font-size:1.125rem;color:var(--text-muted);max-width:600px;margin:0 auto}.overview-section{background:linear-gradient(180deg,var(--background-color) 0%,var(--surface-color) 100%)}.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}.overview-content h3{font-size:1.75rem;margin-bottom:1rem;color:var(--text-color)}.overview-content p{color:var(--text-muted);margin-bottom:1.5rem}.overview-list{list-style:none}.overview-list li{display:flex;align-items:flex-start;gap:0.75rem;margin-bottom:1rem;color:var(--text-muted)}.overview-list li::before{content:"✓";color:var(--secondary-color);font-weight:bold}.workflow-diagram{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.workflow-step{display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--surface-color);border-radius:12px;margin-bottom:0.75rem;border:1px solid var(--border-color);transition:all 0.3s ease}.workflow-step:hover{border-color:var(--primary-color);transform:translateX(5px)}.workflow-step:last-child{margin-bottom:0}.step-icon{width:40px;height:40px;background:var(--gradient-primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0}.step-content{flex:1}.step-title{font-weight:600;color:var(--text-color);font-size:0.9rem}.step-desc{font-size:0.8rem;color:var(--text-muted)}.step-arrow{text-align:center;color:var(--primary-color);font-size:1.25rem;margin:0.5rem 0}.features-section{background:var(--surface-color)}.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}.feature-card{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color);position:relative;overflow:hidden}.feature-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--gradient-primary);transform:scaleX(0);transition:transform 0.3s ease}.feature-card:hover{transform:translateY(-5px);border-color:var(--primary-color);box-shadow:var(--glow-primary)}.feature-card:hover::before{transform:scaleX(1)}.feature-icon{width:60px;height:60px;background:rgba(139,92,246,0.1);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.75rem;margin-bottom:1.5rem}.feature-title{font-size:1.25rem;font-weight:600;margin-bottom:0.75rem;color:var(--text-color)}.feature-description{color:var(--text-muted);font-size:0.95rem}.requirements-section{background:var(--background-color)}.requirements-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem}.req-card{background:var(--surface-light);border-radius:16px;padding:1.5rem;border:1px solid var(--border-color)}.req-header{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}.req-icon{width:45px;height:45px;background:var(--gradient-primary);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.25rem}.req-title{font-size:1.1rem;font-weight:600;color:var(--text-color)}.req-list{list-style:none}.req-list li{display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.5rem;color:var(--text-muted);font-size:0.9rem}.req-list li::before{content:"▸";color:var(--secondary-color);font-weight:bold}.installation-section{background:linear-gradient(180deg,var(--surface-color) 0%,var(--background-color) 100%)}.install-tabs{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.tab-buttons{display:flex;gap:0.5rem;margin-bottom:2rem;background:var(--surface-color);padding:0.5rem;border-radius:12px}.tab-btn{flex:1;padding:0.875rem 1.5rem;border:none;background:transparent;color:var(--text-muted);font-weight:600;border-radius:8px;cursor:pointer;transition:all 0.3s ease}.tab-btn.active{background:var(--gradient-primary);color:white}.tab-btn:hover:not(.active){color:var(--text-color);background:rgba(139,92,246,0.1)}.tab-content{display:none}.tab-content.active{display:block;animation:fadeIn 0.3s ease}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.install-step{margin-bottom:1.5rem}.install-step:last-child{margin-bottom:0}.install-step h4{color:var(--text-color);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem}.step-number{width:28px;height:28px;background:var(--gradient-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-weight:700}.code-block{position:relative;background:#0d1117;border-radius:12px;overflow:hidden;border:1px solid var(--border-color)}.code-header{display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;background:#161b22;border-bottom:1px solid var(--border-color)}.code-lang{font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em}.copy-btn{background:var(--primary-color);color:white;border:none;padding:0.375rem 0.75rem;border-radius:6px;font-size:0.75rem;cursor:pointer;transition:all 0.2s ease}.copy-btn:hover{background:var(--primary-dark)}.code-content{padding:1rem;overflow-x:auto}.code-content pre{margin:0;font-family:"Fira Code","Monaco","Consolas",monospace;font-size:0.875rem;line-height:1.6}.code-content code{color:#e6edf3}.config-section{background:var(--surface-color)}.config-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem}.config-card{background:var(--surface-light);border-radius:16px;padding:1.5rem;border:1px solid var(--border-color)}.config-title{font-size:1.1rem;font-weight:600;color:var(--text-color);margin-bottom:1rem}.config-content{color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem}.usage-section{background:var(--background-color)}.usage-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.usage-features{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.usage-features h3{font-size:1.5rem;margin-bottom:1.5rem;color:var(--text-color)}.usage-item{display:flex;align-items:flex-start;gap:1rem;padding:1rem;background:var(--surface-color);border-radius:12px;margin-bottom:0.75rem;border:1px solid var(--border-color);transition:all 0.3s ease}.usage-item:hover{border-color:var(--primary-color);transform:translateX(5px)}.usage-item:last-child{margin-bottom:0}.usage-icon{width:36px;height:36px;background:rgba(6,182,212,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.usage-item-title{font-weight:600;color:var(--text-color);margin-bottom:0.25rem;font-size:0.95rem}.usage-item-desc{font-size:0.85rem;color:var(--text-muted)}.usage-examples{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.usage-examples h3{font-size:1.5rem;margin-bottom:1.5rem;color:var(--text-color)}.workflow-example{background:var(--surface-color);border-radius:10px;padding:1rem;margin-bottom:0.75rem;border-left:3px solid var(--secondary-color)}.workflow-title{font-weight:600;color:var(--text-color);margin-bottom:0.5rem}.workflow-steps{list-style:none}.workflow-steps li{display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.25rem;color:var(--text-muted);font-size:0.85rem}.workflow-steps li::before{content:"→";color:var(--secondary-color);font-weight:bold}.api-section{background:linear-gradient(180deg,var(--background-color) 0%,var(--surface-color) 100%)}.api-types{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}.api-card{background:var(--surface-light);border-radius:16px;padding:1.5rem;border:1px solid var(--border-color);transition:all 0.3s ease}.api-card:hover{transform:translateY(-5px);border-color:var(--primary-color);box-shadow:var(--glow-primary)}.api-name{font-size:1.1rem;font-weight:600;color:var(--text-color);margin-bottom:0.5rem}.api-desc{color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem}.api-features{list-style:none}.api-features li{display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.25rem;color:var(--text-muted);font-size:0.85rem}.api-features li::before{content:"✓";color:var(--success-color);font-weight:bold}.troubleshooting-section{background:var(--surface-color)}.troubleshooting-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem}.trouble-card{background:var(--surface-light);border-radius:16px;padding:1.5rem;border:1px solid var(--border-color)}.trouble-title{font-size:1.1rem;font-weight:600;color:var(--text-color);margin-bottom:1rem}.trouble-content{color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem}.trouble-solution{background:var(--surface-color);border-radius:8px;padding:0.75rem;border-left:3px solid var(--accent-color)}.changelog-section{background:var(--background-color)}.changelog-timeline{max-width:800px;margin:0 auto}.changelog-item{display:flex;gap:1rem;padding-bottom:2rem;border-bottom:1px solid var(--border-color);margin-bottom:2rem}.changelog-item:last-child{border-bottom:none}.changelog-version{flex-shrink:0;width:120px;padding:0.5rem 1rem;background:var(--gradient-primary);color:white;border-radius:20px;font-weight:600;text-align:center}.changelog-content{flex:1}.changelog-title{font-size:1.1rem;font-weight:600;color:var(--text-color);margin-bottom:0.5rem}.changelog-features{list-style:none}.changelog-features li{display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.25rem;color:var(--text-muted);font-size:0.9rem}.footer{background:var(--surface-color);padding:3rem 0;border-top:1px solid var(--border-color)}.footer-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}.footer-info{color:var(--text-muted);font-size:0.9rem}.footer-info a{color:var(--primary-color);text-decoration:none}.footer-info a:hover{text-decoration:underline}.footer-stats{color:var(--text-muted);font-size:0.875rem}.footer-links a:hover{color:var(--primary-color)}@media (max-width:1024px){.hero-container{grid-template-columns:1fr;text-align:center}.hero-subtitle{margin:0 auto 2rem}.hero-stats{justify-content:center}.hero-actions{justify-content:center}.hero-visual{order:-1}.launcher-diagram{max-width:300px}.features-grid{grid-template-columns:repeat(2,1fr)}.overview-grid,.requirements-grid,.config-grid,.usage-grid{grid-template-columns:1fr}.api-types{grid-template-columns:repeat(2,1fr)}.troubleshooting-grid{grid-template-columns:1fr}}@media (max-width:768px){.hero-title{font-size:2.5rem}.section-title{font-size:2rem}.features-grid{grid-template-columns:1fr}.api-types{grid-template-columns:1fr}.tab-buttons{flex-direction:column}}@media (max-width:480px){.hero-title{font-size:2rem}.hero-stats{flex-wrap:wrap;gap:1rem}.btn{width:100%;justify-content:center}section{padding:3rem 0}}
+    </style>
+</head>
+<body>
+    <header class="hero-section">
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+        <div class="container">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="hero-badge">Claude Code 启动器</div>
+                    <h1 class="hero-title">Claude Code Now</h1>
+                    <p class="hero-subtitle">世界上最快的Claude Code启动器，一键启动，支持多API配置切换，从任意文件夹快速启动，让Claude Code使用体验飞跃提升</p>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">v1.5</span>
+                            <span class="stat-label">版本</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">macOS</span>
+                            <span class="stat-label">平台</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">MIT</span>
+                            <span class="stat-label">许可证</span>
+                        </div>
+                    </div>
+                    <div class="hero-actions">
+                        <a href="https://github.com/orange2ai/claude-code-now" target="_blank" class="btn btn-primary">
+                            <span>查看源码</span>
+                        </a>
+                        <a href="#installation" class="btn btn-secondary">
+                            <span>快速开始</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="launcher-diagram">
+                        <div class="launch-core">
+                            <span class="launch-icon">🚀</span>
+                        </div>
+                        <div class="launch-node">⚡</div>
+                        <div class="launch-node">🔌</div>
+                        <div class="launch-node">📁</div>
+                        <div class="launch-node">⚙️</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="overview-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">概述</span>
+                    <h2 class="section-title">什么是 Claude Code Now？</h2>
+                    <p class="section-subtitle">专为 Claude Code 设计的高效启动器，解决传统命令行启动的繁琐问题</p>
+                </div>
+                <div class="overview-grid">
+                    <div class="overview-content">
+                        <h3>智能启动管理</h3>
+                        <p>Claude Code Now 通过图形化界面和智能配置管理，让用户能够以最快速度启动和使用 Claude Code。告别记忆复杂命令，享受一键启动的便捷体验。</p>
+                        <ul class="overview-list">
+                            <li>一键启动，无需记忆复杂命令</li>
+                            <li>多API支持，快速切换不同配置</li>
+                            <li>从任意文件夹直接启动</li>
+                            <li>智能配置管理和备份</li>
+                            <li>完美的macOS原生体验</li>
+                            <li>Dock集成和菜单栏控制</li>
+                        </ul>
+                    </div>
+                    <div class="workflow-diagram">
+                        <div class="workflow-step">
+                            <div class="step-icon">🎯</div>
+                            <div class="step-content">
+                                <div class="step-title">单击启动</div>
+                                <div class="step-desc">单击Dock图标即可启动Claude Code</div>
+                            </div>
+                        </div>
+                        <div class="step-arrow">↓</div>
+                        <div class="workflow-step">
+                            <div class="step-icon">📁</div>
+                            <div class="step-content">
+                                <div class="step-title">智能检测</div>
+                                <div class="step-desc">自动检测当前工作目录和项目类型</div>
+                            </div>
+                        </div>
+                        <div class="step-arrow">↓</div>
+                        <div class="workflow-step">
+                            <div class="step-icon">🔌</div>
+                            <div class="step-content">
+                                <div class="step-title">API配置</div>
+                                <div class="step-desc">快速切换和配置API服务</div>
+                            </div>
+                        </div>
+                        <div class="step-arrow">↓</div>
+                        <div class="workflow-step">
+                            <div class="step-icon">🚀</div>
+                            <div class="step-content">
+                                <div class="step-title">快速启动</div>
+                                <div class="step-desc">在终端中启动Claude Code并注入配置</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">功能特性</span>
+                    <h2 class="section-title">核心功能</h2>
+                    <p class="section-subtitle">全面的功能覆盖，让Claude Code使用更加高效便捷</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🚀</div>
+                        <h3 class="feature-title">一键快速启动</h3>
+                        <p class="feature-description">Dock图标启动、右键菜单快速访问、智能检测当前工作目录、显示最近使用的项目文件夹</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔌</div>
+                        <h3 class="feature-title">多API配置支持</h3>
+                        <p class="feature-description">支持Anthropic官方API、智谱GLM、自定义API端点，快速切换不同配置，自动验证API密钥</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📁</div>
+                        <h3 class="feature-title">智能文件夹管理</h3>
+                        <p class="feature-description">拖拽启动、右键选择目标文件夹、智能识别项目类型、记录常用文件夹路径</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚙️</div>
+                        <h3 class="feature-title">配置管理中心</h3>
+                        <p class="feature-description">可视化配置管理界面、配置导入导出、环境变量管理、实时验证配置正确性</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3 class="feature-title">用户体验优化</h3>
+                        <p class="feature-description">原生macOS体验、轻量级设计、流畅的启动动画、实时显示启动状态</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <h3 class="feature-title">安全性保障</h3>
+                        <p class="feature-description">本地加密存储、API密钥安全保护、最小权限原则、多重安全验证机制</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="requirements-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">系统要求</span>
+                    <h2 class="section-title">运行环境</h2>
+                    <p class="section-subtitle">确保您的系统满足以下要求以获得最佳使用体验</p>
+                </div>
+                <div class="requirements-grid">
+                    <div class="req-card">
+                        <div class="req-header">
+                            <div class="req-icon">📱</div>
+                            <h3 class="req-title">最低要求</h3>
+                        </div>
+                        <ul class="req-list">
+                            <li>操作系统：macOS 10.15 (Catalina) 或更高</li>
+                            <li>处理器：Intel Core i5 或 Apple Silicon M1</li>
+                            <li>内存：4GB RAM</li>
+                            <li>存储空间：50MB 可用空间</li>
+                            <li>网络：稳定的互联网连接</li>
+                        </ul>
+                    </div>
+                    <div class="req-card">
+                        <div class="req-header">
+                            <div class="req-icon">⚡</div>
+                            <h3 class="req-title">推荐配置</h3>
+                        </div>
+                        <ul class="req-list">
+                            <li>操作系统：macOS 12.0 (Monterey) 或更高</li>
+                            <li>处理器：Apple Silicon M1/M2 或 Intel Core i7</li>
+                            <li>内存：8GB RAM 或更高</li>
+                            <li>存储空间：100MB 可用空间</li>
+                            <li>网络：高速宽带连接</li>
+                        </ul>
+                    </div>
+                    <div class="req-card">
+                        <div class="req-header">
+                            <div class="req-icon">🔧</div>
+                            <h3 class="req-title">依赖要求</h3>
+                        </div>
+                        <ul class="req-list">
+                            <li>Claude Code：已安装最新版本</li>
+                            <li>Git：用于版本控制功能（可选）</li>
+                            <li>终端应用：支持原生终端或iTerm2</li>
+                        </ul>
+                    </div>
+                    <div class="req-card">
+                        <div class="req-header">
+                            <div class="req-icon">🎯</div>
+                            <h3 class="req-title">权限要求</h3>
+                        </div>
+                        <ul class="req-list">
+                            <li>辅助功能权限（用于自动化操作）</li>
+                            <li>完全磁盘访问权限（用于文件管理）</li>
+                            <li>网络访问权限（用于API通信）</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="installation-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">安装指南</span>
+                    <h2 class="section-title">快速安装</h2>
+                    <p class="section-subtitle">选择最适合您的安装方式，快速开始使用Claude Code Now</p>
+                </div>
+                <div class="install-tabs">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" onclick="switchTab(event, 'direct-download')">直接下载</button>
+                        <button class="tab-btn" onclick="switchTab(event, 'git-clone')">Git克隆</button>
+                        <button class="tab-btn" onclick="switchTab(event, 'script-install')">脚本安装</button>
+                    </div>
+                    <div id="direct-download" class="tab-content active">
+                        <div class="install-step">
+                            <h4><span class="step-number">1</span> 访问 Releases 页面</h4>
+                            <p>访问 <a href="https://github.com/orange2ai/claude-code-now/releases" target="_blank" style="color: var(--primary-color);">GitHub Releases</a> 页面</p>
+                        </div>
+                        <div class="install-step">
+                            <h4><span class="step-number">2</span> 下载应用包</h4>
+                            <p>下载最新的 <code>Claude Code Now.app.zip</code> 文件</p>
+                        </div>
+                        <div class="install-step">
+                            <h4><span class="step-number">3</span> 安装应用</h4>
+                            <p>解压并将应用拖拽到 Applications 文件夹</p>
+                        </div>
+                        <div class="install-step">
+                            <h4><span class="step-number">4</span> 首次启动</h4>
+                            <p>从启动台或 Applications 文件夹启动应用</p>
+                        </div>
+                    </div>
+                    <div id="git-clone" class="tab-content">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">bash</span>
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><code># 克隆仓库
+git clone https://github.com/orange2ai/claude-code-now.git
+
+# 进入项目目录
+cd claude-code-now
+
+# 复制应用到Applications文件夹
+cp -r "Claude Code Now.app" /Applications/</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="script-install" class="tab-content">
+                        <div class="install-step">
+                            <h4><span class="step-number">1</span> 一键安装</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># 下载并运行一键安装脚本
+curl -fsSL https://raw.githubusercontent.com/orange2ai/claude-code-now/main/install.sh | bash</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="install-step">
+                            <h4><span class="step-number">2</span> 手动安装（可选）</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># 手动下载脚本执行
+wget https://raw.githubusercontent.com/orange2ai/claude-code-now/main/install.sh
+chmod +x install.sh
+./install.sh</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="usage-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">使用方法</span>
+                    <h2 class="section-title">如何使用</h2>
+                    <p class="section-subtitle">掌握基本和高级功能，提升您的开发效率</p>
+                </div>
+                <div class="usage-grid">
+                    <div class="usage-features">
+                        <h3>基础使用</h3>
+                        <div class="usage-item">
+                            <div class="usage-icon">🚀</div>
+                            <div>
+                                <div class="usage-item-title">Dock图标启动</div>
+                                <div class="usage-item-desc">单击Dock图标启动Claude Code，右键显示更多选项，拖拽文件夹到图标启动</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">📊</div>
+                            <div>
+                                <div class="usage-item-title">菜单栏使用</div>
+                                <div class="usage-item-desc">状态图标显示当前状态，快速启动，快速切换API配置</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">⌨️</div>
+                            <div>
+                                <div class="usage-item-title">快捷键支持</div>
+                                <div class="usage-item-desc">Cmd+Shift+C 快速启动，Cmd+Shift+P 打开项目选择器，Cmd+Shift,A 切换API</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="usage-examples">
+                        <h3>工作流程示例</h3>
+                        <div class="workflow-example">
+                            <div class="workflow-title">日常开发工作流</div>
+                            <ul class="workflow-steps">
+                                <li>早晨启动：从常用项目快速启动</li>
+                                <li>项目切换：在不同项目间快速切换</li>
+                                <li>API切换：根据任务需求切换API</li>
+                                <li>配置备份：定期备份配置文件</li>
+                            </ul>
+                        </div>
+                        <div class="workflow-example">
+                            <div class="workflow-title">团队协作工作流</div>
+                            <ul class="workflow-steps">
+                                <li>配置同步：导入团队配置文件</li>
+                                <li>项目标准化：使用统一的项目配置</li>
+                                <li>API共享：共享团队API配置</li>
+                                <li>环境管理：管理不同环境配置</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="api-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">API管理</span>
+                    <h2 class="section-title">支持的API类型</h2>
+                    <p class="section-subtitle">支持多种API服务，灵活配置满足不同需求</p>
+                </div>
+                <div class="api-types">
+                    <div class="api-card">
+                        <h3 class="api-name">Anthropic Claude API</h3>
+                        <p class="api-desc">官方Claude API，提供最完整的Claude模型支持</p>
+                        <ul class="api-features">
+                            <li>支持所有Claude模型版本</li>
+                            <li>官方技术支持和更新</li>
+                            <li>最高性能和稳定性</li>
+                        </ul>
+                    </div>
+                    <div class="api-card">
+                        <h3 class="api-name">智谱GLM API</h3>
+                        <p class="api-desc">国产大模型API，支持GLM系列模型</p>
+                        <ul class="api-features">
+                            <li>支持GLM-4和GLM-3-turbo</li>
+                            <li>中文优化表现优秀</li>
+                            <li>国内访问速度快</li>
+                        </ul>
+                    </div>
+                    <div class="api-card">
+                        <h3 class="api-name">自定义API</h3>
+                        <p class="api-desc">支持任意兼容OpenAI格式的API端点</p>
+                        <ul class="api-features">
+                            <li>灵活的端点配置</li>
+                            <li>自定义请求头支持</li>
+                            <li>支持各种兼容服务</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="troubleshooting-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">故障排除</span>
+                    <h2 class="section-title">常见问题</h2>
+                    <p class="section-subtitle">解决使用过程中可能遇到的问题</p>
+                </div>
+                <div class="troubleshooting-grid">
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">应用无法启动</h3>
+                        <p class="trouble-content">检查系统权限，重新签名应用，或重新安装应用</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong>使用命令行检查权限并重新签名
+                        </div>
+                    </div>
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">Claude Code路径错误</h3>
+                        <p class="trouble-content">应用无法找到Claude Code的安装路径</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong>在设置中手动配置Claude Code路径，或确保其在PATH中
+                        </div>
+                    </div>
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">API连接失败</h3>
+                        <p class="trouble-content">无法连接到配置的API服务</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong>检查网络连接，验证API密钥，确认端点可用性
+                        </div>
+                    </div>
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">Dock图标问题</h3>
+                        <p class="trouble-content">Dock图标显示异常或无法点击</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong>重置Dock配置，重新添加应用到Dock
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="changelog-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">更新日志</span>
+                    <h2 class="section-title">版本历史</h2>
+                    <p class="section-subtitle">持续更新优化，不断提升用户体验</p>
+                </div>
+                <div class="changelog-timeline">
+                    <div class="changelog-item">
+                        <div class="changelog-version">v1.5.0</div>
+                        <div class="changelog-content">
+                            <div class="changelog-title">最新版本</div>
+                            <ul class="changelog-features">
+                                <li>🎉 新增智谱GLM API支持</li>
+                                <li>🚀 优化启动速度提升50%</li>
+                                <li>🔧 修复中文用户痛点问题</li>
+                                <li>📱 改进用户界面体验</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="changelog-item">
+                        <div class="changelog-version">v1.4.0</div>
+                        <div class="changelog-content">
+                            <div class="changelog-title">功能增强</div>
+                            <ul class="changelog-features">
+                                <li>✨ 支持自定义API配置</li>
+                                <li>🔄 添加配置导入导出功能</li>
+                                <li>🎨 全新Dock图标设计</li>
+                                <li>📊 启动状态监控</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="changelog-item">
+                        <div class="changelog-version">v1.3.0</div>
+                        <div class="changelog-content">
+                            <div class="changelog-title">体验优化</div>
+                            <ul class="changelog-features">
+                                <li>🗂️ 文件夹拖拽启动功能</li>
+                                <li>⌨️ 快捷键支持</li>
+                                <li>🔍 项目搜索功能</li>
+                                <li>🌙 深色模式支持</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="changelog-item">
+                        <div class="changelog-version">v1.1.0</div>
+                        <div class="changelog-content">
+                            <div class="changelog-title">首次发布</div>
+                            <ul class="changelog-features">
+                                <li>🎯 首次公开发布</li>
+                                <li>⚡ 基础启动功能</li>
+                                <li>🔧 基础配置管理</li>
+                                <li>📚 完整文档</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p>&copy; 2025 Claude Code Now. 开源项目，采用 <a href="https://github.com/orange2ai/claude-code-now/blob/main/LICENSE" target="_blank">MIT 许可证</a></p>
+                </div>
+                <div class="footer-stats">
+                    <p>让 Claude Code 启动速度提升 10 倍 | 效率工具推荐</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function switchTab(event, tabId) {
+            const buttons = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
+
+            buttons.forEach(btn => btn.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const code = codeBlock.querySelector('code').textContent;
+
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = '已复制';
+                setTimeout(() => {
+                    button.textContent = '复制';
+                }, 2000);
+            });
+        }
+
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Add parallax effect to particles
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const particles = document.querySelector('.particles');
+            particles.style.transform = `translateY(${scrolled * 0.5}px)`;
+        });
+    </script>
+</body>
+</html>

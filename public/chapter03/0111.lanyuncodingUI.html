@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LanyunCodingUI - Claude Code现代化Web界面</title>
+    <meta name="description" content="LanyunCodingUI 是Claude Code的现代化Web界面，提供直观的可视化体验、交互模式、高级功能（检查点、钩子、插件系统），被称为实测封神的编程助手">
+    <meta name="keywords" content="lanyuncodingui,claude-code,web界面,可视化,编程助手,现代化UI">
+    <style>
+        :root {
+            --primary-color: #ff6b6b;
+            --secondary-color: #4ecdc4;
+            --accent-color: #45b7d1;
+            --success-color: #51cf66;
+            --warning-color: #ffd43b;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --bg-primary: #0a0e27;
+            --bg-secondary: #1a1f3a;
+            --bg-tertiary: #252b4a;
+            --gradient-1: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
+            --gradient-2: linear-gradient(135deg, #4ecdc4 0%, #45b7d1 100%);
+            --gradient-3: linear-gradient(135deg, #45b7d1 0%, #51cf66 100%);
+            --glow-color: rgba(255, 107, 107, 0.5);
+            --particle-color: rgba(255, 107, 107, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 粒子背景 */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--particle-color);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* 头部 */
+        .header {
+            padding: 80px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-1);
+            opacity: 0.1;
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+
+        .title {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                filter: drop-shadow(0 0 20px var(--glow-color));
+            }
+            to {
+                filter: drop-shadow(0 0 30px var(--glow-color));
+            }
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Web界面演示 */
+        .ui-demo {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 40px 0;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ui-demo::before {
+            content: 'Web界面演示';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: var(--bg-primary);
+            padding: 0 10px;
+            color: var(--primary-color);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .web-interface {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .web-header {
+            background: var(--bg-secondary);
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 107, 107, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .web-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .web-controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        .web-control {
+            padding: 8px 16px;
+            background: var(--gradient-1);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .web-control:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .web-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            min-height: 400px;
+        }
+
+        .web-sidebar {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-right: 1px solid rgba(255, 107, 107, 0.1);
+        }
+
+        .web-main {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--gradient-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background: var(--gradient-3);
+        }
+
+        .message-content {
+            flex: 1;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border-top-left-radius: 4px;
+        }
+
+        .message.user .message-content {
+            background: var(--gradient-3);
+            border-top-left-radius: 12px;
+            border-top-right-radius: 4px;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .send-button {
+            padding: 12px 20px;
+            background: var(--gradient-1);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .web-status {
+            padding: 15px 20px;
+            background: var(--bg-secondary);
+            border-top: 1px solid rgba(255, 107, 107, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-color);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* 目录 */
+        .toc {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 40px;
+            margin: 40px 0;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toc::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--gradient-1);
+        }
+
+        .toc-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .toc-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .toc-item {
+            padding: 12px 20px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toc-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-2);
+            opacity: 0.1;
+            transition: left 0.3s ease;
+        }
+
+        .toc-item:hover::before {
+            left: 0;
+        }
+
+        .toc-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .toc-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 内容部分 */
+        .section {
+            margin: 60px 0;
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .section:nth-child(2) { animation-delay: 0.1s; }
+        .section:nth-child(3) { animation-delay: 0.2s; }
+        .section:nth-child(4) { animation-delay: 0.3s; }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subsection {
+            margin: 40px 0;
+            padding-left: 20px;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .subsection-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+        }
+
+        .sub-subsection {
+            margin: 30px 0;
+        }
+
+        .sub-subsection-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        /* 特性卡片 */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .feature-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(255, 107, 107, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 架构图 */
+        .architecture-diagram {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 40px;
+            margin: 40px 0;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            text-align: center;
+        }
+
+        .arch-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--text-primary);
+        }
+
+        .arch-flow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .arch-layer {
+            background: var(--bg-tertiary);
+            padding: 20px 30px;
+            border-radius: 12px;
+            border: 2px solid var(--primary-color);
+            min-width: 300px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .arch-layer:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+        }
+
+        .arch-arrow {
+            font-size: 2rem;
+            color: var(--primary-color);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* 代码块 */
+        .code-block {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--gradient-1);
+        }
+
+        .code-block pre {
+            color: var(--text-primary);
+            font-family: 'Fira Code', 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        /* 列表 */
+        ul, ol {
+            margin: 20px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 10px 0;
+            color: var(--text-secondary);
+        }
+
+        li strong {
+            color: var(--text-primary);
+        }
+
+        /* 引用块 */
+        blockquote {
+            border-left: 4px solid var(--primary-color);
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 0 12px 12px 0;
+            color: var(--text-secondary);
+        }
+
+        /* 表格 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 107, 107, 0.2);
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* 提示框 */
+        .tip {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(78, 205, 196, 0.1));
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .tip::before {
+            content: '💡';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-size: 1.5rem;
+            background: var(--bg-primary);
+            padding: 0 10px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .header {
+                padding: 40px 0;
+            }
+
+            .title {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .toc {
+                padding: 20px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .web-content {
+                grid-template-columns: 1fr;
+            }
+
+            .web-sidebar {
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 107, 107, 0.1);
+            }
+
+            .web-status {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+        }
+
+        /* 滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- 粒子背景 -->
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <h1 class="title">LanyunCodingUI</h1>
+            <p class="subtitle">Claude Code的现代化Web界面，提供直观的可视化体验、交互模式、高级功能（检查点、钩子、插件系统），被称为实测封神的编程助手</p>
+
+            <!-- Web界面演示 -->
+            <div class="ui-demo">
+                <div class="web-interface">
+                    <div class="web-header">
+                        <div class="web-title">LanyunCodingUI - Claude Code 现代化界面</div>
+                        <div class="web-controls">
+                            <button class="web-control">新建会话</button>
+                            <button class="web-control">插件管理</button>
+                            <button class="web-control">设置</button>
+                        </div>
+                    </div>
+                    <div class="web-content">
+                        <div class="web-sidebar">
+                            <h4 style="margin-bottom: 15px; color: var(--text-primary);">会话列表</h4>
+                            <div style="margin-bottom: 10px; padding: 10px; background: var(--bg-tertiary); border-radius: 8px; cursor: pointer;">📝 项目开发</div>
+                            <div style="margin-bottom: 10px; padding: 10px; background: var(--bg-tertiary); border-radius: 8px; cursor: pointer;">📝 代码重构</div>
+                            <div style="margin-bottom: 10px; padding: 10px; background: var(--bg-tertiary); border-radius: 8px; cursor: pointer;">📝 Bug修复</div>
+
+                            <h4 style="margin: 20px 0 15px 0; color: var(--text-primary);">文件浏览器</h4>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                                📁 src/<br>
+                                &nbsp;&nbsp;📄 main.py<br>
+                                &nbsp;&nbsp;📄 utils.py<br>
+                                📁 docs/<br>
+                                &nbsp;&nbsp;📄 README.md
+                            </div>
+                        </div>
+                        <div class="web-main">
+                            <div class="chat-messages">
+                                <div class="message">
+                                    <div class="message-avatar">👤</div>
+                                    <div class="message-content">请帮我分析这个React组件的性能问题</div>
+                                </div>
+                                <div class="message">
+                                    <div class="message-avatar">🤖</div>
+                                    <div class="message-content">我来帮你分析这个React组件的性能。让我查看代码并提供优化建议...</div>
+                                </div>
+                                <div class="message user">
+                                    <div class="message-avatar">👤</div>
+                                    <div class="message-content">这个组件有大量的重渲染问题，需要使用React.memo和useMemo优化</div>
+                                </div>
+                            </div>
+                            <div class="chat-input">
+                                <input type="text" class="input-field" placeholder="输入你的问题...">
+                                <button class="send-button">发送</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="web-status">
+                        <div class="status-item">
+                            <span class="status-indicator"></span>
+                            <span>模型: Claude-3-Opus</span>
+                        </div>
+                        <div class="status-item">
+                            <span>Tokens: 1,234/10,000</span>
+                        </div>
+                        <div class="status-item">
+                            <span>在线</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 目录 -->
+        <nav class="toc">
+            <h2 class="toc-title">目录导航</h2>
+            <div class="toc-list">
+                <div class="toc-item">
+                    <a href="#什么是-lanyuncodingui" class="toc-link">1. 什么是 LanyunCodingUI？</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#核心功能特性" class="toc-link">2. 核心功能特性</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#系统架构" class="toc-link">3. 系统架构</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#安装指南" class="toc-link">4. 安装指南</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#使用方法" class="toc-link">5. 使用方法</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#高级功能" class="toc-link">6. 高级功能</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#故障排除" class="toc-link">7. 故障排除</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 内容 -->
+        <main>
+            <!-- 1. 什么是 LanyunCodingUI？ -->
+            <section id="什么是-lanyuncodingui" class="section">
+                <h2 class="section-title">1. 什么是 LanyunCodingUI？</h2>
+                <p>LanyunCodingUI 是由 LanyunAI 实验室开发的开源项目，专为 Claude Code 设计的现代化 Web 界面。它将传统的命令行编程体验转换为直观、美观的可视化界面，为开发者提供更高效、更友好的编程辅助体验。</p>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">核心价值</h3>
+                    <ul>
+                        <li><strong>可视化体验</strong>：将命令行界面转换为现代化的 Web 界面</li>
+                        <li><strong>交互增强</strong>：提供丰富的交互功能和直观的操作方式</li>
+                        <li><strong>高级功能</strong>：集成检查点、钩子系统、插件管理等高级特性</li>
+                        <li><strong>开源友好</strong>：完全开源，支持二次开发和定制</li>
+                        <li><strong>性能优异</strong>：经过实战验证，被誉为"实测封神"的编程助手</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">设计理念</h3>
+                    <p>LanyunCodingUI 遵循现代化软件设计原则：</p>
+                    <ul>
+                        <li><strong>用户体验优先</strong>：以用户需求为中心的界面设计</li>
+                        <li><strong>功能完整性</strong>：提供完整的 Claude Code 功能支持</li>
+                        <li><strong>可扩展性</strong>：支持插件和扩展系统</li>
+                        <li><strong>性能优化</strong>：确保流畅的用户体验</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 2. 核心功能特性 -->
+            <section id="核心功能特性" class="section">
+                <h2 class="section-title">2. 核心功能特性</h2>
+
+                <div class="features">
+                    <div class="feature-card">
+                        <div class="feature-icon">🌐</div>
+                        <h3 class="feature-title">现代化Web界面</h3>
+                        <p class="feature-description">
+                            响应式设计适配桌面和移动设备，采用最新的设计语言和交互模式，支持深色/浅色主题切换，支持多语言界面
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">💬</div>
+                        <h3 class="feature-title">增强的交互模式</h3>
+                        <p class="feature-description">
+                            类似聊天工具的直观对话界面，可视化的文件浏览和管理，内置代码编辑器支持语法高亮，支持文件拖拽上传
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🔧</div>
+                        <h3 class="feature-title">高级功能支持</h3>
+                        <p class="feature-description">
+                            创建和管理代码检查点，集成 Claude Code 的钩子系统，可视化的插件安装和管理，支持自定义工作流
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3 class="feature-title">实时监控</h3>
+                        <p class="feature-description">
+                            实时显示 Token 使用情况，监控响应时间和性能指标，管理和切换不同的会话，完整的历史对话记录
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3 class="feature-title">开发者友好</h3>
+                        <p class="feature-description">
+                            完整的 Claude Code API 集成，丰富的配置选项，内置调试和日志功能，开放的扩展开发接口
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🚀</div>
+                        <h3 class="feature-title">企业级特性</h3>
+                        <p class="feature-description">
+                            支持多用户并发使用，细粒度的权限控制，数据加密和安全存储，支持多种部署方式
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. 系统架构 -->
+            <section id="系统架构" class="section">
+                <h2 class="section-title">3. 系统架构</h2>
+
+                <div class="architecture-diagram">
+                    <h3 class="arch-title">技术架构</h3>
+                    <div class="arch-flow">
+                        <div class="arch-layer">Frontend (React/Vue.js)</div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-layer">API Gateway (Authentication, Rate Limiting, Request Routing)</div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-layer">Backend Service (Claude Code Integration, File Management)</div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-layer">Data Layer (Database, File Storage, Cache)</div>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">核心技术栈</h3>
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">前端技术</h4>
+                        <ul>
+                            <li><strong>UI框架</strong>：React 或 Vue.js</li>
+                            <li><strong>状态管理</strong>：Redux 或 Vuex</li>
+                            <li><strong>UI组件库</strong>：Ant Design 或 Element UI</li>
+                            <li><strong>构建工具</strong>：Webpack 或 Vite</li>
+                        </ul>
+                    </div>
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">后端技术</h4>
+                        <ul>
+                            <li><strong>编程语言</strong>：Python 3.8+</li>
+                            <li><strong>Web框架</strong>：FastAPI 或 Django</li>
+                            <li><strong>数据库</strong>：PostgreSQL 或 MongoDB</li>
+                            <li><strong>缓存</strong>：Redis 6.0+</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. 安装指南 -->
+            <section id="安装指南" class="section">
+                <h2 class="section-title">4. 安装指南</h2>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">Docker 部署（推荐）</h3>
+                    <div class="code-block">
+                        <pre># 拉取项目
+git clone https://github.com/LanyunAI-labs/lanyuncodingui.git
+cd lanyuncodingui
+
+# 使用 Docker Compose 部署
+docker-compose up -d
+
+# 访问应用
+# http://localhost:3000</pre>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">手动部署</h3>
+                    <div class="code-block">
+                        <pre># 克隆仓库
+git clone https://github.com/LanyunAI-labs/lanyuncodingui.git
+cd lanyuncodingui
+
+# 安装前端依赖
+cd frontend
+npm install
+npm run build
+
+# 安装后端依赖
+cd ../backend
+pip install -r requirements.txt
+
+# 启动服务
+python manage.py runserver</pre>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">系统要求</h3>
+                    <ul>
+                        <li><strong>最低要求</strong>：2核心 CPU, 4GB RAM, 10GB 存储空间</li>
+                        <li><strong>推荐配置</strong>：4核心+ CPU, 8GB+ RAM, 20GB+ 存储空间</li>
+                        <li><strong>依赖服务</strong>：Node.js 18.0+, Python 3.8+, Claude Code 最新版本</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 5. 使用方法 -->
+            <section id="使用方法" class="section">
+                <h2 class="section-title">5. 使用方法</h2>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">基础使用</h3>
+                    <ol>
+                        <li><strong>打开浏览器</strong>：访问 http://localhost:3000</li>
+                        <li><strong>配置 Claude Code</strong>：输入 API 密钥，配置模型参数</li>
+                        <li><strong>创建会话</strong>：新建会话开始对话</li>
+                        <li><strong>文件管理</strong>：上传文件进行分析和处理</li>
+                    </ol>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">会话管理</h3>
+                    <div class="code-block">
+                        <pre>// 创建新会话
+const newSession = {
+  name: "新项目开发",
+  model: "claude-3-opus-20240229",
+  temperature: 0.1,
+  max_tokens: 4096
+};
+
+// API 调用
+POST /api/sessions
+{
+  "name": "项目分析",
+  "config": {
+    "model": "claude-3-sonnet-20240229",
+    "temperature": 0.2
+  }
+}</pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. 高级功能 -->
+            <section id="高级功能" class="section">
+                <h2 class="section-title">6. 高级功能</h2>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">检查点系统</h3>
+                    <ul>
+                        <li><strong>自动创建</strong>：在关键操作时自动创建检查点</li>
+                        <li><strong>手动创建</strong>：用户手动创建检查点</li>
+                        <li><strong>差异对比</strong>：显示检查点间的差异</li>
+                        <li><strong>版本回滚</strong>：快速回滚到指定状态</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">钩子系统</h3>
+                    <div class="code-block">
+                        <pre>hooks:
+  pre_file_edit:
+    - type: "backup"
+      config:
+        backup_dir: "./backups"
+  post_file_edit:
+    - type: "lint"
+      config:
+        linter: "eslint"</pre>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">工作流自动化</h3>
+                    <ul>
+                        <li><strong>代码审查</strong>：自动化代码检查和测试</li>
+                        <li><strong>部署流程</strong>：自动构建、测试、部署</li>
+                        <li><strong>自定义工作流</strong>：支持用户自定义工作流</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 7. 故障排除 -->
+            <section id="故障排除" class="section">
+                <h2 class="section-title">7. 故障排除</h2>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">常见问题</h3>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">无法连接到 Claude Code</h4>
+                        <div class="code-block">
+                            <pre># 检查 Claude Code 状态
+claude --version
+
+# 验证 API 密钥
+curl -H "Authorization: Bearer YOUR_API_KEY" https://api.anthropic.com/v1/messages</pre>
+                        </div>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">界面加载缓慢</h4>
+                        <ul>
+                            <li>检查前端构建配置</li>
+                            <li>优化资源配置和代码分割</li>
+                            <li>启用缓存和压缩</li>
+                        </ul>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">文件上传失败</h4>
+                        <ul>
+                            <li>检查文件权限和磁盘空间</li>
+                            <li>验证文件大小限制配置</li>
+                            <li>检查网络连接稳定性</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="tip">
+                    <p><strong>提示</strong>: LanyunCodingUI 是一个活跃开发的开源项目，如果你在使用中遇到问题或有改进建议，欢迎参与讨论和贡献！让 Claude Code 的 Web 界面体验更加完善！</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // 创建粒子效果
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('.toc-link').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 初始化
+        createParticles();
+
+        // 滚动时的渐入效果
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // 观察所有section
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(30px)';
+            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(section);
+        });
+
+        // Web界面交互效果
+        document.querySelectorAll('.web-control').forEach(button => {
+            button.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>

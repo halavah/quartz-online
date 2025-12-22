@@ -1,0 +1,523 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Claudia - Claude Code 强大GUI应用 | 可视化编程助手界面</title><meta name="description" content="Claudia 是一个强大的Claude Code GUI应用，提供创建自定义智能体、管理交互式会话、运行安全的后台智能体等功能，让Claude Code的使用体验飞跃提升"><meta name="keywords" content="Claudia,Claude Code,GUI应用,可视化界面,编程助手,智能体管理,macOS"><style>*{margin:0;padding:0;box-sizing:border-box}:root{--primary:#8b5cf6;--primary-dark:#7c3aed;--secondary:#06b6d4;--accent:#f59e0b;--background:#0f0f1a;--surface:#1a1a2e;--surface-light:#252542;--text:#e2e8f0;--text-muted:#94a3b8;--border:#334155;--gradient-primary:linear-gradient(135deg,#8b5cf6 0%,#06b6d4 100%);--gradient-hero:linear-gradient(135deg,#1a1a2e 0%,#0f0f1a 50%,#1e1b4b 100%);--glow-primary:0 0 40px rgba(139,92,246,0.3);--glow-secondary:0 0 40px rgba(6,182,212,0.2)}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;line-height:1.7;color:var(--text);background:var(--background);overflow-x:hidden}.container{width:100%;max-width:1200px;margin:0 auto;padding:0 1.5rem}.hero-section{position:relative;min-height:100vh;display:flex;align-items:center;background:var(--gradient-hero);overflow:hidden}.hero-section::before{content:"";position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 20% 80%,rgba(139,92,246,0.15) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(6,182,212,0.1) 0%,transparent 50%),radial-gradient(circle at 50% 50%,rgba(245,158,11,0.05) 0%,transparent 50%);pointer-events:none}.particles{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;pointer-events:none}.particle{position:absolute;width:4px;height:4px;background:var(--primary);border-radius:50%;opacity:0.3;animation:float 20s infinite ease-in-out}.particle:nth-child(2){left:15%;animation-delay:-3s;background:var(--secondary)}.particle:nth-child(3){left:30%;animation-delay:-6s}.particle:nth-child(4){left:45%;animation-delay:-9s;background:var(--accent)}.particle:nth-child(5){left:60%;animation-delay:-12s;background:var(--secondary)}.particle:nth-child(6){left:75%;animation-delay:-15s}.particle:nth-child(7){left:90%;animation-delay:-18s;background:var(--accent)}@keyframes float{0%,100%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:0.3}90%{opacity:0.3}100%{transform:translateY(-100vh) scale(1);opacity:0}}.hero-container{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;padding:2rem 0}.hero-content{animation:fadeInUp 0.8s ease-out}@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}.hero-badge{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);padding:0.5rem 1rem;border-radius:50px;font-size:0.875rem;color:var(--primary);margin-bottom:1.5rem}.hero-badge::before{content:"";width:8px;height:8px;background:var(--primary);border-radius:50%;animation:pulse 2s infinite}@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.2)}}.hero-title{font-size:3.5rem;font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.hero-subtitle{font-size:1.25rem;color:var(--text-muted);margin-bottom:2rem;max-width:500px}.hero-stats{display:flex;gap:2rem;margin-bottom:2rem}.stat-item{text-align:center}.stat-number{display:block;font-size:1.5rem;font-weight:700;color:var(--text)}.stat-label{font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em}.hero-actions{display:flex;gap:1rem;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.875rem 1.75rem;border:none;border-radius:12px;font-weight:600;font-size:1rem;text-decoration:none;cursor:pointer;transition:all 0.3s ease}.btn-primary{background:var(--gradient-primary);color:#fff;box-shadow:var(--glow-primary)}.btn-primary:hover{transform:translateY(-3px);box-shadow:0 10px 40px rgba(139,92,246,0.4)}.btn-secondary{background:var(--surface-light);color:var(--text);border:1px solid var(--border)}.btn-secondary:hover{background:var(--surface);border-color:var(--primary);transform:translateY(-3px)}.hero-visual{position:relative;display:flex;justify-content:center;align-items:center;animation:fadeInUp 0.8s ease-out 0.2s both}.app-showcase{position:relative;width:100%;max-width:500px;aspect-ratio:16/9;background:var(--surface-light);border-radius:16px;overflow:hidden;border:2px solid var(--primary);box-shadow:var(--glow-primary)}.app-interface{position:absolute;top:0;left:0;width:100%;height:100%;background:#1a1a2e}.app-header{display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;background:rgba(26,27,38,0.9);border-bottom:1px solid var(--primary)}.app-title{font-size:0.875rem;color:var(--primary);font-weight:600}.app-actions{display:flex;gap:0.5rem}.app-action-btn{width:30px;height:30px;background:rgba(139,92,246,0.2);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--primary);cursor:pointer;transition:all 0.2s}.app-action-btn:hover{background:var(--primary);color:#fff}.app-sidebar{position:absolute;top:0;left:0;width:200px;height:100%;background:rgba(32,33,42,0.9);border-right:1px solid var(--border)}.sidebar-section{padding:1rem;border-bottom:1px solid var(--border)}.sidebar-title{font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem}.sidebar-item{display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;color:var(--text);border-radius:6px;cursor:pointer;transition:all 0.2s}.sidebar-item:hover{background:rgba(139,92,246,0.1);color:var(--primary)}.sidebar-icon{width:20px;height:20px}.sidebar-text{font-size:0.875rem}.app-main{position:absolute;top:0;left:200px;right:0;bottom:0;background:rgba(38,39,49,0.9)}.app-chat{display:flex;flex-direction:column;height:100%}.chat-header{display:flex;align-items:center;justify-content:space-between;padding:1rem;background:rgba(45,46,59,0.9);border-bottom:1px solid var(--border)}.chat-title{font-size:0.9rem;color:var(--text);font-weight:600}.chat-messages{flex:1;overflow-y:auto;padding:1rem}.message{display:flex;gap:0.75rem;margin-bottom:1rem;padding:1rem;background:rgba(45,46,59,0.6);border-radius:12px;animation:messageSlideIn 0.3s ease-out}.message.user{align-self:flex-end}.message.assistant{align-self:flex-start}@keyframes messageSlideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}.message-avatar{width:32px;height:32px;background:var(--gradient-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}.message-avatar.assistant{background:var(--secondary-color)}.message-content{flex:1;color:var(--text);font-size:0.9rem;line-height:1.6}.chat-input{display:flex;gap:0.5rem;padding:1rem;background:rgba(45,46,59,0.9);border-top:1px solid var(--border)}.chat-input input{flex:1;background:transparent;border:none;color:var(--text);font-size:0.9rem;outline:none}.chat-input input::placeholder{color:var(--text-muted)}.chat-send-btn{width:32px;height:32px;background:var(--gradient-primary);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;transition:all 0.2s}.chat-send-btn:hover{background:var(--primary-dark)}.main-content{position:relative;z-index:1}section{padding:5rem 0}.section-header{text-align:center;margin-bottom:4rem}.section-badge{display:inline-block;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);padding:0.375rem 1rem;border-radius:50px;font-size:0.75rem;color:var(--primary);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem}.section-title{font-size:2.5rem;font-weight:700;margin-bottom:1rem;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.section-subtitle{font-size:1.125rem;color:var(--text-muted);max-width:600px;margin:0 auto}.overview-section{background:linear-gradient(180deg,var(--background) 0%,var(--surface) 100%)}.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}.overview-content h3{font-size:1.75rem;margin-bottom:1rem;color:var(--text)}.overview-content p{color:var(--text-muted);margin-bottom:1.5rem}.overview-list{list-style:none}.overview-list li{display:flex;align-items:flex-start;gap:0.75rem;margin-bottom:1rem;color:var(--text-muted)}.overview-list li::before{content:"✓";color:var(--secondary);font-weight:bold}.features-section{background:var(--surface)}.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}.feature-card{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border);position:relative;overflow:hidden}.feature-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--gradient-primary);transform:scaleX(0);transition:transform 0.3s ease}.feature-card:hover{transform:translateY(-5px);border-color:var(--primary);box-shadow:var(--glow-primary)}.feature-card:hover::before{transform:scaleX(1)}.feature-icon{width:60px;height:60px;background:rgba(139,92,246,0.1);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.75rem;margin-bottom:1.5rem}.feature-title{font-size:1.25rem;font-weight:600;margin-bottom:0.75rem;color:var(--text)}.feature-description{color:var(--text-muted);font-size:0.95rem}.installation-section{background:linear-gradient(180deg,var(--surface) 0%,var(--background) 100%)}.install-tabs{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border)}.tab-buttons{display:flex;gap:0.5rem;margin-bottom:2rem;background:var(--surface);padding:0.5rem;border-radius:12px}.tab-btn{flex:1;padding:0.875rem 1.5rem;border:none;background:transparent;color:var(--text-muted);font-weight:600;border-radius:8px;cursor:pointer;transition:all 0.3s ease}.tab-btn.active{background:var(--gradient-primary);color:#fff}.tab-btn:hover:not(.active){color:var(--text);background:rgba(139,92,246,0.1)}.tab-content.active{display:block;animation:fadeIn 0.3s ease}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.install-step{margin-bottom:1.5rem}.install-step:last-child{margin-bottom:0}.install-step h4{color:var(--text);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem}.step-number{width:28px;height:28px;background:var(--gradient-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-weight:700}.code-block{position:relative;background:#0d1117;border-radius:12px;overflow:hidden;border:1px solid var(--border)}.code-header{display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;background:#161b22;border-bottom:1px solid var(--border)}.code-lang{font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em}.copy-btn{background:var(--primary);color:#fff;border:none;padding:0.375rem 0.75rem;border-radius:6px;font-size:0.75rem;cursor:pointer;transition:all 0.2s ease}.copy-btn:hover{background:var(--primary-dark)}.code-content{padding:1rem;overflow-x:auto}.code-content pre{margin:0;font-family:"Fira Code","Monaco","Consolas",monospace;font-size:0.875rem;line-height:1.6}.code-content code{color:#e6edf3}.workflow-section{background:var(--background)}.workflow-diagram{display:flex;flex-direction:column;gap:2rem}.workflow-step{display:flex;align-items:flex-start;gap:1rem;padding:1.5rem;background:var(--surface-light);border-radius:16px;border:1px solid var(--border);position:relative}.workflow-step::before{content:"";position:absolute;top:50%;left:0;transform:translateY(-50%);width:2px;height:30px;background:var(--gradient-primary)}.workflow-step::after{content:"→";position:absolute;top:50%;right:-15px;transform:transform:translateY(-50%);color:var(--primary);font-size:1.5rem}.workflow-step:last-child::after{display:none}.step-icon{width:50px;height:50px;background:var(--gradient-primary);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;color:#fff;flex-shrink:0}.step-content{flex:1}.step-title{font-weight:600;color:var(--text);margin-bottom:0.5rem;font-size:1.1rem}.step-desc{color:var(--text-muted);font-size:0.9rem}.tech-specs{background:var(--surface);padding:4rem 2rem}.spec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem}.spec-card{background:var(--surface-light);border-radius:16px;padding:1.5rem;border:1px solid var(--border)}.spec-header{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}.spec-icon{width:40px;height:40px;background:var(--gradient-primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;color:#fff}.spec-title{font-size:1.1rem;font-weight:600;color:var(--text)}.spec-content{color:var(--text-muted);font-size:0.9rem}.spec-table{width:100%;border-collapse:collapse;margin-top:1rem}.spec-table th,.spec-table td{padding:0.75rem;text-align:left;border-bottom:1px solid var(--border)}.spec-table th{background:var(--surface);color:var(--text);font-weight:600}.spec-table td{color:var(--text-muted)}.troubleshooting-section{background:var(--surface-light)}.troubleshoot-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem}.trouble-item{background:var(--surface);border-radius:12px;padding:1.5rem;border:1px solid var(--border)}.trouble-header{display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem}.trouble-icon{width:32px;height:32px;background:var(--secondary);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem}.trouble-title{font-weight:600;color:var(--text)}.trouble-solution{color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem}.trouble-code{font-family:"Fira Code",monospace;background:rgba(0,0,0,0.8);color:#e6edf3;padding:1rem;border-radius:8px;font-size:0.875rem}.trouble-code code{color:var(--accent)}.footer{background:var(--surface);padding:3rem 0;border-top:1px solid var(--border)}.footer-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}.footer-info{color:var(--text-muted);font-size:0.9rem}.footer-info a{color:var(--primary);text-decoration:none}.footer-info a:hover{text-decoration:underline}.footer-stats{color:var(--text-muted);font-size:0.875rem}.footer-links a:hover{color:var(--primary)}@media (max-width:1024px){.hero-container{grid-template-columns:1fr;text-align:center}.hero-subtitle{margin:0 auto 2rem}.hero-stats{justify-content:center}.hero-actions{justify-content:center}.hero-visual{order:-1}.app-showcase{max-width:400px}.overview-grid,.workflow-section{grid-template-columns:1fr}.features-grid{grid-template-columns:repeat(2,1fr)}.spec-grid{grid-template-columns:1fr}}@media (max-width:768px){.hero-title{font-size:2.5rem}.section-title{font-size:2rem}.features-grid{grid-template-columns:1fr}.tab-buttons{flex-direction:column}.spec-table{overflow-x:auto}.footer-content{flex-direction:column;text-align:center}}@media (max-width:480px){.hero-title{font-size:2rem}.btn{width:100%;justify-content:center}section{padding:3rem 0}}</style><meta name=referrer content=no-referrer><style>.sf-hidden{display:none!important}</style><link rel=canonical href=https://github.com/GoJam11/claudia-macos><meta http-equiv=content-security-policy content="default-src 'none'; font-src 'self' data:; img-src 'self' data:; style-src 'unsafe-inline'; media-src 'self' data:; script-src 'unsafe-inline' data:; object-src 'self' data:; frame-src 'self' data:;"></head>
+<body>
+<header class="hero-section">
+<div class="particles">
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+</div>
+<div class="container">
+<div class="hero-container">
+<div class="hero-content">
+<div class="hero-badge">macOS 桌面应用</div>
+<h1 class="hero-title">Claudia</h1>
+<p class="hero-subtitle">强大的 Claude Code GUI 应用，提供可视化的智能体管理和项目交互体验</p>
+<div class="hero-stats">
+<div class="stat-item">
+<span class="stat-number">v2.1.0</span>
+<span class="stat-label">版本</span>
+</div>
+<div class="stat-item">
+<span class="stat-number">Electron</span>
+<span class="stat-label">技术</span>
+</div>
+<div class="stat-item">
+<span class="stat-number">MIT</span>
+<span class="stat-label">许可证</span>
+</div>
+</div>
+<div class="hero-actions">
+<a href="https://github.com/GoJam11/claudia-macos" target="_blank" class="btn btn-primary">
+<span>查看源码</span>
+</a>
+<a href="#installation" class="btn btn-secondary">
+<span>立即开始</span>
+</a>
+</div>
+</div>
+<div class="hero-visual">
+<div class="app-showcase">
+<div class="app-interface">
+<div class="app-header">
+<div class="app-title">Claudia</div>
+<div class="app-actions">
+<div class="app-action-btn">⚙</div>
+<div class="app-action-btn">⚙</div>
+<div class="app-action-btn">⚙</div>
+</div>
+</div>
+<div class="app-sidebar">
+<div class="sidebar-section">
+<div class="sidebar-title">智能体</div>
+<div class="sidebar-item">
+<span class="sidebar-icon">🤖</span>
+<span class="sidebar-text">Frontend Expert</span>
+</div>
+<div class="sidebar-item">
+<span class="sidebar-icon">🔧</span>
+<span class="sidebar-text">Backend Guru</span>
+</div>
+<div class="sidebar-item">
+<span class="sidebar-icon">🎨</span>
+<span class="sidebar-text">UX Designer</span>
+</div>
+</div>
+<div class="sidebar-section">
+<div class="sidebar-title">项目</div>
+<div class="sidebar-item">
+<span class="sidebar-icon">📁</span>
+<span class="sidebar-text">My Project</span>
+</div>
+<div class="sidebar-item">
+<span class="sidebar-icon">📊</span>
+<span class="sidebar-text">Analytics</span>
+</div>
+</div>
+</div>
+<div class="app-main">
+<div class="app-chat">
+<div class="chat-header">
+<div class="chat-title">对话会话</div>
+<div class="app-actions">
+<div class="app-action-btn">⚙</div>
+</div>
+</div>
+<div class="chat-messages">
+<div class="message user">
+<div class="message-avatar">👤</div>
+<div class="message-content">请帮我创建一个用户认证组件</div>
+</div>
+<div class="message assistant">
+<div class="message-avatar">🤖</div>
+<div class="message-content">我来帮你创建一个现代化的用户认证组件，包含登录、注册、忘记密码等功能。</div>
+</div>
+</div>
+<div class="chat-input">
+<input type="text" placeholder="输入消息...">
+<div class="chat-send-btn">➤</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</header>
+
+<main class="main-content">
+
+<section class="overview-section">
+<div class="container">
+<div class="section-header">
+<span class="section-badge">概述</span>
+<h2 class="section-title">什么是 Claudia？</h2>
+<p class="section-subtitle">强大的Claude Code GUI应用，为开发者提供直观的编程助手体验</p>
+</div>
+<div class="overview-grid">
+<div class="overview-content">
+<h3>可视化编程体验</h3>
+<p>Claudia 是一个专为 Claude Code 打造的强大 GUI 应用，将传统的命令行界面转换为直观的图形界面。它提供了创建自定义智能体、管理交互式会话、运行安全的后台智能体等功能，让开发者能够以全新的方式与 Claude Code 交互。</p>
+<ul class="overview-list">
+<li>直观的图形用户界面</li>
+<li>创建和管理自定义 AI 智能体</li>
+<li>实时会话管理和监控</li>
+<li>安全的后台智能体执行</li>
+<li>项目文件的可视化管理</li>
+<li>跨会话的上下文保持</li>
+</ul>
+</div>
+<div class="workflow-diagram">
+<div class="workflow-step">
+<div class="step-icon">🎯</div>
+<div class="step-content">
+<div class="step-title">智能体创建</div>
+<div class="step-desc">基于项目需求创建专用的AI智能体</div>
+</div>
+</div>
+<div class="step-arrow">↓</div>
+<div class="workflow-step">
+<div class="step-icon">💬</div>
+<div class="step-content">
+<div class="step-title">对话管理</div>
+<div class="step-desc">管理多个并发的对话会话</div>
+</div>
+</div>
+<div class="step-arrow">↓</div>
+<div class="workflow-step">
+<div class="step-icon">⚡</div>
+<div class="step-content">
+<div class="step-title">任务执行</div>
+<div class="step-desc">后台智能体自动执行编程任务</div>
+</div>
+</div>
+<div class="step-arrow">↓</div>
+<div class="workflow-step">
+<div class="step-icon">📊</div>
+<div class="step-content">
+<div class="step-title">结果整合</div>
+<div class="step-desc">整合和优化执行结果</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="features-section">
+<div class="container">
+<div class="section-header">
+<span class="section-badge">功能特性</span>
+<h2 class="section-title">核心功能</h2>
+<p class="section-subtitle">Claudia 提供了丰富的功能，让 Claude Code 使用更加高效便捷</p>
+</div>
+<div class="features-grid">
+<div class="feature-card">
+<div class="feature-icon">🤖</div>
+<h3 class="feature-title">智能体系统</h3>
+<p class="feature-description">创建和管理具有不同专长的AI智能体，如前端专家、后端架构师、DevOps工程师等</p>
+</div>
+<div class="feature-card">
+<div class="feature-icon">💬</div>
+<h3 class="feature-title">会话管理</h3>
+<p class="feature-description">管理多个并行的对话会话，保持对话的连续性和上下文</p>
+</div>
+<div class="feature-card">
+<div class="feature-icon">⚡</div>
+<h3 class="feature-title">后台执行</h3>
+<p class="feature-description">支持安全的后台智能体执行，无需持续监控</p>
+</div>
+<div class="feature-card">
+<div class="feature-icon">📁</div>
+<h3 class="feature-title">项目管理</h3>
+<p class="feature-description">可视化的项目文件管理和浏览器</p>
+</div>
+<div class="feature-card">
+<div class="feature-icon">🎨</div>
+<h3 class="feature-title">用户界面</h3>
+<p class="feature-description">现代化的Web界面，支持主题定制和响应式设计</p>
+</div>
+<div class="feature-card">
+<div class="feature-icon">🔧</h3>
+<h3 class="feature-title">插件系统</h3>
+<p class="feature-description">可扩展的插件架构，支持自定义功能</p>
+</div>
+<div class="feature-card">
+<div class="feature-icon">📊</h3>
+<h3 class="feature-title">实时监控</h3>
+<p class="feature-description">实时监控智能体状态和性能指标</p>
+</div>
+</div>
+</div>
+</section>
+
+<section class="installation-section">
+<div class="container">
+<div class="section-header">
+<span class="section-badge">安装指南</span>
+<h2 class="section-title">快速开始</h2>
+<p class="section-subtitle">几种简单的安装方式，选择最适合你的开发环境</p>
+</div>
+<div class="install-tabs">
+<div class="tab-buttons">
+<button class="tab-btn active">Docker</button>
+<button class="tab-btn">直接下载</button>
+<button class="tab-btn">源码编译</button>
+</div>
+<div class="tab-content active">
+<div class="install-step">
+<h4><span class="step-number">1</span> Docker 部署</h4>
+<div class="code-block">
+<div class="code-header">
+<span class="code-lang">Bash</span>
+<button class="copy-btn">复制</button>
+</div>
+<div class="code-content">
+<pre><code># 拉取镜像
+docker pull gojam11/claudia:latest
+
+# 运行容器
+docker run -d \
+  --name claudia \
+  -v ~/.claude:/root/.claude \
+  -v ~/.claudia-mem:/root/.claudia-mem \
+  -p 8080:8080 \
+  gojam11/claudia:latest
+</code></pre>
+</div>
+</div>
+</div>
+<div class="install-step">
+<h4><span class="step-number">2</span> 访问应用</h4>
+<p>打开浏览器访问：<a href="http://localhost:8080" target="_blank">http://localhost:8080</a></p>
+</div>
+</div>
+<div class="tab-content sf-hidden">
+<div class="install-step">
+<h4><span class="step-number">1</span> 下载应用</h4>
+<div class="code-block">
+<div class="code-header">
+<span class="code-lang">Bash</span>
+<button class="copy-btn">复制</button>
+</div>
+<div class="code-content">
+<pre><code># macOS
+wget https://github.com/GoJam11/claudia-macos/releases/latest/download/Claudia-macos.dmg
+
+# Windows
+# 下载 Claudia-macos.zip 并解压
+</code></pre>
+</div>
+</div>
+<div class="install-step">
+<h4><span class="step-number">2</span> 安装应用</h4>
+<div class="code-block">
+<div class="code-header">
+<span class="code-lang">macOS</span>
+<button class="code-lang btn-copy">复制</button>
+</div>
+<div class="code-content">
+<pre><code># 双击 .dmg 文件
+open Claudia-macos.dmg
+
+# 拖拽到 Applications 文件夹
+</code></pre>
+</div>
+</div>
+</div>
+<div class="tab-content sf-hidden">
+<div class="install-step">
+<h4><span class="step-number">1</span> 克隆仓库</h4>
+<div class="code-block">
+<div class="code-header">
+<span class="code-lang">Bash</span>
+<button class="copy-btn">复制</button>
+</div>
+<div class="code-content">
+<pre><code># 克隆仓库
+git clone https://github.com/GoJam11/claudia-macos.git
+cd claudia-macos
+
+# 安装依赖
+npm install
+
+# 构建应用
+npm run build
+
+# 启动应用
+npm start
+</code></pre>
+</div>
+</div>
+</div>
+</section>
+
+<section class="workflow-section">
+<div class="container">
+<div class="section-header">
+<span class="section-badge">工作流程</span>
+<h2 class="section-title">如何使用</h2>
+<p class="section-subtitle">使用 Claudia 提升你的 Claude Code 开发效率</p>
+</div>
+<div class="workflow-diagram">
+<div class="workflow-step">
+<div class="step-icon">🚀</div>
+<div class="step-content">
+<div class="step-title">启动应用</div>
+<div class="step-desc">在系统上启动 Claudia 应用</div>
+</div>
+</div>
+<div class="step-arrow">↓</div>
+<div class="workflow-step">
+<div class="step-icon">🎯</div>
+<div class="step-content">
+<div class="step-title">创建智能体</div>
+<div class="step-desc">基于项目需求创建专用的AI智能体</div>
+</div>
+</div>
+<div class="step-arrow">↓</div>
+<div class="workflow-step">
+<div class="step-icon">💬</div>
+<div class="step-content">
+<div class="step-title">开始对话</div>
+<div class="step-desc">与智能体进行编程对话和任务协作</div>
+</div>
+</div>
+<div class="step-arrow">↓</div>
+<div class="workflow-step">
+<div class="step-icon">⚡</div>
+<div class="step-content">
+<div class="step-title">任务执行</div>
+<div class="step-desc">智能体在后台执行具体的编程任务</div>
+</div>
+</div>
+<div class="step-arrow">↓</div>
+<div class="workflow-step">
+<div class="step-icon">📊</div>
+<div class="step-content">
+<div class="step-title">结果验证</div>
+<div class="step-desc">查看和管理执行结果</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="tech-specs">
+<div class="container">
+<div class="section-header">
+<span class="section-badge">技术规格</span>
+<h2 class="section-title">技术细节</h2>
+<p class="section-subtitle">了解 Claudia 的技术栈和系统要求</p>
+</div>
+<div class="spec-grid">
+<div class="spec-card">
+<div class="spec-header">
+<div class="spec-icon">💻</div>
+<div class="spec-title">版本信息</div>
+</div>
+<div class="spec-content">
+<ul>
+<li><strong>当前版本</strong>：v2.1.0</li>
+<li><strong>开发语言</strong>：TypeScript, Electron</li>
+<li><strong>许可证</strong>：MIT License</li>
+<li><strong>发布日期</strong>：2025-12-22</li>
+</ul>
+</div>
+</div>
+<div class="spec-card">
+<div class="spec-header">
+<div class="spec-icon">🔧</div>
+<div class="title">系统要求</div>
+</div>
+<div class="spec-content">
+<ul>
+<li><strong>操作系统</strong>：macOS 10.15+（推荐），Windows 10+，Linux</li>
+<li><strong>处理器</strong>：64位 CPU，2核以上（推荐4核）</li>
+<li><strong>内存</strong>：4GB RAM（推荐 8GB）</li>
+<li><strong>存储空间</strong>：500MB 可用空间</li>
+<li><strong>网络</strong>：稳定的互联网连接</li>
+</ul>
+</div>
+</div>
+<div class="spec-card">
+<div class="spec-header">
+<div class="spec-icon">⚡</div>
+<div class="spec-title">性能特性</div>
+</div>
+<div class="spec-content">
+<ul>
+<li><strong>启动时间</strong>：< 3秒</li>
+<li><strong>内存使用</strong>：< 200MB</li>
+<li><li><strong>CPU使用</strong>：< 10%（空闲状态）</li>
+<li><strong>并发会话</strong>：支持 10+ 个并发会话</li>
+<li><strong>智能体数量</strong>：无限制</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="troubleshooting-section">
+<div class="container">
+<div class="section-header">
+<span class="section-badge">故障排除</span>
+<h2 class="section-title">常见问题</h2>
+<p class="section-section">快速解决使用中可能遇到的问题</p>
+</div>
+<div class="troubleshoot-grid">
+<div class="trouble-item">
+<div class="trouble-header">
+<div class="trouble-icon">❓</div>
+<div class="trouble-title">应用无法启动</div>
+</div>
+<div class="trouble-solution">
+<p><strong>解决方案：</strong></p>
+<ul>
+<li>检查系统要求是否满足</li>
+<li>验证 Docker 或 Node.js 版本</li>
+<li>查看错误日志获取详细信息</li>
+</ul>
+<div class="trouble-code">
+<pre><code># 检查 Docker 版本
+docker --version
+
+# 检查 Node.js 版本
+node --version
+
+# 查看错误日志
+docker logs claudia
+</code></pre>
+</div>
+</div>
+</div>
+<div class="trouble-item">
+<div class="trouble-header">
+<div class="trouble-icon">🔗</div>
+<div class="trouble-title">连接Claude Code失败</div>
+</div>
+<div class="trouble-solution">
+<p><strong>解决方案：</strong></p>
+<ul>
+<li>验证 Claude Code 安装和配置</li>
+<li>检查 API 密钥配置</li>
+li>测试网络连接</li>
+</ul>
+<div class="trouble-code">
+<pre><code># 验证 Claude Code 安装
+claude --version
+
+# 测试 API 连接
+curl -H "Authorization: Bearer $CLAUDE_API_KEY" \
+  https://api.anthropic.com/v1/messages
+</code></pre>
+</div>
+</div>
+</div>
+<div class="trouble-item">
+<div class="trouble-header">
+<div class="trouble-icon">🎨</div>
+<div class="trouble-title">界面显示异常</div>
+</div>
+<div class="trouble-solution">
+<p><strong>解决方案：</strong></p>
+<ul>
+<li>清理应用缓存数据</li>
+</ul>
+<div class="trouble-code">
+<pre><code># 清理缓存
+rm -rf ~/Library/Application\ Support/Claudia/
+
+# 重新启动应用
+open -a Claudia.app
+</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<footer class="footer">
+<div class="container">
+<div class="footer-content">
+<div class="footer-info">
+<p>© 2025 Claudia. All rights reserved.</p>
+<p><a href="https://github.com/GoJam11/claudia-macos" target="_blank">GitHub</a> | <a href="https://claude.ai/" target="_blank">Claude AI</a></p>
+</div>
+<div class="footer-stats">
+<p>版本 v2.1.0 | 构建 2025-12-22</p>
+<p><a href="https://github.com/GoJam11/claudia-macos/stargazers" target="_blank">⭐ 1.2k+ Stars</a></p>
+</div>
+</div>
+</div>
+</footer>
+
+</main>
+
+</body></html>

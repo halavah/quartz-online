@@ -94,8 +94,9 @@ for /f "usebackq delims=" %%a in (`powershell -Command "$content = Get-Content '
 :: 确定分类
 if "%CHAPTER%"=="chapter01" set "CATEGORY=安装指南"
 if "%CHAPTER%"=="chapter02" set "CATEGORY=使用技巧"
-if "%CHAPTER%"=="chapter03" set "CATEGORY=插件工具"
-if "%CHAPTER%"=="chapter04" set "CATEGORY=开发工具"
+if "%CHAPTER%"=="chapter03" set "CATEGORY=使用工具"
+if "%CHAPTER%"=="chapter04" set "CATEGORY=最新动态"
+if "%CHAPTER%"=="chapter05" set "CATEGORY=网络工具"
 
 :: 输出到临时文件
 (

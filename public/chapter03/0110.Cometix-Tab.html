@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cometix-Tab - VSCode/Cursor Tab增强工具</title>
+    <meta name="description" content="Cometix-Tab 是Copilot++生态项目中的Tab增强工具，为VSCode和JetBrains IDE提供类似Cursor Tab的无限标签页功能，无需魔法和账号">
+    <meta name="keywords" content="cometix-tab,vscode,cursor-tab,ide-plugin,typescript,tab管理">
+    <style>
+        :root {
+            --primary-color: #007acc;
+            --secondary-color: #4080d0;
+            --accent-color: #00d4aa;
+            --success-color: #28a745;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --gradient-1: linear-gradient(135deg, #007acc 0%, #4080d0 100%);
+            --gradient-2: linear-gradient(135deg, #4080d0 0%, #00d4aa 100%);
+            --gradient-3: linear-gradient(135deg, #00d4aa 0%, #28a745 100%);
+            --glow-color: rgba(0, 122, 204, 0.5);
+            --particle-color: rgba(0, 122, 204, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 粒子背景 */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--particle-color);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* 头部 */
+        .header {
+            padding: 80px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-1);
+            opacity: 0.1;
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+
+        .title {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                filter: drop-shadow(0 0 20px var(--glow-color));
+            }
+            to {
+                filter: drop-shadow(0 0 30px var(--glow-color));
+            }
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* IDE演示 */
+        .ide-demo {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 40px 0;
+            border: 1px solid rgba(0, 122, 204, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ide-demo::before {
+            content: 'IDE Tab增强演示';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: var(--bg-primary);
+            padding: 0 10px;
+            color: var(--primary-color);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .ide-window {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .ide-header {
+            background: var(--bg-secondary);
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(0, 122, 204, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ide-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .ide-control {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .ide-control.close {
+            background: #ff5f56;
+        }
+
+        .ide-control.minimize {
+            background: #ffbd2e;
+        }
+
+        .ide-control.maximize {
+            background: #27c93f;
+        }
+
+        .ide-title {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .ide-tabs {
+            display: flex;
+            background: var(--bg-tertiary);
+            overflow-x: auto;
+            padding: 0 10px;
+        }
+
+        .ide-tab {
+            padding: 8px 16px;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid rgba(0, 122, 204, 0.1);
+            border-bottom: none;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .ide-tab:hover {
+            background: rgba(0, 122, 204, 0.1);
+            color: var(--text-primary);
+        }
+
+        .ide-tab.active {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border-color: var(--primary-color);
+            border-top: 2px solid var(--primary-color);
+        }
+
+        .ide-tab-content {
+            padding: 20px;
+            background: var(--bg-primary);
+            min-height: 200px;
+            color: var(--text-secondary);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+        }
+
+        /* 目录 */
+        .toc {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 40px;
+            margin: 40px 0;
+            border: 1px solid rgba(0, 122, 204, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toc::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--gradient-1);
+        }
+
+        .toc-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .toc-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .toc-item {
+            padding: 12px 20px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toc-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-2);
+            opacity: 0.1;
+            transition: left 0.3s ease;
+        }
+
+        .toc-item:hover::before {
+            left: 0;
+        }
+
+        .toc-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0, 122, 204, 0.3);
+        }
+
+        .toc-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 内容部分 */
+        .section {
+            margin: 60px 0;
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .section:nth-child(2) { animation-delay: 0.1s; }
+        .section:nth-child(3) { animation-delay: 0.2s; }
+        .section:nth-child(4) { animation-delay: 0.3s; }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subsection {
+            margin: 40px 0;
+            padding-left: 20px;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .subsection-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+        }
+
+        .sub-subsection {
+            margin: 30px 0;
+        }
+
+        .sub-subsection-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        /* 特性卡片 */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .feature-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(0, 122, 204, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 122, 204, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 架构图 */
+        .architecture-diagram {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 40px;
+            margin: 40px 0;
+            border: 1px solid rgba(0, 122, 204, 0.2);
+            text-align: center;
+        }
+
+        .arch-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--text-primary);
+        }
+
+        .arch-flow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .arch-layer {
+            background: var(--bg-tertiary);
+            padding: 20px 30px;
+            border-radius: 12px;
+            border: 2px solid var(--primary-color);
+            min-width: 300px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .arch-layer:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 122, 204, 0.3);
+        }
+
+        .arch-arrow {
+            font-size: 2rem;
+            color: var(--primary-color);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* 代码块 */
+        .code-block {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(0, 122, 204, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--gradient-1);
+        }
+
+        .code-block pre {
+            color: var(--text-primary);
+            font-family: 'Fira Code', 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        /* 列表 */
+        ul, ol {
+            margin: 20px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 10px 0;
+            color: var(--text-secondary);
+        }
+
+        li strong {
+            color: var(--text-primary);
+        }
+
+        /* 引用块 */
+        blockquote {
+            border-left: 4px solid var(--primary-color);
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 0 12px 12px 0;
+            color: var(--text-secondary);
+        }
+
+        /* 表格 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 122, 204, 0.2);
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* 提示框 */
+        .tip {
+            background: linear-gradient(135deg, rgba(0, 122, 204, 0.1), rgba(0, 212, 170, 0.1));
+            border: 1px solid rgba(0, 122, 204, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .tip::before {
+            content: '💡';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-size: 1.5rem;
+            background: var(--bg-primary);
+            padding: 0 10px;
+        }
+
+        /* 支持的IDE图标 */
+        .ide-support {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .ide-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .ide-icon:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 122, 204, 0.3);
+        }
+
+        .ide-logo {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .ide-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .ide-version {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .header {
+                padding: 40px 0;
+            }
+
+            .title {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .toc {
+                padding: 20px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .ide-support {
+                gap: 20px;
+            }
+
+            .ide-tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+            }
+        }
+
+        /* 滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- 粒子背景 -->
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <h1 class="title">Cometix-Tab</h1>
+            <p class="subtitle">Copilot++生态项目中的Tab增强工具，为VSCode和JetBrains IDE提供类似Cursor Tab的无限标签页功能，无需魔法和账号</p>
+
+            <!-- IDE演示 -->
+            <div class="ide-demo">
+                <div class="ide-window">
+                    <div class="ide-header">
+                        <div class="ide-controls">
+                            <div class="ide-control close"></div>
+                            <div class="ide-control minimize"></div>
+                            <div class="ide-control maximize"></div>
+                        </div>
+                        <div class="ide-title">Cometix-Tab Enhanced IDE</div>
+                    </div>
+                    <div class="ide-tabs">
+                        <div class="ide-tab active">📄 index.js</div>
+                        <div class="ide-tab">📄 App.jsx</div>
+                        <div class="ide-tab">📄 styles.css</div>
+                        <div class="ide-tab">📄 config.json</div>
+                        <div class="ide-tab">📄 README.md</div>
+                        <div class="ide-tab">📁 components/Header.jsx</div>
+                        <div class="ide-tab">📁 utils/api.js</div>
+                    </div>
+                    <div class="ide-tab-content">
+                        // Enhanced Tab Management with Cometix-Tab<br>
+                        const TabManager = {<br>
+                        &nbsp;&nbsp;maxTabs: 1000,<br>
+                        &nbsp;&nbsp;smartFolding: true,<br>
+                        &nbsp;&nbsp;groupByProject: true,<br>
+                        &nbsp;&nbsp;searchEnabled: true<br>
+                        };
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 目录 -->
+        <nav class="toc">
+            <h2 class="toc-title">目录导航</h2>
+            <div class="toc-list">
+                <div class="toc-item">
+                    <a href="#什么是-cometix-tab" class="toc-link">1. 什么是 Cometix-Tab？</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#核心功能特性" class="toc-link">2. 核心功能特性</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#系统架构" class="toc-link">3. 系统架构</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#安装指南" class="toc-link">4. 安装指南</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#配置说明" class="toc-link">5. 配置说明</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#使用方法" class="toc-link">6. 使用方法</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#故障排除" class="toc-link">7. 故障排除</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 内容 -->
+        <main>
+            <!-- 1. 什么是 Cometix-Tab？ -->
+            <section id="什么是-cometix-tab" class="section">
+                <h2 class="section-title">1. 什么是 Cometix-Tab？</h2>
+                <p>Cometix-Tab 是由 Haleclipse 开发的开源项目，属于 Copilot++ 生态系统的一部分。它为流行的代码编辑器（VSCode、JetBrains IDE系列）提供了类似 Cursor Tab 的增强标签页管理功能，让开发者能够享受无限标签页、智能标签页管理等先进功能。</p>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">核心价值</h3>
+                    <ul>
+                        <li><strong>无限标签页</strong>：突破传统IDE的标签页数量限制</li>
+                        <li><strong>智能管理</strong>：基于使用模式的智能标签页管理</li>
+                        <li><strong>跨平台支持</strong>：支持VSCode和JetBrains IDE系列</li>
+                        <li><strong>无需账号</strong>：不需要魔法网络或付费账号</li>
+                        <li><strong>开源免费</strong>：完全开源，免费使用</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">设计理念</h3>
+                    <p>Cometix-Tab 遵循以用户体验为中心的设计原则：</p>
+                    <ul>
+                        <li><strong>无缝集成</strong>：与原生IDE功能无缝集成</li>
+                        <li><strong>性能优先</strong>：高效的内存管理和标签页切换</li>
+                        <li><strong>用户友好</strong>：直观的界面和简单的操作</li>
+                        <li><strong>可扩展性</strong>：支持插件和自定义扩展</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 2. 核心功能特性 -->
+            <section id="核心功能特性" class="section">
+                <h2 class="section-title">2. 核心功能特性</h2>
+
+                <div class="features">
+                    <div class="feature-card">
+                        <div class="feature-icon">📑</div>
+                        <h3 class="feature-title">无限标签页支持</h3>
+                        <p class="feature-description">
+                            突破IDE原生的标签页数量限制，智能内存管理避免性能问题，优化标签页切换速度，保持标签页的状态和历史
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🧠</div>
+                        <h3 class="feature-title">智能标签页管理</h3>
+                        <p class="feature-description">
+                            基于使用频率的标签页排序，按项目自动分组标签页，自动折叠不常用的标签页，快速访问最近使用的标签页
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <h3 class="feature-title">高级搜索和导航</h3>
+                        <p class="feature-description">
+                            快速搜索和定位特定标签页，支持模糊搜索文件名，在标签页内容中搜索，键盘快捷键快速导航
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <h3 class="feature-title">界面定制</h3>
+                        <p class="feature-description">
+                            支持多种IDE主题，可自定义标签页布局和样式，文件类型图标显示，标签页状态和修改指示
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🔄</div>
+                        <h3 class="feature-title">会话管理</h3>
+                        <p class="feature-description">
+                            保存和恢复标签页会话，管理工作区标签页配置，启动时自动恢复上次会话，导入导出标签页配置
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🚀</div>
+                        <h3 class="feature-title">性能优化</h3>
+                        <p class="feature-description">
+                            延迟加载不活跃标签页，智能缓存提高响应速度，优化内存和CPU使用，异步操作避免界面卡顿
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. 系统架构 -->
+            <section id="系统架构" class="section">
+                <h2 class="section-title">3. 系统架构</h2>
+
+                <div class="architecture-diagram">
+                    <h3 class="arch-title">技术架构</h3>
+                    <div class="arch-flow">
+                        <div class="arch-layer">Cometix-Tab Extension</div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-layer">IDE Integration Layer (VSCode Extension API, JetBrains Platform SDK)</div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-layer">Native IDE (Tab System, File System, Project Explorer)</div>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">支持的IDE</h3>
+                    <div class="ide-support">
+                        <div class="ide-icon">
+                            <div class="ide-logo">💻</div>
+                            <div class="ide-name">Visual Studio Code</div>
+                            <div class="ide-version">v1.80.0+</div>
+                        </div>
+                        <div class="ide-icon">
+                            <div class="ide-logo">☕</div>
+                            <div class="ide-name">IntelliJ IDEA</div>
+                            <div class="ide-version">v2023.2+</div>
+                        </div>
+                        <div class="ide-icon">
+                            <div class="ide-logo">🐍</div>
+                            <div class="ide-name">PyCharm</div>
+                            <div class="ide-version">v2023.2+</div>
+                        </div>
+                        <div class="ide-icon">
+                            <div class="ide-logo">🌐</div>
+                            <div class="ide-name">WebStorm</div>
+                            <div class="ide-version">v2023.2+</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. 安装指南 -->
+            <section id="安装指南" class="section">
+                <h2 class="section-title">4. 安装指南</h2>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">VSCode 安装</h3>
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">从扩展市场安装</h4>
+                        <div class="code-block">
+                            <pre># 在VSCode中
+1. 打开扩展面板 (Ctrl+Shift+X)
+2. 搜索 "Cometix-Tab"
+3. 点击安装
+4. 重新加载VSCode</pre>
+                        </div>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">从VSIX文件安装</h4>
+                        <div class="code-block">
+                            <pre># 下载VSIX文件
+wget https://github.com/Haleclipse/Cometix-Tab/releases/latest/download/cometix-tab.vsix
+
+# 安装扩展
+code --install-extension cometix-tab.vsix</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">JetBrains IDE 安装</h3>
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">从插件市场安装</h4>
+                        <div class="code-block">
+                            <pre># 在JetBrains IDE中
+1. 打开 File -> Settings -> Plugins
+2. 搜索 "Cometix-Tab"
+3. 点击安装
+4. 重启IDE</pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. 配置说明 -->
+            <section id="配置说明" class="section">
+                <h2 class="section-title">5. 配置说明</h2>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">VSCode 配置</h3>
+                    <div class="code-block">
+                        <pre>{
+  "cometixTab.enabled": true,
+  "cometixTab.maxTabs": 1000,
+  "cometixTab.groupByProject": true,
+  "cometixTab.smartFolding": true,
+  "cometixTab.sessionAutoSave": true,
+  "cometixTab.searchEnabled": true,
+  "cometixTab.theme": "auto",
+  "cometixTab.showFileIcons": true,
+  "cometixTab.showModifiedDate": true
+}</pre>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">快捷键配置</h3>
+                    <div class="code-block">
+                        <pre>{
+  "key": "ctrl+shift+t",
+  "command": "cometixTab.togglePanel",
+  "when": "editorTextFocus"
+},
+{
+  "key": "ctrl+shift+f",
+  "command": "cometixTab.searchTabs",
+  "when": "editorTextFocus"
+}</pre>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">性能配置</h3>
+                    <div class="code-block">
+                        <pre>{
+  "cometixTab.performance": {
+    "lazyLoading": true,
+    "cacheSize": 100,
+    "maxMemoryUsage": 512,
+    "gcThreshold": 0.8,
+    "asyncOperations": true
+  }
+}</pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. 使用方法 -->
+            <section id="使用方法" class="section">
+                <h2 class="section-title">6. 使用方法</h2>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">基础使用</h3>
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">启用Cometix-Tab</h4>
+                        <div class="code-block">
+                            <pre># VSCode中
+1. 打开命令面板 (Ctrl+Shift+P)
+2. 输入 "Cometix-Tab: Enable"
+3. 选择启用</pre>
+                        </div>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">基础快捷键</h4>
+                        <ul>
+                            <li><strong>Ctrl+Shift+T</strong>：切换标签页面板</li>
+                            <li><strong>Ctrl+Shift+F</strong>：搜索标签页</li>
+                            <li><strong>Ctrl+Shift+O</strong>：打开新标签页</li>
+                            <li><strong>Ctrl+Shift+W</strong>：关闭标签页</li>
+                            <li><strong>Ctrl+Shift+Tab</strong>：在标签页间切换</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">高级功能</h3>
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">项目分组</h4>
+                        <div class="code-block">
+                            <pre>{
+  "cometixTab.projectGroups": {
+    "enabled": true,
+    "autoDetect": true,
+    "customGroups": {
+      "frontend": ["src/", "components/", "views/"],
+      "backend": ["api/", "models/", "controllers/"]
+    }
+  }
+}</pre>
+                        </div>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">搜索语法</h4>
+                        <ul>
+                            <li><code>filename:component.js</code>：按文件名搜索</li>
+                            <li><code>content:"useState hook"</code>：按内容搜索</li>
+                            <li><code>project:frontend</code>：按项目搜索</li>
+                            <li><code>modified:today</code>：按修改时间搜索</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. 故障排除 -->
+            <section id="故障排除" class="section">
+                <h2 class="section-title">7. 故障排除</h2>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">常见问题</h3>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">扩展无法加载</h4>
+                        <div class="code-block">
+                            <pre># 检查VSCode版本
+code --version
+
+# 重新安装扩展
+code --uninstall-extension haleclipse.cometix-tab
+code --install-extension haleclipse.cometix-tab</pre>
+                        </div>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">标签页显示异常</h4>
+                        <div class="code-block">
+                            <pre># 重置配置
+在VSCode中打开设置
+搜索 "cometixTab"
+点击 "Reset to Default"
+
+# 清理缓存
+rm -rf ~/.vscode/extensions/haleclipse.cometix-tab-*/
+rm -rf ~/.vscode/cometix-tab/</pre>
+                        </div>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">性能问题</h4>
+                        <div class="code-block">
+                            <pre># 调整性能配置
+{
+  "cometixTab.performance": {
+    "lazyLoading": true,
+    "cacheSize": 50,
+    "maxMemoryUsage": 256
+  }
+}
+
+# 监控性能
+Cometix-Tab: Show Performance Stats</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tip">
+                    <p><strong>提示</strong>: Cometix-Tab 是一个活跃开发的开源项目，如果你觉得有用，请考虑给项目一个 Star，或者参与贡献代码！让你的IDE标签页管理体验更上一层楼！</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // 创建粒子效果
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('.toc-link').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 初始化
+        createParticles();
+
+        // 滚动时的渐入效果
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // 观察所有section
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(30px)';
+            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(section);
+        });
+
+        // 标签页交互效果
+        document.querySelectorAll('.ide-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.ide-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

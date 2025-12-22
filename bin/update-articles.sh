@@ -43,9 +43,11 @@ extract_metadata() {
     elif [[ "$relative_path" == chapter02/* ]]; then
         category="使用技巧"
     elif [[ "$relative_path" == chapter03/* ]]; then
-        category="插件工具"
+        category="使用工具"
     elif [[ "$relative_path" == chapter04/* ]]; then
-        category="开发工具"
+        category="最新动态"
+    elif [[ "$relative_path" == chapter04/* ]]; then
+        category="网络工具"
     else
         category="其他"
     fi

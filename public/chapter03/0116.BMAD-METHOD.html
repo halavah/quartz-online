@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMAD Method - 多智能体协作框架</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #8b5cf6;
+            --secondary-color: #f59e0b;
+            --accent-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --gradient-1: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            --gradient-2: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 背景动画 */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.2) 0%, transparent 50%);
+            animation: particlesMove 20s ease-in-out infinite;
+        }
+
+        @keyframes particlesMove {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(1deg); }
+            66% { transform: translateY(20px) rotate(-1deg); }
+        }
+
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .floating-element:nth-child(1) {
+            width: 120px;
+            height: 120px;
+            left: 10%;
+            top: 20%;
+            animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+            width: 80px;
+            height: 80px;
+            right: 15%;
+            top: 30%;
+            animation-delay: 2s;
+        }
+
+        .floating-element:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            left: 60%;
+            bottom: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(180deg); }
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 导航栏 */
+        nav {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Hero 部分 */
+        .hero {
+            padding: 8rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1), transparent);
+            border-radius: 50%;
+            animation: heroGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes heroGlow {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 智能体协作演示 */
+        .collaboration-demo {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .collaboration-demo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-1);
+        }
+
+        .bmad-cycle {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .cycle-phase {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .cycle-phase:hover {
+            transform: translateY(-5px);
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+        }
+
+        .phase-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1.5rem;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        .phase-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+            font-size: 1.2rem;
+        }
+
+        .phase-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* 智能体网格演示 */
+        .agents-grid {
+            background: rgba(15, 23, 42, 0.95);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            margin: 3rem 0;
+        }
+
+        .grid-header {
+            background: rgba(30, 41, 59, 0.9);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .grid-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .grid-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .control-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .control-dot:hover {
+            opacity: 0.8;
+        }
+
+        .control-close { background: #ef4444; }
+        .control-minimize { background: #f59e0b; }
+        .control-maximize { background: #10b981; }
+
+        .grid-body {
+            padding: 2rem;
+            min-height: 400px;
+        }
+
+        .agents-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .agent-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-2);
+        }
+
+        .agent-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 15px 30px rgba(139, 92, 246, 0.2);
+        }
+
+        .agent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .agent-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            animation: statusPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        .agent-type {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .agent-capabilities {
+            margin-top: 1rem;
+        }
+
+        .capability-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .capability-tag {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--primary-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        /* 工作流演示 */
+        .workflow-demo {
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 3rem 0;
+        }
+
+        .workflow-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .workflow-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .workflow-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .workflow-button {
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .workflow-button:hover {
+            background: rgba(139, 92, 246, 0.3);
+            border-color: rgba(139, 92, 246, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .workflow-button.active {
+            background: var(--gradient-1);
+            border-color: transparent;
+        }
+
+        .workflow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .workflow-step:hover {
+            transform: translateX(10px);
+            border-color: rgba(139, 92, 246, 0.3);
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .step-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .step-agent {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .step-arrow {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            align-self: center;
+            margin-left: 1rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(5px); }
+        }
+
+        /* 功能特性 */
+        .features {
+            padding: 4rem 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1.5rem;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 系统架构 */
+        .architecture {
+            padding: 4rem 0;
+        }
+
+        .arch-diagram {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 3rem;
+            margin: 2rem 0;
+        }
+
+        .arch-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .arch-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .arch-box:hover {
+            transform: translateY(-5px);
+            border-color: rgba(139, 92, 246, 0.3);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .arch-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+            font-size: 1.1rem;
+        }
+
+        .arch-items {
+            list-style: none;
+            text-align: left;
+        }
+
+        .arch-items li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        .arch-items li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+        }
+
+        /* 安装指南 */
+        .install-section {
+            padding: 4rem 0;
+        }
+
+        .install-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .install-method {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .install-method:hover {
+            transform: translateY(-5px);
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+        }
+
+        .install-method::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-2);
+        }
+
+        .method-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .method-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        /* 代码示例 */
+        .code-example {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .code-title {
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .copy-button {
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background: rgba(139, 92, 246, 0.3);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        .copy-button.copied {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: var(--success-color);
+        }
+
+        pre {
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 3rem 0;
+            margin-top: 6rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--text-primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .bmad-cycle {
+                grid-template-columns: 1fr;
+            }
+
+            .agents-container {
+                grid-template-columns: 1fr;
+            }
+
+            .workflow-step {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .step-arrow {
+                transform: rotate(90deg);
+                margin: 1rem 0;
+            }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(139, 92, 246, 0.5);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(139, 92, 246, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景动画 -->
+    <div class="bg-animation">
+        <div class="particles"></div>
+        <div class="floating-elements">
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+        </div>
+    </div>
+
+    <!-- 导航栏 -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">🤖 BMAD Method</div>
+            <ul class="nav-links">
+                <li><a href="#demo">协作框架</a></li>
+                <li><a href="#features">功能特性</a></li>
+                <li><a href="#architecture">系统架构</a></li>
+                <li><a href="#install">安装指南</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero 部分 -->
+    <section class="hero">
+        <div class="container">
+            <h1>BMAD Method</h1>
+            <p class="subtitle">多智能体协作框架，通过敏捷驱动开发工作流轻松打造复杂的AI应用系统，提供智能体编排、任务分解、协同工作等功能</p>
+        </div>
+    </section>
+
+    <!-- 智能体协作演示 -->
+    <section id="demo" class="container">
+        <div class="collaboration-demo">
+            <h2 style="text-align: center; margin-bottom: 3rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                BMAD 开发周期
+            </h2>
+
+            <div class="bmad-cycle">
+                <div class="cycle-phase">
+                    <div class="phase-icon">🏗️</div>
+                    <div class="phase-title">Build</div>
+                    <div class="phase-description">需求分析、架构设计、智能体配置、工作流定义</div>
+                </div>
+
+                <div class="cycle-phase">
+                    <div class="phase-icon">📊</div>
+                    <div class="phase-title">Monitor</div>
+                    <div class="phase-description">实时监控、性能跟踪、质量检查、异常检测</div>
+                </div>
+
+                <div class="cycle-phase">
+                    <div class="phase-icon">🔄</div>
+                    <div class="phase-title">Adapt</div>
+                    <div class="phase-description">性能优化、流程调整、智能体更新、策略改进</div>
+                </div>
+
+                <div class="cycle-phase">
+                    <div class="phase-icon">🚀</div>
+                    <div class="phase-title">Deploy</div>
+                    <div class="phase-description">系统集成、测试验证、生产部署、运维支持</div>
+                </div>
+            </div>
+
+            <!-- 智能体网格演示 -->
+            <h3 style="text-align: center; margin: 4rem 0 2rem; font-size: 1.8rem; color: var(--text-primary);">
+                多智能体协作网络
+            </h3>
+
+            <div class="agents-grid">
+                <div class="grid-header">
+                    <div class="grid-title">BMAD Agent Registry - 智能体注册中心</div>
+                    <div class="grid-controls">
+                        <div class="control-dot control-close"></div>
+                        <div class="control-dot control-minimize"></div>
+                        <div class="control-dot control-maximize"></div>
+                    </div>
+                </div>
+                <div class="grid-body">
+                    <div class="agents-container">
+                        <div class="agent-card">
+                            <div class="agent-header">
+                                <div class="agent-name">编码专家</div>
+                                <div class="agent-status"></div>
+                            </div>
+                            <div class="agent-type">Claude-3-Opus</div>
+                            <div class="agent-capabilities">
+                                <div class="capability-tags">
+                                    <span class="capability-tag">代码生成</span>
+                                    <span class="capability-tag">代码审查</span>
+                                    <span class="capability-tag">重构优化</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="agent-card">
+                            <div class="agent-header">
+                                <div class="agent-name">测试专家</div>
+                                <div class="agent-status"></div>
+                            </div>
+                            <div class="agent-type">Claude-3-Sonnet</div>
+                            <div class="agent-capabilities">
+                                <div class="capability-tags">
+                                    <span class="capability-tag">单元测试</span>
+                                    <span class="capability-tag">集成测试</span>
+                                    <span class="capability-tag">性能测试</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="agent-card">
+                            <div class="agent-header">
+                                <div class="agent-name">架构师</div>
+                                <div class="agent-status"></div>
+                            </div>
+                            <div class="agent-type">Claude-3-Opus</div>
+                            <div class="agent-capabilities">
+                                <div class="capability-tags">
+                                    <span class="capability-tag">系统设计</span>
+                                    <span class="capability-tag">架构评审</span>
+                                    <span class="capability-tag">技术选型</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="agent-card">
+                            <div class="agent-header">
+                                <div class="agent-name">文档专家</div>
+                                <div class="agent-status"></div>
+                            </div>
+                            <div class="agent-type">Claude-3-Haiku</div>
+                            <div class="agent-capabilities">
+                                <div class="capability-tags">
+                                    <span class="capability-tag">API文档</span>
+                                    <span class="capability-tag">用户手册</span>
+                                    <span class="capability-tag">技术博客</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="agent-card">
+                            <div class="agent-header">
+                                <div class="agent-name">DevOps专家</div>
+                                <div class="agent-status"></div>
+                            </div>
+                            <div class="agent-type">Claude-3-Sonnet</div>
+                            <div class="agent-capabilities">
+                                <div class="capability-tags">
+                                    <span class="capability-tag">CI/CD</span>
+                                    <span class="capability-tag">容器化</span>
+                                    <span class="capability-tag">监控部署</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="agent-card">
+                            <div class="agent-header">
+                                <div class="agent-name">产品经理</div>
+                                <div class="agent-status"></div>
+                            </div>
+                            <div class="agent-type">Claude-3-Opus</div>
+                            <div class="agent-capabilities">
+                                <div class="capability-tags">
+                                    <span class="capability-tag">需求分析</span>
+                                    <span class="capability-tag">项目管理</span>
+                                    <span class="capability-tag">用户调研</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 工作流演示 -->
+    <section class="container">
+        <div class="workflow-demo">
+            <div class="workflow-header">
+                <div class="workflow-title">🔄 敏捷工作流演示</div>
+                <div class="workflow-controls">
+                    <button class="workflow-button active" onclick="setWorkflow(this, 'development')">软件开发</button>
+                    <button class="workflow-button" onclick="setWorkflow(this, 'testing')">测试流程</button>
+                    <button class="workflow-button" onclick="setWorkflow(this, 'deployment')">部署流程</button>
+                </div>
+            </div>
+
+            <div class="workflow-steps" id="workflow-steps">
+                <div class="workflow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">需求分析</div>
+                        <div class="step-description">产品经理智能体分析用户需求，制定功能规格说明书</div>
+                    </div>
+                    <div class="step-agent">产品经理</div>
+                    <div class="step-arrow">→</div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">架构设计</div>
+                        <div class="step-description">架构师智能体设计系统架构，选择技术栈和组件</div>
+                    </div>
+                    <div class="step-agent">架构师</div>
+                    <div class="step-arrow">→</div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">代码实现</div>
+                        <div class="step-description">编码专家智能体根据架构设计实现核心功能</div>
+                    </div>
+                    <div class="step-agent">编码专家</div>
+                    <div class="step-arrow">→</div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-title">测试验证</div>
+                        <div class="step-description">测试专家智能体进行全面测试，确保代码质量</div>
+                    </div>
+                    <div class="step-agent">测试专家</div>
+                    <div class="step-arrow">→</div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <div class="step-title">文档编写</div>
+                        <div class="step-description">文档专家智能体编写用户文档和API文档</div>
+                    </div>
+                    <div class="step-agent">文档专家</div>
+                    <div class="step-arrow">→</div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <div class="step-title">部署上线</div>
+                        <div class="step-description">DevOps专家智能体部署应用到生产环境</div>
+                    </div>
+                    <div class="step-agent">DevOps专家</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 功能特性 -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                核心功能特性
+            </h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
+                完整的多智能体协作开发解决方案
+            </p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="feature-title">智能体管理</h3>
+                    <p class="feature-description">智能体注册、生命周期管理、能力映射和性能监控，动态管理多个AI智能体</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <h3 class="feature-title">任务分解与分配</h3>
+                    <p class="feature-description">智能分析任务复杂度、动态分解子任务、最优分配和负载均衡</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">协作协调</h3>
+                    <p class="feature-description">标准化通信协议、冲突解决、协同决策和状态同步机制</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">监控与分析</h3>
+                    <p class="feature-description">实时监控、性能分析、瓶颈识别和自动报告生成</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3 class="feature-title">部署与扩展</h3>
+                    <p class="feature-description">自动部署、弹性扩展、版本管理和快速回滚机制</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔧</div>
+                    <h3 class="feature-title">开发工具</h3>
+                    <p class="feature-description">可视化编辑器、调试工具、模拟环境和自动文档生成</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 系统架构 -->
+    <section id="architecture" class="architecture">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                系统架构
+            </h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
+                模块化设计，支持大规模智能体协作
+            </p>
+
+            <div class="arch-diagram">
+                <div class="arch-container">
+                    <div class="arch-box">
+                        <div class="arch-title">Agent Registry</div>
+                        <ul class="arch-items">
+                            <li>服务发现</li>
+                            <li>健康检查</li>
+                            <li>能力目录</li>
+                            <li>负载均衡</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-box">
+                        <div class="arch-title">Task Manager</div>
+                        <ul class="arch-items">
+                            <li>任务队列</li>
+                            <li>智能调度器</li>
+                            <li>依赖管理</li>
+                            <li>状态跟踪</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-box">
+                        <div class="arch-title">Workflow Engine</div>
+                        <ul class="arch-items">
+                            <li>流程定义</li>
+                            <li>执行引擎</li>
+                            <li>条件分支</li>
+                            <li>错误处理</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-box">
+                        <div class="arch-title">Communication Layer</div>
+                        <ul class="arch-items">
+                            <li>消息总线</li>
+                            <li>协议适配</li>
+                            <li>安全认证</li>
+                            <li>数据序列化</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-box">
+                        <div class="arch-title">Monitoring System</div>
+                        <ul class="arch-items">
+                            <li>实时监控</li>
+                            <li>性能分析</li>
+                            <li>告警系统</li>
+                            <li>日志收集</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-box">
+                        <div class="arch-title">Execution Environment</div>
+                        <ul class="arch-items">
+                            <li>Docker容器</li>
+                            <li>Kubernetes集群</li>
+                            <li>云基础设施</li>
+                            <li>资源管理</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 安装指南 -->
+    <section id="install" class="install-section">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                安装指南
+            </h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
+                多种部署方式，快速搭建多智能体协作环境
+            </p>
+
+            <div class="install-methods">
+                <div class="install-method">
+                    <div class="method-title">
+                        <div class="method-icon">🐳</div>
+                        Docker Compose 部署
+                    </div>
+                    <div class="code-example">
+                        <div class="code-header">
+                            <span class="code-title">部署命令</span>
+                            <button class="copy-button" onclick="copyCode(this)">复制代码</button>
+                        </div>
+                        <pre><code># 克隆仓库
+git clone https://github.com/bmadcode/BMAD-METHOD.git
+cd BMAD-METHOD
+
+# 启动服务
+docker-compose up -d
+
+# 验证安装
+curl http://localhost:8080/health</code></pre>
+                    </div>
+                </div>
+
+                <div class="install-method">
+                    <div class="method-title">
+                        <div class="method-icon">☸️</div>
+                        Kubernetes 部署
+                    </div>
+                    <div class="code-example">
+                        <div class="code-header">
+                            <span class="code-title">部署命令</span>
+                            <button class="copy-button" onclick="copyCode(this)">复制代码</button>
+                        </div>
+                        <pre><code># 应用 Kubernetes 配置
+kubectl apply -f k8s/
+
+# 查看部署状态
+kubectl get pods -n bmad-system
+
+# 获取服务地址
+kubectl get svc -n bmad-system</code></pre>
+                    </div>
+                </div>
+
+                <div class="install-method">
+                    <div class="method-title">
+                        <div class="method-icon">🔧</div>
+                        源码安装
+                    </div>
+                    <div class="code-example">
+                        <div class="code-header">
+                            <span class="code-title">安装命令</span>
+                            <button class="copy-button" onclick="copyCode(this)">复制代码</button>
+                        </div>
+                        <pre><code># 克隆仓库
+git clone https://github.com/bmadcode/BMAD-METHOD.git
+cd BMAD-METHOD
+
+# 安装依赖
+npm install
+
+# 构建项目
+npm run build
+
+# 启动服务
+npm start</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-example" style="margin-top: 3rem;">
+                <div class="code-header">
+                    <span class="code-title">基础配置示例 (~/.bmad/config.yaml)</span>
+                    <button class="copy-button" onclick="copyCode(this)">复制代码</button>
+                </div>
+                <pre><code>server:
+  host: "0.0.0.0"
+  port: 8080
+  workers: 4
+
+agents:
+  registry:
+    enabled: true
+    auto_discovery: true
+    health_check_interval: 30
+
+  communication:
+    protocol: "grpc"
+    timeout: 30000
+
+workflows:
+  default_timeout: 3600
+  max_concurrent: 10
+  retry_policy:
+    max_retries: 3
+    backoff: "exponential"
+
+monitoring:
+  enabled: true
+  metrics_interval: 60
+  log_level: "info"</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>项目链接</h3>
+                    <ul>
+                        <li><a href="https://github.com/bmadcode/BMAD-METHOD">GitHub仓库</a></li>
+                        <li><a href="https://github.com/bmadcode/BMAD-METHOD/issues">问题反馈</a></li>
+                        <li><a href="https://github.com/bmadcode/BMAD-METHOD/discussions">用户讨论</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>相关资源</h3>
+                    <ul>
+                        <li><a href="https://bmad-method.docs.com/">官方文档</a></li>
+                        <li><a href="https://github.com/bmadcode/BMAD-METHOD-examples">示例项目</a></li>
+                        <li><a href="https://www.youtube.com/playlist?list=BMAD_TUTORIALS">视频教程</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>开发指南</h3>
+                    <ul>
+                        <li><a href="#">快速开始</a></li>
+                        <li><a href="#">智能体开发</a></li>
+                        <li><a href="#">工作流设计</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 bmadcode. 开源项目，采用Apache 2.0许可证。BMAD Method让多智能体协作开发更加简单和高效！</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 复制代码功能
+        function copyCode(button) {
+            const codeBlock = button.parentElement.parentElement.querySelector('code');
+            const text = codeBlock.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                button.textContent = '已复制';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.textContent = '复制代码';
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('复制失败:', err);
+            });
+        }
+
+        // 工作流切换
+        function setWorkflow(button, type) {
+            // 移除所有按钮的active类
+            document.querySelectorAll('.workflow-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // 添加active类到当前按钮
+            button.classList.add('active');
+
+            // 更新工作流内容
+            updateWorkflowContent(type);
+        }
+
+        function updateWorkflowContent(type) {
+            const workflowSteps = document.getElementById('workflow-steps');
+
+            const workflows = {
+                development: [
+                    { title: '需求分析', desc: '产品经理智能体分析用户需求，制定功能规格说明书', agent: '产品经理' },
+                    { title: '架构设计', desc: '架构师智能体设计系统架构，选择技术栈和组件', agent: '架构师' },
+                    { title: '代码实现', desc: '编码专家智能体根据架构设计实现核心功能', agent: '编码专家' },
+                    { title: '测试验证', desc: '测试专家智能体进行全面测试，确保代码质量', agent: '测试专家' },
+                    { title: '文档编写', desc: '文档专家智能体编写用户文档和API文档', agent: '文档专家' },
+                    { title: '部署上线', desc: 'DevOps专家智能体部署应用到生产环境', agent: 'DevOps专家' }
+                ],
+                testing: [
+                    { title: '测试计划', desc: '测试专家智能体制订测试计划和策略', agent: '测试专家' },
+                    { title: '单元测试', desc: '编码专家智能体编写单元测试用例', agent: '编码专家' },
+                    { title: '集成测试', desc: '测试专家智能体进行系统集成测试', agent: '测试专家' },
+                    { title: '性能测试', desc: '性能测试专家智能体执行压力测试', agent: '性能专家' },
+                    { title: '安全测试', desc: '安全专家智能体进行安全漏洞扫描', agent: '安全专家' },
+                    { title: '测试报告', desc: '测试经理智能体生成测试报告', agent: '测试经理' }
+                ],
+                deployment: [
+                    { title: '环境准备', desc: 'DevOps专家智能体准备部署环境', agent: 'DevOps专家' },
+                    { title: '镜像构建', desc: '构建专家智能体构建Docker镜像', agent: '构建专家' },
+                    { title: '配置部署', desc: '部署专家智能体配置K8s部署文件', agent: '部署专家' },
+                    { title: '滚动发布', desc: '发布专家智能体执行滚动更新', agent: '发布专家' },
+                    { title: '健康检查', desc: '监控专家智能体检查应用健康状态', agent: '监控专家' },
+                    { title: '完成验证', desc: '验证专家智能体验证部署结果', agent: '验证专家' }
+                ]
+            };
+
+            const currentWorkflow = workflows[type];
+            let stepsHTML = '';
+
+            currentWorkflow.forEach((step, index) => {
+                const isLast = index === currentWorkflow.length - 1;
+                stepsHTML += `
+                    <div class="workflow-step">
+                        <div class="step-number">${index + 1}</div>
+                        <div class="step-content">
+                            <div class="step-title">${step.title}</div>
+                            <div class="step-description">${step.desc}</div>
+                        </div>
+                        <div class="step-agent">${step.agent}</div>
+                        ${!isLast ? '<div class="step-arrow">→</div>' : ''}
+                    </div>
+                `;
+            });
+
+            workflowSteps.innerHTML = stepsHTML;
+
+            // 重新添加动画
+            setTimeout(() => {
+                document.querySelectorAll('.workflow-step').forEach((step, index) => {
+                    step.style.opacity = '0';
+                    step.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        step.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                        step.style.opacity = '1';
+                        step.style.transform = 'translateY(0)';
+                    }, index * 100);
+                });
+            }, 100);
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 动态加载动画
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // 观察所有卡片
+        document.querySelectorAll('.cycle-phase, .feature-card, .install-method, .arch-box').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+
+        // 智能体状态更新动画
+        function updateAgentStatus() {
+            const statusDots = document.querySelectorAll('.agent-status');
+
+            statusDots.forEach((dot, index) => {
+                setTimeout(() => {
+                    // 随机改变状态颜色
+                    const colors = ['var(--accent-color)', 'var(--warning-color)', 'var(--primary-color)'];
+                    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                    dot.style.background = randomColor;
+                    dot.style.transition = 'background 0.5s ease';
+                }, index * 200);
+            });
+        }
+
+        // 每5秒更新一次状态
+        setInterval(updateAgentStatus, 5000);
+
+        // 添加智能体卡片悬停效果
+        document.querySelectorAll('.agent-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // 粒子效果增强
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.style.position = 'absolute';
+            particle.style.width = Math.random() * 6 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.background = 'rgba(139, 92, 246, 0.6)';
+            particle.style.borderRadius = '50%';
+            particle.style.pointerEvents = 'none';
+
+            const startX = Math.random() * window.innerWidth;
+            const startY = Math.random() * window.innerHeight;
+
+            particle.style.left = startX + 'px';
+            particle.style.top = startY + 'px';
+
+            document.querySelector('.particles').appendChild(particle);
+
+            const duration = Math.random() * 3000 + 2000;
+            const endX = startX + (Math.random() - 0.5) * 200;
+            const endY = startY + (Math.random() - 0.5) * 200;
+
+            particle.animate([
+                { transform: `translate(0, 0) scale(1)`, opacity: 1 },
+                { transform: `translate(${endX - startX}px, ${endY - startY}px) scale(0)`, opacity: 0 }
+            ], {
+                duration: duration,
+                easing: 'ease-out'
+            }).onfinish = () => particle.remove();
+        }
+
+        // 定期创建新粒子
+        setInterval(createParticle, 500);
+    </script>
+</body>
+</html>

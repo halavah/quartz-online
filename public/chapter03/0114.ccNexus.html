@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCNexus - 智能API网关</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #8b5cf6;
+            --secondary-color: #06b6d4;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --gradient-1: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            --gradient-2: linear-gradient(135deg, var(--accent-color), var(--success-color));
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 背景动画 */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(59, 130, 246, 0.2) 0%, transparent 50%);
+            animation: particlesMove 20s ease-in-out infinite;
+        }
+
+        @keyframes particlesMove {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(1deg); }
+            66% { transform: translateY(20px) rotate(-1deg); }
+        }
+
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .floating-element:nth-child(1) {
+            width: 120px;
+            height: 120px;
+            left: 10%;
+            top: 20%;
+            animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+            width: 80px;
+            height: 80px;
+            right: 15%;
+            top: 30%;
+            animation-delay: 2s;
+        }
+
+        .floating-element:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            left: 60%;
+            bottom: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(180deg); }
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 导航栏 */
+        nav {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Hero 部分 */
+        .hero {
+            padding: 8rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1), transparent);
+            border-radius: 50%;
+            animation: heroGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes heroGlow {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 网关演示 */
+        .gateway-demo {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gateway-demo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-1);
+        }
+
+        .gateway-flow {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+            align-items: center;
+        }
+
+        .flow-item {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .flow-item:hover {
+            transform: translateY(-5px);
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+        }
+
+        .flow-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1.5rem;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        .flow-arrow {
+            position: absolute;
+            right: -1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            color: var(--accent-color);
+            animation: arrowMove 2s ease-in-out infinite;
+        }
+
+        @keyframes arrowMove {
+            0%, 100% { transform: translateY(-50%) translateX(0); }
+            50% { transform: translateY(-50%) translateX(10px); }
+        }
+
+        .flow-item:last-child .flow-arrow {
+            display: none;
+        }
+
+        .flow-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+        }
+
+        .flow-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* 提供商状态 */
+        .provider-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        .provider-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .provider-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-2);
+        }
+
+        .provider-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(6, 182, 212, 0.3);
+            box-shadow: 0 20px 40px rgba(6, 182, 212, 0.2);
+        }
+
+        .provider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .provider-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .provider-status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-healthy {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success-color);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning-color);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .provider-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .metric-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* 负载均衡演示 */
+        .load-balancer-demo {
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 3rem 0;
+        }
+
+        .balancer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .balancer-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .balancer-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .control-button {
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .control-button:hover {
+            background: rgba(139, 92, 246, 0.3);
+            border-color: rgba(139, 92, 246, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .control-button.active {
+            background: var(--gradient-1);
+            border-color: transparent;
+        }
+
+        .request-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .request-source {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+        }
+
+        .request-destinations {
+            display: flex;
+            gap: 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .destination {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .destination:hover {
+            transform: scale(1.05);
+            background: rgba(16, 185, 129, 0.3);
+        }
+
+        .request-paths {
+            position: absolute;
+            top: 50%;
+            left: 15%;
+            right: 15%;
+            height: 2px;
+            background: rgba(139, 92, 246, 0.3);
+            z-index: 1;
+        }
+
+        .request-particle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: requestFlow 3s ease-in-out infinite;
+        }
+
+        @keyframes requestFlow {
+            0% { left: 15%; }
+            100% { left: 85%; }
+        }
+
+        /* 功能特性 */
+        .features {
+            padding: 4rem 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1.5rem;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 系统架构 */
+        .architecture {
+            padding: 4rem 0;
+        }
+
+        .arch-diagram {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 3rem;
+            margin: 2rem 0;
+        }
+
+        .arch-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .arch-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .arch-box:hover {
+            transform: translateY(-5px);
+            border-color: rgba(139, 92, 246, 0.3);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .arch-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+            font-size: 1.1rem;
+        }
+
+        .arch-items {
+            list-style: none;
+            text-align: left;
+        }
+
+        .arch-items li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        .arch-items li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+        }
+
+        /* 配置示例 */
+        .config-example {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .config-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .config-title {
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .copy-button {
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background: rgba(139, 92, 246, 0.3);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        .copy-button.copied {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: var(--success-color);
+        }
+
+        pre {
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* 安装指南 */
+        .install-section {
+            padding: 4rem 0;
+        }
+
+        .install-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .install-method {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .install-method:hover {
+            transform: translateY(-5px);
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+        }
+
+        .install-method::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-2);
+        }
+
+        .method-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .method-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 3rem 0;
+            margin-top: 6rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--text-primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .gateway-flow {
+                grid-template-columns: 1fr;
+            }
+
+            .flow-arrow {
+                display: none;
+            }
+
+            .flow-item {
+                margin-bottom: 2rem;
+            }
+
+            .flow-item::after {
+                content: '↓';
+                position: absolute;
+                bottom: -1.5rem;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 1.5rem;
+                color: var(--accent-color);
+            }
+
+            .arch-container {
+                grid-template-columns: 1fr;
+            }
+
+            .provider-status {
+                grid-template-columns: 1fr;
+            }
+
+            .request-destinations {
+                flex-direction: column;
+            }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(139, 92, 246, 0.5);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(139, 92, 246, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景动画 -->
+    <div class="bg-animation">
+        <div class="particles"></div>
+        <div class="floating-elements">
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+        </div>
+    </div>
+
+    <!-- 导航栏 -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">🌐 CCNexus</div>
+            <ul class="nav-links">
+                <li><a href="#demo">网关演示</a></li>
+                <li><a href="#features">功能特性</a></li>
+                <li><a href="#architecture">系统架构</a></li>
+                <li><a href="#install">安装指南</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero 部分 -->
+    <section class="hero">
+        <div class="container">
+            <h1>CCNexus</h1>
+            <p class="subtitle">专为Claude Code和Codex CLI设计的智能API网关，支持多平台集成、端点轮换、使用监控和负载均衡，提供可靠性和性能增强</p>
+        </div>
+    </section>
+
+    <!-- 网关演示 -->
+    <section id="demo" class="container">
+        <div class="gateway-demo">
+            <h2 style="text-align: center; margin-bottom: 3rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                智能API网关工作流程
+            </h2>
+
+            <div class="gateway-flow">
+                <div class="flow-item">
+                    <div class="flow-icon">👥</div>
+                    <div class="flow-title">客户端应用</div>
+                    <div class="flow-description">Claude Code、Codex CLI等AI编程助手</div>
+                    <div class="flow-arrow">→</div>
+                </div>
+
+                <div class="flow-item">
+                    <div class="flow-icon">🚪</div>
+                    <div class="flow-title">CCNexus网关</div>
+                    <div class="flow-description">请求路由、负载均衡、健康监控</div>
+                    <div class="flow-arrow">→</div>
+                </div>
+
+                <div class="flow-item">
+                    <div class="flow-icon">⚖️</div>
+                    <div class="flow-title">负载均衡器</div>
+                    <div class="flow-description">智能分配、故障转移、性能优化</div>
+                    <div class="flow-arrow">→</div>
+                </div>
+
+                <div class="flow-item">
+                    <div class="flow-icon">🔗</div>
+                    <div class="flow-title">API提供商</div>
+                    <div class="flow-description">OpenAI、Anthropic、Gemini等服务</div>
+                </div>
+            </div>
+
+            <!-- 提供商状态监控 -->
+            <h3 style="text-align: center; margin: 3rem 0 2rem; font-size: 1.8rem; color: var(--text-primary);">
+                实时提供商状态
+            </h3>
+
+            <div class="provider-status">
+                <div class="provider-card">
+                    <div class="provider-header">
+                        <div class="provider-name">🤖 OpenAI</div>
+                        <div class="provider-status-badge status-healthy">健康</div>
+                    </div>
+                    <div class="provider-metrics">
+                        <div class="metric-item">
+                            <span class="metric-label">响应时间</span>
+                            <span class="metric-value">245ms</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">成功率</span>
+                            <span class="metric-value">99.2%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">请求/分钟</span>
+                            <span class="metric-value">1,234</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">权重</span>
+                            <span class="metric-value">3</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="provider-card">
+                    <div class="provider-header">
+                        <div class="provider-name">🧠 Anthropic</div>
+                        <div class="provider-status-badge status-healthy">健康</div>
+                    </div>
+                    <div class="provider-metrics">
+                        <div class="metric-item">
+                            <span class="metric-label">响应时间</span>
+                            <span class="metric-value">189ms</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">成功率</span>
+                            <span class="metric-value">99.8%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">请求/分钟</span>
+                            <span class="metric-value">892</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">权重</span>
+                            <span class="metric-value">4</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="provider-card">
+                    <div class="provider-header">
+                        <div class="provider-name">🌟 Gemini</div>
+                        <div class="provider-status-badge status-warning">警告</div>
+                    </div>
+                    <div class="provider-metrics">
+                        <div class="metric-item">
+                            <span class="metric-label">响应时间</span>
+                            <span class="metric-value">456ms</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">成功率</span>
+                            <span class="metric-value">97.5%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">请求/分钟</span>
+                            <span class="metric-value">567</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">权重</span>
+                            <span class="metric-value">2</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 负载均衡演示 -->
+            <div class="load-balancer-demo">
+                <div class="balancer-header">
+                    <div class="balancer-title">⚖️ 负载均衡演示</div>
+                    <div class="balancer-controls">
+                        <button class="control-button active" onclick="setStrategy(this, 'weighted')">加权轮询</button>
+                        <button class="control-button" onclick="setStrategy(this, 'round-robin')">轮询</button>
+                        <button class="control-button" onclick="setStrategy(this, 'least-connections')">最少连接</button>
+                    </div>
+                </div>
+
+                <div class="request-flow">
+                    <div class="request-source">📥 请求进入</div>
+                    <div class="request-paths">
+                        <div class="request-particle"></div>
+                    </div>
+                    <div class="request-destinations">
+                        <div class="destination">OpenAI</div>
+                        <div class="destination">Anthropic</div>
+                        <div class="destination">Gemini</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 功能特性 -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                核心功能特性
+            </h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
+                为AI API提供企业级的网关解决方案
+            </p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">多提供商支持</h3>
+                    <p class="feature-description">统一管理OpenAI、Anthropic、Gemini等多个AI平台，支持自定义提供商和混合使用</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⚖️</div>
+                    <h3 class="feature-title">智能负载均衡</h3>
+                    <p class="feature-description">多种负载均衡策略，健康检查，故障转移，动态权重调整，确保高可用性</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">使用监控</h3>
+                    <p class="feature-description">实时统计、成本分析、性能监控、告警通知和详细的报告生成</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 class="feature-title">安全功能</h3>
+                    <p class="feature-description">API密钥管理、访问控制、请求限制、数据加密和完整的审计日志</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3 class="feature-title">性能优化</h3>
+                    <p class="feature-description">连接池、异步处理、压缩传输、CDN集成和多级缓存策略</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔧</div>
+                    <h3 class="feature-title">高级特性</h3>
+                    <p class="feature-description">智能缓存、请求转换、协议适配、插件系统和配置热重载</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 系统架构 -->
+    <section id="architecture" class="architecture">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                系统架构
+            </h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
+                模块化设计，高效协同工作
+            </p>
+
+            <div class="arch-diagram">
+                <div class="arch-container">
+                    <div class="arch-box">
+                        <div class="arch-title">Request Router</div>
+                        <ul class="arch-items">
+                            <li>请求解析和验证</li>
+                            <li>路由决策引擎</li>
+                            <li>协议转换</li>
+                            <li>响应处理</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-box">
+                        <div class="arch-title">Load Balancer</div>
+                        <ul class="arch-items">
+                            <li>多种分配算法</li>
+                            <li>动态权重管理</li>
+                            <li>健康检查</li>
+                            <li>故障检测</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-box">
+                        <div class="arch-title">Health Monitor</div>
+                        <ul class="arch-items">
+                            <li>实时状态监控</li>
+                            <li>性能指标监控</li>
+                            <li>告警系统</li>
+                            <li>统计数据收集</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-box">
+                        <div class="arch-title">Rate Limiter</div>
+                        <ul class="arch-items">
+                            <li>请求限制</li>
+                            <li>配额管理</li>
+                            <li>优先级处理</li>
+                            <li>流量控制</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-box">
+                        <div class="arch-title">Analytics Engine</div>
+                        <ul class="arch-items">
+                            <li>实时分析</li>
+                            <li>成本统计</li>
+                            <li>性能报告</li>
+                            <li>趋势预测</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-box">
+                        <div class="arch-title">Security Layer</div>
+                        <ul class="arch-items">
+                            <li>身份验证</li>
+                            <li>授权控制</li>
+                            <li>数据加密</li>
+                            <li>威胁检测</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 安装指南 -->
+    <section id="install" class="install-section">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                安装指南
+            </h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
+                多种安装方式，快速部署使用
+            </p>
+
+            <div class="install-methods">
+                <div class="install-method">
+                    <div class="method-title">
+                        <div class="method-icon">📦</div>
+                        预编译二进制文件
+                    </div>
+                    <div class="config-example">
+                        <div class="config-header">
+                            <span class="config-title">安装命令</span>
+                            <button class="copy-button" onclick="copyCode(this)">复制代码</button>
+                        </div>
+                        <pre><code># Linux/macOS 下载
+wget https://github.com/lich0821/ccNexus/releases/latest/download/ccnexus-linux-amd64.tar.gz
+tar -xzf ccnexus-linux-amd64.tar.gz
+
+# 移动到系统路径
+sudo mv ccnexus /usr/local/bin/
+
+# 验证安装
+ccnexus --version</code></pre>
+                    </div>
+                </div>
+
+                <div class="install-method">
+                    <div class="method-title">
+                        <div class="method-icon">🔧</div>
+                        源码编译
+                    </div>
+                    <div class="config-example">
+                        <div class="config-header">
+                            <span class="config-title">编译命令</span>
+                            <button class="copy-button" onclick="copyCode(this)">复制代码</button>
+                        </div>
+                        <pre><code># 克隆仓库
+git clone https://github.com/lich0821/ccNexus.git
+cd ccNexus
+
+# 编译
+go build -o ccnexus cmd/ccnexus/main.go
+
+# 安装到系统路径
+sudo mv ccnexus /usr/local/bin/
+
+# 验证安装
+ccnexus --version</code></pre>
+                    </div>
+                </div>
+
+                <div class="install-method">
+                    <div class="method-title">
+                        <div class="method-icon">🐳</div>
+                        Docker部署
+                    </div>
+                    <div class="config-example">
+                        <div class="config-header">
+                            <span class="config-title">Docker命令</span>
+                            <button class="copy-button" onclick="copyCode(this)">复制代码</button>
+                        </div>
+                        <pre><code># 拉取镜像
+docker pull lich0821/ccnexus
+
+# 运行容器
+docker run -d \
+  --name ccnexus \
+  -p 8080:8080 \
+  -v $(pwd)/config:/app/config \
+  lich0821/ccnexus
+
+# 验证部署
+curl http://localhost:8080/health</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="config-example" style="margin-top: 3rem;">
+                <div class="config-header">
+                    <span class="config-title">基础配置示例 (config.yaml)</span>
+                    <button class="copy-button" onclick="copyCode(this)">复制代码</button>
+                </div>
+                <pre><code>server:
+  host: "0.0.0.0"
+  port: 8080
+  workers: 4
+
+providers:
+  openai:
+    name: "OpenAI"
+    base_url: "https://api.openai.com/v1"
+    api_key: "${OPENAI_API_KEY}"
+    models: ["gpt-4", "gpt-3.5-turbo"]
+    timeout: 30000
+    weight: 2
+
+  anthropic:
+    name: "Anthropic"
+    base_url: "https://api.anthropic.com"
+    api_key: "${ANTHROPIC_API_KEY}"
+    models: ["claude-3-opus-20240229", "claude-3-sonnet-20240229"]
+    timeout: 30000
+    weight: 3
+
+routing:
+  default_strategy: "weighted_round_robin"
+  health_check_interval: 30
+  max_retries: 3
+  timeout: 60000
+
+monitoring:
+  enabled: true
+  metrics_interval: 60
+  log_level: "info"
+  export_prometheus: true</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>项目链接</h3>
+                    <ul>
+                        <li><a href="https://github.com/lich0821/ccNexus">GitHub仓库</a></li>
+                        <li><a href="https://github.com/lich0821/ccNexus/issues">问题反馈</a></li>
+                        <li><a href="https://github.com/lich0821/ccNexus/discussions">用户讨论</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>相关资源</h3>
+                    <ul>
+                        <li><a href="#">官方文档</a></li>
+                        <li><a href="#">API文档</a></li>
+                        <li><a href="#">配置示例</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>社区支持</h3>
+                    <ul>
+                        <li><a href="#">开发者社区</a></li>
+                        <li><a href="#">技术论坛</a></li>
+                        <li><a href="#">贡献指南</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 lich0821. 开源项目，采用MIT许可证。CCNexus让AI API管理更加智能和高效！</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 复制代码功能
+        function copyCode(button) {
+            const codeBlock = button.parentElement.parentElement.querySelector('code');
+            const text = codeBlock.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                button.textContent = '已复制';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.textContent = '复制代码';
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('复制失败:', err);
+            });
+        }
+
+        // 负载均衡策略切换
+        function setStrategy(button, strategy) {
+            // 移除所有按钮的active类
+            document.querySelectorAll('.control-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // 添加active类到当前按钮
+            button.classList.add('active');
+
+            // 这里可以添加实际的策略切换逻辑
+            console.log('切换到策略:', strategy);
+
+            // 更新动画效果
+            updateRequestFlow(strategy);
+        }
+
+        function updateRequestFlow(strategy) {
+            const particles = document.querySelectorAll('.request-particle');
+
+            particles.forEach((particle, index) => {
+                // 根据策略调整动画
+                switch(strategy) {
+                    case 'weighted':
+                        particle.style.animationDuration = `${2 + index * 0.5}s`;
+                        break;
+                    case 'round-robin':
+                        particle.style.animationDuration = `${3 + index * 1}s`;
+                        break;
+                    case 'least-connections':
+                        particle.style.animationDuration = `${1.5 + index * 0.3}s`;
+                        break;
+                }
+            });
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 动态加载动画
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // 观察所有卡片
+        document.querySelectorAll('.feature-card, .install-method, .arch-box').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+
+        // 模拟实时数据更新
+        function updateProviderMetrics() {
+            const cards = document.querySelectorAll('.provider-card');
+
+            cards.forEach(card => {
+                const responseTime = card.querySelector('.metric-value');
+                const currentResponseTime = parseInt(responseTime.textContent);
+
+                // 模拟响应时间变化
+                const newResponseTime = currentResponseTime + Math.floor(Math.random() * 40 - 20);
+                responseTime.textContent = Math.max(100, newResponseTime) + 'ms';
+
+                // 随机更新状态
+                const statusBadge = card.querySelector('.provider-status-badge');
+                if (Math.random() < 0.1) {
+                    statusBadge.classList.toggle('status-healthy');
+                    statusBadge.classList.toggle('status-warning');
+                    statusBadge.textContent = statusBadge.classList.contains('status-healthy') ? '健康' : '警告';
+                }
+            });
+        }
+
+        // 每5秒更新一次指标
+        setInterval(updateProviderMetrics, 5000);
+
+        // 创建更多的请求粒子
+        function createRequestParticle() {
+            const pathsContainer = document.querySelector('.request-paths');
+            const particle = document.createElement('div');
+            particle.className = 'request-particle';
+            particle.style.animationDelay = Math.random() * 2 + 's';
+            pathsContainer.appendChild(particle);
+
+            // 动画结束后移除粒子
+            particle.addEventListener('animationend', () => {
+                particle.remove();
+            });
+        }
+
+        // 定期创建新粒子
+        setInterval(createRequestParticle, 1000);
+
+        // 初始化时创建几个粒子
+        for (let i = 0; i < 3; i++) {
+            setTimeout(createRequestParticle, i * 300);
+        }
+
+        // 粒子效果增强
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.style.position = 'absolute';
+            particle.style.width = Math.random() * 6 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.background = 'rgba(139, 92, 246, 0.6)';
+            particle.style.borderRadius = '50%';
+            particle.style.pointerEvents = 'none';
+
+            const startX = Math.random() * window.innerWidth;
+            const startY = Math.random() * window.innerHeight;
+
+            particle.style.left = startX + 'px';
+            particle.style.top = startY + 'px';
+
+            document.querySelector('.particles').appendChild(particle);
+
+            const duration = Math.random() * 3000 + 2000;
+            const endX = startX + (Math.random() - 0.5) * 200;
+            const endY = startY + (Math.random() - 0.5) * 200;
+
+            particle.animate([
+                { transform: `translate(0, 0) scale(1)`, opacity: 1 },
+                { transform: `translate(${endX - startX}px, ${endY - startY}px) scale(0)`, opacity: 0 }
+            ], {
+                duration: duration,
+                easing: 'ease-out'
+            }).onfinish = () => particle.remove();
+        }
+
+        // 定期创建新粒子
+        setInterval(createParticle, 500);
+    </script>
+</body>
+</html>
