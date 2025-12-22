@@ -182,9 +182,9 @@ export default function Home() {
         </div>
 
         {/* 文章网格/列表 */}
-        <div className={`${viewMode === 'table' ? 'w-full' : 'space-y-4'} mb-12`}>
+        <div className={`${viewMode === 'table' ? 'w-full' : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'} mb-12`}>
           {currentArticles.length === 0 ? (
-            <div className="text-center py-20">
+            <div className="col-span-full text-center py-20">
               <div className="text-7xl mb-6">🔍</div>
               <h3 className="text-3xl font-bold mb-3" style={{ color: 'var(--text-color)' }}>
                 未找到匹配的文章
@@ -282,74 +282,74 @@ export default function Home() {
               </table>
             </div>
           ) : (
-            // 列表视图
+            // 网格视图
             currentArticles.map((article: any, index: number) => (
               <Link
                 key={article.htmlFile}
                 href={`/${article.htmlFile.replace('.html', '')}`}
-                className="group block"
+                className="group block h-full"
               >
-                <article style={{
-                  background: 'var(--card-bg)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '1rem',
-                  padding: '1.5rem 2rem',
-                  transition: 'all 0.3s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '1.5rem'
-                }}
-                className="hover:scale-[1.02] hover:shadow-xl"
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = 'var(--primary-color)';
-                  (e.currentTarget as HTMLElement).style.boxShadow = '0 10px 30px rgba(0, 102, 255, 0.15)';
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-color)';
-                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
-                }}
+                <article
+                  style={{
+                    background: 'var(--card-bg)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '1rem',
+                    padding: '1.5rem',
+                    transition: 'all 0.3s ease',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }}
+                  className="hover:scale-[1.02] hover:shadow-xl"
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.borderColor = 'var(--primary-color)';
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 10px 30px rgba(0, 102, 255, 0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-color)';
+                    (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                  }}
                 >
-                  {/* 序号 */}
-                  <div className="flex-shrink-0 text-2xl font-bold" style={{
-                    color: 'var(--primary-color)',
-                    opacity: 0.2,
-                    minWidth: '3rem'
-                  }}>
-                    {String(startIndex + index + 1).padStart(2, '0')}
+                  {/* 分类标签 */}
+                  <div className="flex justify-between items-start mb-3">
+                    <span className="text-xs font-bold px-2 py-1 rounded" style={{
+                      background: 'var(--primary-color)',
+                      color: 'white'
+                    }}>
+                      {article.category || '开发工具'}
+                    </span>
+                    <div className="text-sm font-bold" style={{
+                      color: 'var(--primary-color)',
+                      opacity: 0.3
+                    }}>
+                      {String(startIndex + index + 1).padStart(2, '0')}
+                    </div>
                   </div>
 
-                  {/* 主要内容 */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h2 className="text-xl font-bold group-hover:text-blue-400 transition-colors" style={{
-                        color: 'var(--text-color)',
-                        lineHeight: 1.4
-                      }}>
-                        {article.title}
-                      </h2>
-                      <span className="text-xs font-bold px-2 py-1 rounded flex-shrink-0" style={{
-                        background: 'var(--primary-color)',
-                        color: 'white'
-                      }}>
-                        {article.category || '开发工具'}
-                      </span>
-                    </div>
-                    <p style={{
-                      color: 'var(--text-secondary)',
-                      lineHeight: 1.6,
-                      fontSize: '0.95rem'
-                    }}>
-                      {article.description}
-                    </p>
-                  </div>
+                  {/* 标题 */}
+                  <h2 className="text-lg font-bold mb-3 group-hover:text-blue-400 transition-colors line-clamp-2" style={{
+                    color: 'var(--text-color)',
+                    lineHeight: 1.4,
+                    flex: '0 0 auto'
+                  }}>
+                    {article.title}
+                  </h2>
+
+                  {/* 描述 */}
+                  <p className="text-sm mb-4 line-clamp-3 flex-1" style={{
+                    color: 'var(--text-secondary)',
+                    lineHeight: 1.6
+                  }}>
+                    {article.description}
+                  </p>
 
                   {/* 箭头指示器 */}
-                  <div className="flex-shrink-0">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center transition-all group-hover:scale-110 group-hover:translate-x-1" style={{
+                  <div className="flex justify-end">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center transition-all group-hover:scale-110 group-hover:translate-x-1" style={{
                       background: 'var(--gradient-primary)',
                       color: 'white'
                     }}>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                       </svg>
                     </div>

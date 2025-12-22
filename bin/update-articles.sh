@@ -87,7 +87,7 @@ cat > "$ARTICLES_JSON" << 'EOF'
     "beianNumber": "京ICP备12345678号",
     "copyrightText": "© 2025 Halavah's Tech. All rights reserved.",
     "adLink": "https://api.nekoapi.com",
-    "defaultViewMode": "table"
+    "defaultViewMode": "list"
   },
   "articles": [
 EOF
