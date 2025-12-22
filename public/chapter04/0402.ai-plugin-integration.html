@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Plugin Integration - AI插件集成实战指南</title>
+    <meta name="description" content="Claude Code插件生态系统的实用指南，包括MCP服务器安装、数据分析工具集成、第三方服务对接等，构建完整的AI开发工作流">
+    <meta name="keywords" content="ai-plugin,mcp-server,integration,automation,tool-ecosystem">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #8b5cf6;
+            --secondary-color: #06b6d4;
+            --accent-color: #f59e0b;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-light: #94a3b8;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --border-color: #e2e8f0;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --shadow-1: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --shadow-2: 0 20px 40px rgba(0, 0, 0, 0.15);
+            --shadow-glow: 0 0 30px rgba(139, 92, 246, 0.3);
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 粒子背景 */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 15s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+            }
+            25% {
+                transform: translateY(-20px) translateX(10px);
+            }
+            50% {
+                transform: translateY(10px) translateX(-10px);
+            }
+            75% {
+                transform: translateY(-15px) translateX(5px);
+            }
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            text-align: center;
+            padding: 4rem 0;
+            position: relative;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            animation: slideDown 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: fadeInScale 1s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeIn 1.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 3rem;
+            margin-bottom: 4rem;
+            box-shadow: var(--shadow-2);
+            position: relative;
+            animation: slideUp 1.2s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 章节样式 */
+        .section {
+            margin-bottom: 3rem;
+            animation: fadeInSection 0.8s ease-out;
+        }
+
+        @keyframes fadeInSection {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--gradient-1);
+            border-radius: 2px;
+        }
+
+        .section-description {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        /* 特性网格 */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-1);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-2);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 代码块样式 */
+        .code-block {
+            background: var(--text-primary);
+            color: #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            position: relative;
+            font-family: Monaco, Consolas, 'Courier New', monospace;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .code-title {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        pre {
+            margin: 0;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+
+        code {
+            color: #e2e8f0;
+        }
+
+        /* Mermaid图表容器 */
+        .mermaid-container {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+            box-shadow: var(--shadow-1);
+        }
+
+        /* 导航目录 */
+        .toc {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .toc h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc li {
+            margin-bottom: 0.75rem;
+        }
+
+        .toc a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .toc a:hover {
+            color: var(--primary-color);
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .toc a::before {
+            content: '▸';
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        /* 步骤样式 */
+        .step-list {
+            counter-reset: step-counter;
+        margin: 2rem 0;
+        }
+
+        .step-item {
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 3rem;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .step-item::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: -1.5rem;
+            top: 1.5rem;
+            width: 2rem;
+            height: 2rem;
+            background: var(--gradient-1);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow-1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .main-content {
+                padding: 2rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 粒子背景 -->
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-badge">🔌 AI插件集成</div>
+            <h1 class="hero-title">AI Plugin Integration</h1>
+            <p class="hero-subtitle">Claude Code插件生态系统的实战指南，构建完整的AI开发工作流</p>
+        </section>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-wrapper">
+                <!-- 目录导航 -->
+                <nav class="toc">
+                    <h3>📋 目录导航</h3>
+                    <ul>
+                        <li><a href="#section-1">1. 插件生态系统概览</a></li>
+                        <li><a href="#section-2">2. MCP服务器安装配置</a></li>
+                        <li><a href="#section-3">3. AI数据分析工具</a></li>
+                        <li><a href="#section-4">4. AnyVoice语音生态</a></li>
+                        <li><a href="#section-5">5. 第三方服务集成</a></li>
+                        <li><a href="#section-6">6. 实战案例</a></li>
+                        <li><a href="#section-7">7. 最佳实践</a></li>
+                    </ul>
+                </nav>
+
+                <!-- Section 1 -->
+                <section id="section-1" class="section">
+                    <h2 class="section-title">1. 插件生态系统概览</h2>
+                    <p class="section-description">
+                        Claude Code的插件系统基于Model Context Protocol (MCP)，提供标准化的接口让各种AI工具无缝集成。
+                    </p>
+
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+                            graph TD
+                                A[Claude Code Core] --> B[MCP Protocol]
+                                B --> C[Official Servers]
+                                B --> D[Community Plugins]
+                                B --> E[Custom Integrations]
+
+                                C --> F[文件系统]
+                                C --> G[GitHub]
+                                C --> H[数据库]
+
+                                D --> I[Web自动化]
+                                D --> J[数据分析]
+                                D --> K[云服务]
+                        </div>
+                    </div>
+
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">🔧</div>
+                            <h3 class="feature-title">核心开发工具</h3>
+                            <div class="feature-description">
+                                <ul>
+                                    <li>文件系统操作：文件读写、目录管理</li>
+                                    <li>版本控制：Git集成、代码提交</li>
+                                    <li>数据库操作：SQL查询、数据管理</li>
+                                    <li>网络请求：API调用、数据获取</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">📊</div>
+                            <h3 class="feature-title">数据分析工具</h3>
+                            <div class="feature-description">
+                                <ul>
+                                    <li>数据处理：CSV、JSON、XML解析</li>
+                                    <li>可视化：图表生成、数据展示</li>
+                                    <li>统计分析：趋势分析、报告生成</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">☁️</div>
+                            <h3 class="feature-title">云服务集成</h3>
+                            <div class="feature-description">
+                                <ul>
+                                    <li>AWS服务：S3存储、Lambda函数</li>
+                                    <li>数据库：PostgreSQL、MySQL、MongoDB</li>
+                                    <li>API服务：GitHub、Slack、Jira</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">40+</div>
+                            <div class="stat-label">官方MCP服务器</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">100+</div>
+                            <div class="stat-label">社区插件</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">∞</div>
+                            <div class="stat-label">自定义集成</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2 -->
+                <section id="section-2" class="section">
+                    <h2 class="section-title">2. MCP服务器安装配置</h2>
+                    <p class="section-description">
+                        官方推荐的MCP服务器，提供基础的文件操作、网络请求和版本控制功能。
+                    </p>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">核心工具包安装</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre><code><span class="comment"># 核心工具 - 推荐优先安装</span>
+npm install @modelcontextprotocol/server-filesystem
+npm install @modelcontextprotocol/server-github
+npm install @modelcontextprotocol/server-fetch
+npm install @modelprotocol/server-shell
+
+<span class="comment"># 扩展工具 - 按需安装</span>
+npm install @modelcontextprotocol/server-postgres
+npm install @modelcontextprotocol/server-puppeteer
+npm install @modelcontextprotocol/server-sqlite</code></pre>
+                    </div>
+
+                    <div class="step-list">
+                        <div class="step-item">
+                            <h4>1. 创建工作目录</h4>
+                            <p>为MCP服务器创建专用工作目录，便于管理和配置。</p>
+                        </div>
+                        <div class="step-item">
+                            <h4>2. 选择服务器</h4>
+                            <p>根据项目需求选择合适的MCP服务器组合，考虑功能需求和资源占用。</p>
+                        </div>
+                        <div class="step-item">
+                            <h4>3. 配置连接</h4>
+                            <p>在Claude Code中配置MCP服务器连接参数，启动集成工作流。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3 -->
+                <section id="section-3" class="section">
+                    <h2 class="section-title">3. AI数据分析工具</h2>
+                    <p class="section-description">
+                        集成强大的数据分析能力，让AI助手处理和分析各种数据格式。
+                    </p>
+
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">📈</div>
+                            <h3 class="feature-title">数据处理</h3>
+                            <div class="feature-description">
+                                支持CSV、JSON、XML等多种数据格式的解析和转换。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">📊</div>
+                            <h3 class="feature-title">可视化工具</h3>
+                            <div class="feature-description">
+                                生成各种类型的图表和可视化展示数据洞察。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">🔍</div>
+                            <h3 class="feature-title">统计分析</h3>
+                            <div class="feature-description">
+                                执行趋势分析、异常检测和预测建模。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 4 -->
+                <section id="section-4" class="section">
+                    <h2 class="section-title">4. AnyVoice语音生态</h2>
+                    <p class="section-description">
+                        通过语音输入扩展Claude Code的交互方式，提供更自然的对话体验。
+                    </p>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">语音集成配置</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre><code># 安装语音服务器
+npm install @anyvoice/server-voice
+
+# 配置语音识别
+{
+  "voice_engine": "whisper",
+  "language": "zh-CN",
+  "model": "base"
+}
+
+# 启动语音功能
+/voice enable</code></pre>
+                    </div>
+
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">🎤</div>
+                            <h3 class="feature-title">语音输入</h3>
+                            <div class="feature-description">
+                                支持自然语音输入，实时语音转文字。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">💬</div>
+                            <h3 class="feature-title">语音输出</h3>
+                            <div class="feature-description">
+                                AI响应语音播报，提供语音反馈。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">🌐</div>
+                            <h3 class="feature-title">多语言支持</h3>
+                            <div class="feature-description">
+                                支持多种语言的语音识别和合成。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 5 -->
+                <section id="section-5" class="section">
+                    <h2 class="section-title">5. 第三方服务集成</h2>
+                    <p class="section-section">
+                        通过MCP协议集成各种第三方服务，扩展Claude Code的能力边界。
+                    </p>
+
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">☁️</div>
+                            <h3 class="feature-title">云平台服务</h3>
+                            <div class="feature-description">
+                                集成AWS、Azure、GCP等主流云平台服务。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">🗄️</div>
+                            <h3 class="feature-title">开发工具</h3>
+                            <div class="feature-description">
+                                集成Jira、GitLab、GitHub等开发平台。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">📊</div>
+                            <h3 class="feature-title">数据服务</h3>
+                            <div class="feature-description">
+                                连接各种数据库和数据分析平台。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 6 -->
+                <section id="section-6" class="section">
+                    <h2 class="section-title">6. 实战案例</h2>
+                    <p class="section-description">
+                        基于真实项目的集成案例，展示插件系统的实际应用效果。
+                    </p>
+
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">📊</div>
+                            <h3 class="feature-title">数据分析平台</h3>
+                            <div class="feature-description">
+                                集成数据处理和可视化工具，构建完整的数据分析工作流。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">🔧</div>
+                            <h3 class="feature-title">自动化工具</h3>
+                            <div class="feature-description">
+                                通过插件实现代码生成、测试自动化等功能。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">🤖</div>
+                            <h3 class="feature-title">知识管理</h3>
+                            <div class="feature-description">
+                                集成文档管理和搜索功能，提高知识获取效率。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 7 -->
+                <section id="section-7" class="section">
+                    <h2 class="section-title">7. 最佳实践</h2>
+                    <p class="section-description">
+                        遵循最佳实践原则，确保插件系统的稳定和高效运行。
+                    </p>
+
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">🎯</div>
+                            <h3 class="feature-title">按需安装</h3>
+                            <div class="feature-description">
+                                根据实际需求选择合适的插件，避免过度配置。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">🔍</div>
+                            <h3 class="feature-title">定期更新</h3>
+                            <div class="feature-description">
+                                保持插件版本更新，获取最新功能和安全修复。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">⚡</div>
+                            <h3 class="feature-title">性能监控</h3>
+                            <div class="feature-description">
+                                监控插件性能，及时发现和解决问题。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">🔒</div>
+                            <h3 class="feature-title">安全配置</h3>
+                            <div class="feature-description">
+                                合理配置权限，保护敏感数据和资源。
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CTA Section -->
+                    <section class="section">
+                        <div style="text-align: center; margin-top: 3rem;">
+                            <a href="#" class="btn">开始集成插件</a>
+                        </div>
+                    </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 创建粒子效果
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+
+                // 随机大小
+                const size = Math.random() * 6 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+
+                // 随机位置
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+
+                // 随机延迟和持续时间
+                particle.style.animationDelay = `${Math.random() * 15}s`;
+                particle.style.animationDuration = `${Math.random() * 10 + 15}s`;
+
+                // 随机不透明度
+                particle.style.opacity = `${Math.random() * 0.3 + 0.1}`;
+
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // 代码复制功能
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const code = codeBlock.querySelector('code');
+            const text = code.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '已复制!';
+                button.style.background = 'rgba(16, 185, 129, 0.8)';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('复制失败:', err);
+                button.textContent = '复制失败';
+                setTimeout(() => {
+                    button.textContent = '复制';
+                }, 2000);
+            });
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 滚动动画
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationDelay = '0s';
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.animationPlayState = 'paused';
+            observer.observe(section);
+        });
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+        });
+    </script>
+</body>
+</html>

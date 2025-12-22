@@ -207,80 +207,81 @@ export default function Home() {
               </button>
             </div>
           ) : viewMode === 'table' ? (
-            // 表格视图
-            <div className="w-full overflow-hidden rounded-lg border" style={{ borderColor: 'var(--border-color)', background: 'var(--card-bg)' }}>
-              <table className="w-full">
-                <thead>
-                  <tr style={{ background: 'var(--dark-bg)', borderBottom: `1px solid var(--border-color)` }}>
-                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
-                      #
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
-                      标题
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
-                      描述
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
-                      分类
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
-                      操作
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentArticles.map((article: any, index: number) => (
-                    <tr
-                      key={article.htmlFile}
-                      className="hover:bg-blue-500/10 transition-colors cursor-pointer group"
-                      style={{ borderBottom: `1px solid var(--border-color)` }}
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-secondary)' }}>
-                        {String(startIndex + index + 1).padStart(2, '0')}
-                      </td>
-                      <td className="px-6 py-4">
-                        <Link
-                          href={`/${article.htmlFile.replace('.html', '')}`}
-                          className="text-sm font-semibold group-hover:text-blue-400 transition-colors"
-                          style={{ color: 'var(--text-color)' }}
-                        >
-                          {article.title}
-                        </Link>
-                      </td>
-                      <td className="px-6 py-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                        <div className="max-w-xs truncate">
-                          {article.description}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-xs font-bold px-2 py-1 rounded" style={{
-                          background: 'var(--primary-color)',
-                          color: 'white'
-                        }}>
-                          {article.category || '开发工具'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <Link
-                          href={`/${article.htmlFile.replace('.html', '')}`}
-                          className="inline-flex items-center gap-2 px-3 py-1 rounded transition-all hover:gap-3"
-                          style={{
-                            background: 'var(--gradient-primary)',
-                            color: 'white'
-                          }}
-                        >
-                          <span>查看</span>
-                          <svg className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                          </svg>
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            // 网格视图（6个卡片）
+            currentArticles.map((article: any, index: number) => (
+              <Link
+                key={article.htmlFile}
+                href={`/${article.htmlFile.replace('.html', '')}`}
+                className="group block h-full"
+              >
+                <article
+                  style={{
+                    background: 'var(--card-bg)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '1rem',
+                    padding: '1.5rem',
+                    transition: 'all 0.3s ease',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }}
+                  className="hover:scale-[1.02] hover:shadow-xl"
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.borderColor = 'var(--primary-color)';
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 10px 30px rgba(0, 102, 255, 0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-color)';
+                    (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                  }}
+                >
+                  {/* 分类标签 */}
+                  <div className="flex justify-between items-start mb-3">
+                    <span className="text-xs font-bold px-2 py-1 rounded" style={{
+                      background: 'var(--primary-color)',
+                      color: 'white'
+                    }}>
+                      {article.category || '开发工具'}
+                    </span>
+                    <div className="text-sm font-bold" style={{
+                      color: 'var(--primary-color)',
+                      opacity: 0.3
+                    }}>
+                      {String(startIndex + index + 1).padStart(2, '0')}
+                    </div>
+                  </div>
+
+                  {/* 标题 */}
+                  <h2 className="text-lg font-bold mb-3 group-hover:text-blue-400 transition-colors line-clamp-2" style={{
+                    color: 'var(--text-color)',
+                    lineHeight: 1.4,
+                    flex: '0 0 auto'
+                  }}>
+                    {article.title}
+                  </h2>
+
+                  {/* 描述 */}
+                  <p className="text-sm mb-4 line-clamp-3 flex-1" style={{
+                    color: 'var(--text-secondary)',
+                    lineHeight: 1.6
+                  }}>
+                    {article.description}
+                  </p>
+
+                  {/* 箭头指示器 */}
+                  <div className="flex justify-end">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center transition-all group-hover:scale-110 group-hover:translate-x-1" style={{
+                      background: 'var(--gradient-primary)',
+                      color: 'white'
+                    }}>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </div>
+                  </div>
+                </article>
+              </Link>
+            ))
           ) : (
             // 列表视图（垂直布局）
             currentArticles.map((article: any, index: number) => (
