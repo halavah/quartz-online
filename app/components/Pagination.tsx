@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -7,8 +9,18 @@ interface PaginationProps {
 }
 
 export default function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const pages = [];
-  const showPages = 5; // 显示的页码数量
+  // Mobile: show fewer pages
+  const showPages = isMobile ? 3 : 5;
 
   let startPage = Math.max(1, currentPage - Math.floor(showPages / 2));
   let endPage = Math.min(totalPages, startPage + showPages - 1);
@@ -23,7 +35,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
   }
 
   const buttonStyle = (isActive: boolean = false, isDisabled: boolean = false) => ({
-    padding: '0.5rem 1rem',
+    padding: isMobile ? '0.4rem 0.7rem' : '0.5rem 1rem',
     borderRadius: '0.5rem',
     transition: 'all 0.3s ease',
     background: isActive
@@ -37,11 +49,30 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
       : isDisabled
       ? 'var(--text-secondary)'
       : 'var(--text-color)',
-    cursor: isDisabled ? 'not-allowed' : 'pointer'
+    cursor: isDisabled ? 'not-allowed' : 'pointer',
+    fontSize: isMobile ? '0.8rem' : '0.875rem',
+    minWidth: isMobile ? '32px' : '40px'
   });
 
+  const navStyle = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: isMobile ? '0.25rem' : '0.5rem',
+    marginTop: '3rem',
+    paddingBottom: '2rem',
+    padding: isMobile ? '0 0.5rem' : '0'
+  };
+
+  const ellipsisStyle = {
+    color: 'var(--text-secondary)',
+    padding: isMobile ? '0 0.25rem' : '0 0.5rem',
+    fontSize: isMobile ? '0.8rem' : '0.875rem',
+    userSelect: 'none' as const
+  };
+
   return (
-    <nav className="flex justify-center items-center gap-2 mt-12 pb-8">
+    <nav style={navStyle}>
       {/* 上一页 */}
       <button
         onClick={() => onPageChange(currentPage - 1)}
@@ -60,7 +91,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
           }
         }}
       >
-        上一页
+        {isMobile ? '‹' : '上一页'}
       </button>
 
       {/* 第一页 */}
@@ -80,7 +111,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
           >
             1
           </button>
-          {startPage > 2 && <span style={{ color: 'var(--text-secondary)', padding: '0 0.5rem' }}>...</span>}
+          {startPage > 2 && <span style={ellipsisStyle}>...</span>}
         </>
       )}
 
@@ -110,7 +141,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
       {/* 最后一页 */}
       {endPage < totalPages && (
         <>
-          {endPage < totalPages - 1 && <span style={{ color: 'var(--text-secondary)', padding: '0 0.5rem' }}>...</span>}
+          {endPage < totalPages - 1 && <span style={ellipsisStyle}>...</span>}
           <button
             onClick={() => onPageChange(totalPages)}
             style={buttonStyle()}
@@ -146,7 +177,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
           }
         }}
       >
-        下一页
+        {isMobile ? '›' : '下一页'}
       </button>
     </nav>
   );
