@@ -105,6 +105,10 @@ show_menu() {
     echo -e "     ${PURPLE}→${NC} 自动扫描 HTML 文件并更新 articles.json"
     echo ""
 
+    echo -e "${GREEN}  5.${NC} ☁️  ${BLUE}部署到 Cloudflare${NC} (cf-deploy.sh)"
+    echo -e "     ${PURPLE}→${NC} 构建并部署到 Cloudflare Pages (Next.js)"
+    echo ""
+
     echo -e "${PURPLE}═══════════════════════════════════════════════════════════${NC}"
     echo ""
 
@@ -123,7 +127,7 @@ main() {
         # 重置 choice 变量，避免保留上次的输入
         choice=""
 
-        echo -ne "${YELLOW}请选择操作 [0-4] (默认: 1):${NC} "
+        echo -ne "${YELLOW}请选择操作 [0-5] (默认: 1):${NC} "
         read -r choice
 
         # 如果用户直接按回车，默认选择 1
@@ -148,6 +152,11 @@ main() {
             4)
                 print_header "执行: 更新文章列表"
                 run_script "update-articles.sh"
+                ;;
+
+            5)
+                print_header "执行: 部署到 Cloudflare"
+                run_script "cf-deploy.sh"
                 ;;
 
             0)
