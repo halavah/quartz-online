@@ -2,7 +2,7 @@
 
 # ========================================
 # Quartz Online - Cloudflare Pages 部署脚本
-# 使用 @cloudflare/next-on-pages 部署 Next.js 项目
+# 使用 Next.js 静态导出部署到 Cloudflare Pages
 # ========================================
 
 # 颜色定义
@@ -47,7 +47,7 @@ cd ..
 # 项目名称
 PROJECT_NAME="quartz-online"
 
-print_header "Cloudflare Pages 部署 - $PROJECT_NAME (Next.js)"
+print_header "Cloudflare Pages 部署 - $PROJECT_NAME (Next.js 静态导出)"
 
 # 检查是否安装了 wrangler
 print_info "检查 wrangler 是否已安装..."
@@ -91,12 +91,12 @@ fi
 export CLOUDFLARE_API_KEY
 export CLOUDFLARE_EMAIL
 
-# 构建 Next.js 项目（使用 next-on-pages）
+# 构建 Next.js 项目（静态导出）
 print_info "开始构建 Next.js 项目..."
-print_info "运行: npx @cloudflare/next-on-pages"
+print_info "运行: npm run build"
 echo ""
 
-if npx @cloudflare/next-on-pages; then
+if npm run build; then
     print_success "构建成功"
 else
     print_error "构建失败"
@@ -106,7 +106,7 @@ fi
 echo ""
 print_info "准备部署到 Cloudflare Pages..."
 print_info "项目名称: $PROJECT_NAME"
-print_info "部署目录: .vercel/output/static"
+print_info "部署目录: out/"
 echo ""
 
 # 确认部署
@@ -121,7 +121,7 @@ fi
 print_info "正在上传并部署..."
 echo ""
 
-npx wrangler pages deploy .vercel/output/static --project-name="$PROJECT_NAME"
+npx wrangler pages deploy out --project-name="$PROJECT_NAME"
 
 # 检查部署结果
 if [ $? -eq 0 ]; then

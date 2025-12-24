@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server'
 
+// Force static export compatibility
+export const dynamic = 'force-static'
+
 export async function GET() {
   return NextResponse.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
     service: 'quartz-online'
   })
 }

@@ -3,7 +3,7 @@ setlocal EnableDelayedExpansion
 
 REM ========================================
 REM Quartz Online - Cloudflare Pages 部署脚本
-REM 使用 @cloudflare/next-on-pages 部署 Next.js 项目
+REM 使用 Next.js 静态导出部署到 Cloudflare Pages
 REM ========================================
 
 REM Navigate to the directory where the script is located
@@ -18,7 +18,7 @@ set "PROJECT_NAME=quartz-online"
 cls
 echo.
 echo ╔════════════════════════════════════════════════════════════╗
-echo ║  Cloudflare Pages 部署 - %PROJECT_NAME% (Next.js)
+echo ║  Cloudflare Pages 部署 - %PROJECT_NAME% (Next.js 静态导出)
 echo ╚════════════════════════════════════════════════════════════╝
 echo.
 
@@ -79,12 +79,12 @@ if "%CLOUDFLARE_EMAIL%"=="" (
     exit /b 1
 )
 
-REM 构建 Next.js 项目（使用 next-on-pages）
+REM 构建 Next.js 项目（静态导出）
 echo [信息] 开始构建 Next.js 项目...
-echo [信息] 运行: npx @cloudflare/next-on-pages
+echo [信息] 运行: npm run build
 echo.
 
-call npx @cloudflare/next-on-pages
+call npm run build
 if %errorlevel% neq 0 (
     echo [错误] 构建失败
     pause
@@ -96,7 +96,7 @@ echo [成功] 构建成功
 echo.
 echo [信息] 准备部署到 Cloudflare Pages...
 echo [信息] 项目名称: %PROJECT_NAME%
-echo [信息] 部署目录: .vercel\output\static
+echo [信息] 部署目录: out\
 echo.
 
 REM 确认部署
@@ -111,7 +111,7 @@ REM 执行部署
 echo [信息] 正在上传并部署...
 echo.
 
-npx wrangler pages deploy .vercel\output\static --project-name=%PROJECT_NAME%
+npx wrangler pages deploy out --project-name=%PROJECT_NAME%
 
 REM 检查部署结果
 if %errorlevel% equ 0 (
