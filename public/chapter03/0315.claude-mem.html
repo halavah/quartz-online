@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude-Mem - Claude Code 持久化记忆系统</title>
+    <meta name="description" content="Claude-Mem 是thedotmack开发的Claude Code持久化记忆系统，提供Web界面记忆管理、记忆流可视化、智能记忆检索等功能，让Claude具备长期记忆和上下文保持能力">
+    <meta name="keywords" content="claude-mem,thedotmack,持久化记忆,记忆管理,记忆可视化,智能检索,上下文保持,web界面">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #06b6d4;
+            --secondary-color: #3b82f6;
+            --accent-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --gradient-1: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            --gradient-2: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 背景动画 */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 80%, rgba(6, 182, 212, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.2) 0%, transparent 50%);
+            animation: particlesMove 20s ease-in-out infinite;
+        }
+
+        @keyframes particlesMove {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(1deg); }
+            66% { transform: translateY(20px) rotate(-1deg); }
+        }
+
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .floating-element:nth-child(1) {
+            width: 120px;
+            height: 120px;
+            left: 10%;
+            top: 20%;
+            animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+            width: 80px;
+            height: 80px;
+            right: 15%;
+            top: 30%;
+            animation-delay: 2s;
+        }
+
+        .floating-element:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            left: 60%;
+            bottom: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(180deg); }
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 导航栏 */
+        nav {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Hero 部分 */
+        .hero {
+            padding: 8rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.1), transparent);
+            border-radius: 50%;
+            animation: heroGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes heroGlow {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 记忆系统演示 */
+        .memory-demo {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .memory-demo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-1);
+        }
+
+        .memory-flow {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .memory-node {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .memory-node:hover {
+            transform: translateY(-5px);
+            border-color: rgba(6, 182, 212, 0.3);
+            box-shadow: 0 20px 40px rgba(6, 182, 212, 0.2);
+        }
+
+        .memory-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1.5rem;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        .memory-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+        }
+
+        .memory-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Web界面演示 */
+        .web-interface {
+            background: rgba(15, 23, 42, 0.95);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            margin: 3rem 0;
+        }
+
+        .interface-header {
+            background: rgba(30, 41, 59, 0.9);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .interface-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .interface-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .control-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .control-dot:hover {
+            opacity: 0.8;
+        }
+
+        .control-close { background: #ef4444; }
+        .control-minimize { background: #f59e0b; }
+        .control-maximize { background: #10b981; }
+
+        .interface-body {
+            padding: 2rem;
+            min-height: 400px;
+        }
+
+        .memory-browser {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 1.5rem;
+            height: 500px;
+        }
+
+        .memory-sidebar {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+        }
+
+        .memory-main {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .memory-list {
+            list-style: none;
+        }
+
+        .memory-item {
+            background: rgba(51, 65, 85, 0.5);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .memory-item:hover {
+            background: rgba(6, 182, 212, 0.2);
+            border-color: rgba(6, 182, 212, 0.3);
+            transform: translateX(4px);
+        }
+
+        .memory-item.active {
+            background: rgba(6, 182, 212, 0.3);
+            border-color: rgba(6, 182, 212, 0.5);
+        }
+
+        .memory-time {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .memory-content {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .memory-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .memory-tag {
+            background: rgba(6, 182, 212, 0.2);
+            color: var(--primary-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .memory-details {
+            background: rgba(51, 65, 85, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .memory-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .memory-detail-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .memory-detail-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-button {
+            background: rgba(6, 182, 212, 0.2);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-button:hover {
+            background: rgba(6, 182, 212, 0.3);
+            border-color: rgba(6, 182, 212, 0.5);
+        }
+
+        .memory-detail-content {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 功能特性 */
+        .features {
+            padding: 4rem 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(6, 182, 212, 0.3);
+            box-shadow: 0 20px 40px rgba(6, 182, 212, 0.2);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1.5rem;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 系统架构 */
+        .architecture {
+            padding: 4rem 0;
+        }
+
+        .arch-diagram {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 3rem;
+            margin: 2rem 0;
+        }
+
+        .arch-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .arch-step {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .arch-step:hover {
+            transform: translateX(10px);
+            border-color: rgba(6, 182, 212, 0.3);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+        }
+
+        .step-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .arch-arrow {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            text-align: center;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(5px); }
+        }
+
+        /* 安装指南 */
+        .install-section {
+            padding: 4rem 0;
+        }
+
+        .install-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .install-method {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .install-method:hover {
+            transform: translateY(-5px);
+            border-color: rgba(6, 182, 212, 0.3);
+            box-shadow: 0 20px 40px rgba(6, 182, 212, 0.2);
+        }
+
+        .install-method::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-2);
+        }
+
+        .method-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .method-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        /* 代码示例 */
+        .code-example {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .code-title {
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .copy-button {
+            background: rgba(6, 182, 212, 0.2);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background: rgba(6, 182, 212, 0.3);
+            border-color: rgba(6, 182, 212, 0.5);
+        }
+
+        .copy-button.copied {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: var(--success-color);
+        }
+
+        pre {
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* 配置表格 */
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .config-table th,
+        .config-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .config-table th {
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .config-table tr:hover {
+            background: rgba(6, 182, 212, 0.05);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 3rem 0;
+            margin-top: 6rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--text-primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .memory-flow {
+                grid-template-columns: 1fr;
+            }
+
+            .memory-browser {
+                grid-template-columns: 1fr;
+            }
+
+            .memory-sidebar {
+                display: none;
+            }
+
+            .arch-step {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .arch-arrow {
+                transform: rotate(90deg);
+            }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(6, 182, 212, 0.5);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(6, 182, 212, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景动画 -->
+    <div class="bg-animation">
+        <div class="particles"></div>
+        <div class="floating-elements">
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+        </div>
+    </div>
+
+    <!-- 导航栏 -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">🧠 Claude-Mem</div>
+            <ul class="nav-links">
+                <li><a href="#demo">记忆系统</a></li>
+                <li><a href="#features">功能特性</a></li>
+                <li><a href="#architecture">系统架构</a></li>
+                <li><a href="#install">安装指南</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero 部分 -->
+    <section class="hero">
+        <div class="container">
+            <h1>Claude-Mem</h1>
+            <p class="subtitle">为 Claude Code 打造的持久化记忆压缩系统，自动捕获会话上下文，让 AI 拥有真正的长期记忆能力</p>
+        </div>
+    </section>
+
+    <!-- 记忆系统演示 -->
+    <section id="demo" class="container">
+        <div class="memory-demo">
+            <h2 style="text-align: center; margin-bottom: 3rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                智能记忆工作流程
+            </h2>
+
+            <div class="memory-flow">
+                <div class="memory-node">
+                    <div class="memory-icon">👁️</div>
+                    <div class="memory-title">观察捕获</div>
+                    <div class="memory-description">自动捕获 Claude Code 的工具使用观察和重要对话</div>
+                </div>
+
+                <div class="memory-node">
+                    <div class="memory-icon">🧩</div>
+                    <div class="memory-title">智能压缩</div>
+                    <div class="memory-description">AI 驱动的智能压缩和摘要生成，保留关键信息</div>
+                </div>
+
+                <div class="memory-node">
+                    <div class="memory-icon">💾</div>
+                    <div class="memory-title">持久存储</div>
+                    <div class="memory-description">分层记忆存储，支持索引、详情和完美回忆层</div>
+                </div>
+
+                <div class="memory-node">
+                    <div class="memory-icon">🔄</div>
+                    <div class="memory-title">上下文注入</div>
+                    <div class="memory-description">新会话开始时自动注入相关记忆，无缝衔接</div>
+                </div>
+            </div>
+
+            <!-- Web界面演示 -->
+            <h3 style="text-align: center; margin: 4rem 0 2rem; font-size: 1.8rem; color: var(--text-primary);">
+                Web 管理界面
+            </h3>
+
+            <div class="web-interface">
+                <div class="interface-header">
+                    <div class="interface-title">Claude-Mem Memory Browser - http://localhost:37777</div>
+                    <div class="interface-controls">
+                        <div class="control-dot control-close"></div>
+                        <div class="control-dot control-minimize"></div>
+                        <div class="control-dot control-maximize"></div>
+                    </div>
+                </div>
+                <div class="interface-body">
+                    <div class="memory-browser">
+                        <div class="memory-sidebar">
+                            <div class="sidebar-section">
+                                <div class="sidebar-title">最近记忆</div>
+                                <ul class="memory-list">
+                                    <li class="memory-item active">
+                                        <div class="memory-time">2024-01-15 14:30</div>
+                                        <div class="memory-content">项目架构设计讨论</div>
+                                        <div class="memory-tags">
+                                            <span class="memory-tag">架构</span>
+                                            <span class="memory-tag">设计</span>
+                                        </div>
+                                    </li>
+                                    <li class="memory-item">
+                                        <div class="memory-time">2024-01-15 10:15</div>
+                                        <div class="memory-content">数据库迁移策略</div>
+                                        <div class="memory-tags">
+                                            <span class="memory-tag">数据库</span>
+                                            <span class="memory-tag">迁移</span>
+                                        </div>
+                                    </li>
+                                    <li class="memory-item">
+                                        <div class="memory-time">2024-01-14 16:45</div>
+                                        <div class="memory-content">API 端点优化</div>
+                                        <div class="memory-tags">
+                                            <span class="memory-tag">API</span>
+                                            <span class="memory-tag">性能</span>
+                                        </div>
+                                    </li>
+                                    <li class="memory-item">
+                                        <div class="memory-time">2024-01-14 09:20</div>
+                                        <div class="memory-content">用户认证系统实现</div>
+                                        <div class="memory-tags">
+                                            <span class="memory-tag">认证</span>
+                                            <span class="memory-tag">安全</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="sidebar-section">
+                                <div class="sidebar-title">记忆统计</div>
+                                <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                                    <div style="margin-bottom: 0.5rem;">总记忆数: 1,234</div>
+                                    <div style="margin-bottom: 0.5rem;">今日新增: 12</div>
+                                    <div style="margin-bottom: 0.5rem;">存储大小: 2.5MB</div>
+                                    <div>命中率: 89%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="memory-main">
+                            <div class="memory-details">
+                                <div class="memory-detail-header">
+                                    <div class="memory-detail-title">项目架构设计讨论</div>
+                                    <div class="memory-detail-actions">
+                                        <button class="action-button">编辑</button>
+                                        <button class="action-button">删除</button>
+                                        <button class="action-button">导出</button>
+                                    </div>
+                                </div>
+                                <div class="memory-detail-content">
+                                    <p><strong>时间:</strong> 2024-01-15 14:30:00</p>
+                                    <p><strong>标签:</strong> 架构, 设计, 微服务</p>
+                                    <p><strong>摘要:</strong></p>
+                                    <p>讨论了将单体应用重构为微服务架构的方案。主要包括以下几个方面：</p>
+                                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                        <li>服务拆分策略：按业务领域划分服务边界</li>
+                                        <li>数据一致性：采用事件溯源和CQRS模式</li>
+                                        <li>服务通信：使用REST API和消息队列</li>
+                                        <li>部署方案：容器化部署，使用Kubernetes编排</li>
+                                    </ul>
+                                    <p style="margin-top: 1rem;"><strong>关键决策:</strong></p>
+                                    <ol style="margin-left: 1.5rem;">
+                                        <li>优先拆分用户服务和订单服务</li>
+                                        <li>引入API网关统一管理请求路由</li>
+                                        <li>采用分布式缓存提高性能</li>
+                                    </ol>
+                                </div>
+                            </div>
+
+                            <div class="sidebar-section">
+                                <div class="sidebar-title">搜索记忆</div>
+                                <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+                                    <input type="text" placeholder="搜索记忆内容..." style="flex: 1; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; padding: 0.75rem; color: var(--text-primary);">
+                                    <button class="action-button">搜索</button>
+                                </div>
+                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                    <span class="memory-tag">架构</span>
+                                    <span class="memory-tag">API</span>
+                                    <span class="memory-tag">数据库</span>
+                                    <span class="memory-tag">前端</span>
+                                    <span class="memory-tag">测试</span>
+                                    <span class="memory-tag">部署</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 功能特性 -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                核心功能特性
+            </h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
+                为 AI 助手提供企业级的记忆管理能力
+            </p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <h3 class="feature-title">持久化记忆</h3>
+                    <p class="feature-description">分层记忆检索，模拟人类记忆模式，跨会话上下文保留，无缝衔接工作流程</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🗜️</div>
+                    <h3 class="feature-title">智能压缩</h3>
+                    <p class="feature-description">AI驱动的语义摘要生成，渐进式信息披露策略，记忆权重衰减和时间衰减机制</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3 class="feature-title">全文搜索</h3>
+                    <p class="feature-description">支持全文关键词搜索，语义搜索功能，理解查询意图，智能相关性排序</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🌐</div>
+                    <h3 class="feature-title">Web界面</h3>
+                    <p class="feature-description">在 http://localhost:37777 实时查看记忆流，可视化管理和浏览所有记忆内容</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">统计分析</h3>
+                    <p class="feature-description">记忆统计和分析功能，使用趋势分析，记忆类型分布，性能监控</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="feature-title">自动化管理</h3>
+                    <p class="feature-description">无需手动干预，后台透明运行，自动完成所有记忆管理工作，智能触发和更新</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 系统架构 -->
+    <section id="architecture" class="architecture">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                系统架构
+            </h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
+                模块化设计，协同工作完成记忆管理
+            </p>
+
+            <div class="arch-diagram">
+                <div class="arch-flow">
+                    <div class="arch-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">会话开始 → 自动注入上下文</div>
+                            <div class="step-description">新会话开始时，系统自动检索并注入最近的观察和相关记忆作为上下文</div>
+                        </div>
+                    </div>
+
+                    <div class="arch-arrow">↓</div>
+
+                    <div class="arch-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">工具使用 → 自动捕获观察</div>
+                            <div class="step-description">实时捕获 Claude Code 的工具使用观察，记录重要操作和对话内容</div>
+                        </div>
+                    </div>
+
+                    <div class="arch-arrow">↓</div>
+
+                    <div class="arch-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">智能处理 → AI 压缩生成摘要</div>
+                            <div class="step-description">使用 AI 模型对捕获的信息进行智能压缩，生成语义摘要和关键词</div>
+                        </div>
+                    </div>
+
+                    <div class="arch-arrow">↓</div>
+
+                    <div class="arch-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">持久存储 → 分层存储记忆</div>
+                            <div class="step-description">将处理后的记忆内容分层存储到数据库，建立索引和关联关系</div>
+                        </div>
+                    </div>
+
+                    <div class="arch-arrow">↓</div>
+
+                    <div class="arch-step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <div class="step-title">会话结束 → 记忆保存完成</div>
+                            <div class="step-description">会话结束后，所有记忆内容完成保存，为下次会话提供上下文支持</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 安装指南 -->
+    <section id="install" class="install-section">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                安装指南
+            </h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
+                简单安装，快速开始使用持久化记忆功能
+            </p>
+
+            <div class="install-methods">
+                <div class="install-method">
+                    <div class="method-title">
+                        <div class="method-icon">🔌</div>
+                        插件安装（推荐）
+                    </div>
+                    <div class="code-example">
+                        <div class="code-header">
+                            <span class="code-title">安装命令</span>
+                            <button class="copy-button" onclick="copyCode(this)">复制代码</button>
+                        </div>
+                        <pre><code># 添加官方插件市场
+claude plugin marketplace add https://github.com/anthropics/claude-code
+
+# 安装 Claude-Mem 插件
+claude plugin install claude-mem</code></pre>
+                    </div>
+                </div>
+
+                <div class="install-method">
+                    <div class="method-title">
+                        <div class="method-icon">🔧</div>
+                        手动安装
+                    </div>
+                    <div class="code-example">
+                        <div class="code-header">
+                            <span class="code-title">编译安装</span>
+                            <button class="copy-button" onclick="copyCode(this)">复制代码</button>
+                        </div>
+                        <pre><code># 克隆仓库
+git clone https://github.com/thedotmack/claude-mem.git
+cd claude-mem
+
+# 安装依赖
+npm install
+
+# 构建项目
+npm run build</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-example" style="margin-top: 3rem;">
+                <div class="code-header">
+                    <span class="code-title">MCP 配置 (.claude/settings.json)</span>
+                    <button class="copy-button" onclick="copyCode(this)">复制代码</button>
+                </div>
+                <pre><code>{
+  "mcpServers": {
+    "claude-mem": {
+      "command": "node",
+      "args": ["/path/to/claude-mem/dist/index.js"],
+      "env": {
+        "CLAUDE_MEM_PORT": "37777",
+        "CLAUDE_MEM_HOST": "localhost",
+        "CLAUDE_MEM_DB_PATH": "./memory.db",
+        "CLAUDE_MEM_MAX_TOKENS": "1000",
+        "CLAUDE_MEM_COMPRESSION_MODEL": "claude-3-haiku-20240307"
+      }
+    }
+  }
+}</code></pre>
+            </div>
+
+            <h3 style="text-align: center; margin: 3rem 0 2rem; font-size: 1.8rem; color: var(--text-primary);">
+                高级配置选项
+            </h3>
+
+            <div style="overflow-x: auto;">
+                <table class="config-table">
+                    <thead>
+                        <tr>
+                            <th>配置项</th>
+                            <th>描述</th>
+                            <th>默认值</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>CLAUDE_MEM_PORT</td>
+                            <td>Web界面端口</td>
+                            <td>37777</td>
+                        </tr>
+                        <tr>
+                            <td>CLAUDE_MEM_HOST</td>
+                            <td>服务器主机</td>
+                            <td>localhost</td>
+                        </tr>
+                        <tr>
+                            <td>CLAUDE_MEM_DB_PATH</td>
+                            <td>数据库文件路径</td>
+                            <td>./memory.db</td>
+                        </tr>
+                        <tr>
+                            <td>CLAUDE_MEM_MAX_TOKENS</td>
+                            <td>最大Token数量</td>
+                            <td>1000</td>
+                        </tr>
+                        <tr>
+                            <td>CLAUDE_MEM_COMPRESSION_MODEL</td>
+                            <td>压缩模型</td>
+                            <td>claude-3-haiku-20240307</td>
+                        </tr>
+                        <tr>
+                            <td>CLAUDE_MEM_RETENTION_DAYS</td>
+                            <td>记忆保留天数</td>
+                            <td>30</td>
+                        </tr>
+                        <tr>
+                            <td>CLAUDE_MEM_AUTO_SUMMARIZE</td>
+                            <td>自动摘要</td>
+                            <td>true</td>
+                        </tr>
+                        <tr>
+                            <td>CLAUDE_MEM_DEBUG</td>
+                            <td>调试模式</td>
+                            <td>false</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>项目链接</h3>
+                    <ul>
+                        <li><a href="https://github.com/thedotmack/claude-mem">GitHub仓库</a></li>
+                        <li><a href="https://github.com/thedotmack/claude-mem/issues">问题反馈</a></li>
+                        <li><a href="https://github.com/thedotmack/claude-mem/discussions">用户讨论</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>相关资源</h3>
+                    <ul>
+                        <li><a href="https://docs.anthropic.com/claude/docs/claude-code">Claude Code文档</a></li>
+                        <li><a href="https://modelcontextprotocol.io/">MCP协议规范</a></li>
+                        <li><a href="https://github.com/thedotmack/claude-mem/releases">更新日志</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>使用指南</h3>
+                    <ul>
+                        <li><a href="#">快速开始</a></li>
+                        <li><a href="#">配置说明</a></li>
+                        <li><a href="#">最佳实践</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 thedotmack. 开源项目，采用AGPL-3.0许可证。Claude-Mem 让 AI 助手拥有真正的长期记忆能力！</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 复制代码功能
+        function copyCode(button) {
+            const codeBlock = button.parentElement.parentElement.querySelector('code');
+            const text = codeBlock.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                button.textContent = '已复制';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.textContent = '复制代码';
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('复制失败:', err);
+            });
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 动态加载动画
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // 观察所有卡片
+        document.querySelectorAll('.memory-node, .feature-card, .install-method, .arch-step').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+
+        // 记忆项点击切换
+        document.querySelectorAll('.memory-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // 移除所有active类
+                document.querySelectorAll('.memory-item').forEach(el => {
+                    el.classList.remove('active');
+                });
+                // 添加active类到当前项
+                this.classList.add('active');
+            });
+        });
+
+        // 模拟实时记忆更新
+        function addNewMemory() {
+            const memoryList = document.querySelector('.memory-list');
+            const newMemory = document.createElement('li');
+            newMemory.className = 'memory-item';
+            newMemory.style.opacity = '0';
+            newMemory.innerHTML = `
+                <div class="memory-time">${new Date().toLocaleString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</div>
+                <div class="memory-content">新的记忆条目已添加</div>
+                <div class="memory-tags">
+                    <span class="memory-tag">实时</span>
+                </div>
+            `;
+
+            memoryList.insertBefore(newMemory, memoryList.firstChild);
+
+            // 添加动画效果
+            setTimeout(() => {
+                newMemory.style.transition = 'opacity 0.5s ease';
+                newMemory.style.opacity = '1';
+            }, 100);
+        }
+
+        // 每10秒添加一个新记忆
+        setInterval(addNewMemory, 10000);
+
+        // 粒子效果增强
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.style.position = 'absolute';
+            particle.style.width = Math.random() * 6 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.background = 'rgba(6, 182, 212, 0.6)';
+            particle.style.borderRadius = '50%';
+            particle.style.pointerEvents = 'none';
+
+            const startX = Math.random() * window.innerWidth;
+            const startY = Math.random() * window.innerHeight;
+
+            particle.style.left = startX + 'px';
+            particle.style.top = startY + 'px';
+
+            document.querySelector('.particles').appendChild(particle);
+
+            const duration = Math.random() * 3000 + 2000;
+            const endX = startX + (Math.random() - 0.5) * 200;
+            const endY = startY + (Math.random() - 0.5) * 200;
+
+            particle.animate([
+                { transform: `translate(0, 0) scale(1)`, opacity: 1 },
+                { transform: `translate(${endX - startX}px, ${endY - startY}px) scale(0)`, opacity: 0 }
+            ], {
+                duration: duration,
+                easing: 'ease-out'
+            }).onfinish = () => particle.remove();
+        }
+
+        // 定期创建新粒子
+        setInterval(createParticle, 500);
+    </script>
+</body>
+</html>

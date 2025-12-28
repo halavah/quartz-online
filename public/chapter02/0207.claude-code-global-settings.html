@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code 全局配置与设置</title>
+    <meta name="description" content="全面掌握Claude Code配置系统，包含settings.json配置、环境变量、企业部署策略和最佳实践">
+    <meta name="keywords" content="Claude Code,全局配置,settings.json,环境变量,企业部署,最佳实践">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0066ff;
+            --secondary-color: #00d4ff;
+            --accent-color: #ff6b00;
+            --dark-bg: #0a0e27;
+            --card-bg: #1a1f3a;
+            --text-color: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --border-color: #2a2f4a;
+            --success-color: #00c853;
+            --gradient-primary: linear-gradient(135deg, #0066ff 0%, #00d4ff 100%);
+            --gradient-hero: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--dark-bg);
+        }
+
+        .hero-section {
+            background: var(--gradient-hero);
+            padding: 4rem 2rem 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(0, 102, 255, 0.2);
+            color: var(--secondary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            margin-bottom: 1rem;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: flex;
+            gap: 3rem;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .toc-sidebar {
+            width: 280px;
+            position: sticky;
+            top: 2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+
+        .toc-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .toc-sidebar ul {
+            list-style: none;
+        }
+
+        .toc-sidebar li {
+            margin-bottom: 0.5rem;
+        }
+
+        .toc-sidebar a {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .toc-sidebar a:hover {
+            background: rgba(0, 102, 255, 0.1);
+            color: var(--primary-color);
+            transform: translateX(4px);
+        }
+
+        .toc-sidebar a.active {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 102, 255, 0.2);
+        }
+
+        .card h4 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .card h5 {
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            color: #58a6ff;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .list {
+            margin: 1rem 0 1rem 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .list li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .list li strong {
+            color: var(--text-color);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        th {
+            background: rgba(0, 102, 255, 0.1);
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(0, 102, 255, 0.05);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.4);
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: var(--secondary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .back-to-top svg {
+            margin-bottom: 2px;
+        }
+
+        .footer {
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 1024px) {
+            .toc-sidebar {
+                position: static;
+                width: 100%;
+                max-height: none;
+                order: -1;
+                margin-bottom: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            .main-content {
+                padding: 2rem 1rem;
+                flex-direction: column;
+            }
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-container">
+            <span class="hero-badge">全局配置</span>
+            <h1 class="hero-title">Claude Code 全局配置与设置</h1>
+            <p class="hero-subtitle">全面掌握Claude Code配置系统，包含settings.json配置、环境变量、企业部署策略和最佳实践</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- TOC Sidebar -->
+        <nav class="toc-sidebar">
+            <h2 class="toc-title">📋 目录导航</h2>
+            <ul>
+                <li><a href="#settings-json">1. settings.json完全配置</a></li>
+                <li><a href="#env-variables">2. 环境变量大全</a></li>
+                <li><a href="#enterprise-deploy">3. 企业级部署策略</a></li>
+                <li><a href="#config-priority">4. 配置优先级详解</a></li>
+                <li><a href="#best-practices">5. 最佳实践建议</a></li>
+            </ul>
+        </nav>
+
+        <!-- Content -->
+        <div class="content-wrapper">
+            <!-- Section 1: settings.json -->
+            <section id="settings-json" class="section">
+                <h2 class="section-title">1️⃣ settings.json完全配置</h2>
+
+                <div class="card">
+                    <h5>配置文件位置</h5>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>配置类型</th>
+                                    <th>文件位置</th>
+                                    <th>描述</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>企业策略</td>
+                                    <td><code>/etc/claude-code/policies.json</code></td>
+                                    <td>企业级策略配置，最高优先级</td>
+                                </tr>
+                                <tr>
+                                    <td>用户全局</td>
+                                    <td><code>~/.claude/settings.json</code></td>
+                                    <td>用户个人配置，所有项目生效</td>
+                                </tr>
+                                <tr>
+                                    <td>项目共享</td>
+                                    <td><code>.claude/settings.json</code></td>
+                                    <td>项目共享配置，可提交到Git</td>
+                                </tr>
+                                <tr>
+                                    <td>项目本地</td>
+                                    <td><code>.claude/settings.local.json</code></td>
+                                    <td>项目本地配置，被Git忽略</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>完整配置示例</h4>
+                    <div class="code-block">
+                        <code>{
+  // API和认证配置
+  "apiKeyHelper": "/usr/local/bin/company-key-helper.sh",
+
+  // 环境变量
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://open.bigmodel.cn/api/anthropic",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-4.6",
+    "NODE_ENV": "development"
+  },
+
+  // 权限配置
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Read(*)",
+      "Write(*.md)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(sudo *)"
+    ]
+  },
+
+  // 其他配置
+  "cleanupPeriodDays": 30,
+  "includeCoAuthoredBy": true
+}</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Environment Variables -->
+            <section id="env-variables" class="section">
+                <h2 class="section-title">2️⃣ 环境变量大全</h2>
+
+                <div class="card">
+                    <h4>API和认证相关</h4>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>变量名</th>
+                                    <th>描述</th>
+                                    <th>示例值</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>ANTHROPIC_API_KEY</code></td>
+                                    <td>API密钥</td>
+                                    <td><code>sk-ant-...</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>ANTHROPIC_AUTH_TOKEN</code></td>
+                                    <td>认证令牌</td>
+                                    <td><code>sk-ant-...</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>ANTHROPIC_BASE_URL</code></td>
+                                    <td>自定义API端点</td>
+                                    <td><code>https://api.anthropic.com</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>模型配置</h4>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>变量名</th>
+                                    <th>描述</th>
+                                    <th>示例值</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>ANTHROPIC_MODEL</code></td>
+                                    <td>默认模型名称</td>
+                                    <td><code>claude-sonnet-4</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>ANTHROPIC_DEFAULT_SONNET_MODEL</code></td>
+                                    <td>Sonnet模型映射</td>
+                                    <td><code>glm-4.6</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>ANTHROPIC_DEFAULT_HAIKU_MODEL</code></td>
+                                    <td>Haiku模型映射</td>
+                                    <td><code>glm-4.5-air</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>功能开关</h4>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>变量名</th>
+                                    <th>描述</th>
+                                    <th>值</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>DISABLE_AUTOUPDATER</code></td>
+                                    <td>禁用自动更新</td>
+                                    <td><code>1</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>DISABLE_TELEMETRY</code></td>
+                                    <td>禁用遥测</td>
+                                    <td><code>1</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC</code></td>
+                                    <td>禁用非必要流量</td>
+                                    <td><code>1</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Enterprise Deployment -->
+            <section id="enterprise-deploy" class="section">
+                <h2 class="section-title">3️⃣ 企业级部署策略</h2>
+
+                <div class="card">
+                    <h4>Linux企业配置</h4>
+                    <div class="code-block">
+                        <code># 创建企业配置目录
+sudo mkdir -p /etc/claude-code
+
+# 创建策略文件
+sudo tee /etc/claude-code/policies.json << EOF
+{
+  "permissions": {
+    "allow": [
+      "Read(/home/*/projects/*)",
+      "Write(/home/*/projects/*/src/**/*)"
+    ],
+    "deny": [
+      "Write(/etc/*)",
+      "Bash(sudo *)"
+    ]
+  },
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.company.com",
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "0"
+  }
+}
+EOF</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>密钥管理</h4>
+                    <div class="code-block">
+                        <code>#!/bin/bash
+# /usr/local/bin/company-key-helper.sh
+
+# 从公司密钥管理系统获取临时密钥
+RESPONSE=$(curl -s -X POST \
+  -H "Authorization: Bearer $COMP_SERVICE_TOKEN" \
+  https://keymanager.company.com/api/keys/claude)
+
+echo $RESPONSE | jq -r '.apiKey'</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>监控和审计</h4>
+                    <div class="code-block">
+                        <code># 启用审计日志
+{
+  "env": {
+    "CLAUDE_CODE_ENABLE_AUDIT_LOG": "1",
+    "AUDIT_LOG_PATH": "/var/log/claude-code/audit.log",
+    "AUDIT_LOG_FORMAT": "json"
+  }
+}</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Configuration Priority -->
+            <section id="config-priority" class="section">
+                <h2 class="section-title">4️⃣ 配置优先级详解</h2>
+
+                <div class="card">
+                    <h4>优先级层次</h4>
+                    <div class="code-block">
+                        <code>1. 命令行参数          (最高优先级)
+2. 环境变量
+3. 项目本地配置        (.claude/settings.local.json)
+4. 项目共享配置        (.claude/settings.json)
+5. 用户全局配置        (~/.claude/settings.json)
+6. 企业策略配置        (最低优先级)</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>配置继承示例</h4>
+                    <div class="code-block">
+                        <code>// 全局配置
+{
+  "permissions": {
+    "allow": ["Read(*)"],
+    "deny": ["Bash(sudo*)"]
+  }
+}
+
+// 项目配置
+{
+  "permissions": {
+    // 继承全局allow，添加新的权限
+    "allow": ["Bash(npm run *)"]
+  },
+  // 覆盖全局配置
+  "env": {
+    "NODE_ENV": "development"
+  }
+}</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Best Practices -->
+            <section id="best-practices" class="section">
+                <h2 class="section-title">5️⃣ 最佳实践建议</h2>
+
+                <div class="card">
+                    <h4>安全配置</h4>
+                    <div class="list">
+                        <li><strong>敏感信息保护</strong>：使用 <code>settings.local.json</code> 存储敏感信息</li>
+                        <li><strong>权限最小化</strong>：遵循最小权限原则，只授予必要的权限</li>
+                        <li><strong>定期轮换密钥</strong>：定期更新API密钥</li>
+                        <li><strong>启用审计</strong>：开启审计日志记录重要操作</li>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>性能优化</h4>
+                    <div class="code-block">
+                        <code>{
+  "env": {
+    // 限制输出长度减少Token使用
+    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "4096",
+
+    // 短任务使用小模型
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "glm-4.5-air"
+  }
+}</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>团队协作</h4>
+                    <div class="list">
+                        <li><strong>标准化项目配置</strong>：使用项目级共享配置统一团队规范</li>
+                        <li><strong>版本控制</strong>：重要配置进行版本管理</li>
+                        <li><strong>定期审查</strong>：定期审查和更新权限设置</li>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>维护建议</h4>
+                    <div class="code-block">
+                        <code>#!/bin/bash
+# claude-maintenance.sh
+
+# 清理缓存
+find ~/.claude/cache -name "*.tmp" -mtime +7 -delete
+
+# 验证配置
+claude /doctor
+
+# 生成使用报告
+claude -p "生成本月使用报告" > monthly-report.md</code>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Back to Top -->
+    <button class="back-to-top" id="backToTop">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M7 14l5-5 5 5" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        回到顶部
+    </button>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <p id="copyright-text">© 2025 Halavah's Tech. All rights reserved.</p>
+            <p id="beian-number"></p>
+        </div>
+    </footer>
+
+    <script>
+        fetch('/data/articles.json')
+            .then(response => response.json())
+            .then(data => {
+                const { beianNumber, copyrightText } = data.config;
+                document.getElementById('copyright-text').textContent =
+                    copyrightText || '© 2025 Halavah\'s Tech. All rights reserved.';
+                if (beianNumber) {
+                    document.getElementById('beian-number').textContent = beianNumber;
+                }
+            })
+            .catch(error => console.error('Failed to load config:', error));
+
+        document.querySelectorAll('.toc-sidebar a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    document.querySelectorAll('.toc-sidebar a').forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${entry.target.id}`) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, { rootMargin: '-100px 0px -80% 0px' });
+
+        document.querySelectorAll('section[id]').forEach(section => {
+            observer.observe(section);
+        });
+
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

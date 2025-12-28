@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code Windows 系统完整安装指南</title>
+    <meta name="description" content="Claude Code在Windows系统上的完整安装指南,包括Git Bash安装、PowerShell安装、npm安装和API配置">
+    <meta name="keywords" content="Claude Code,Windows安装,Git Bash,PowerShell,npm安装,API配置">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0066ff;
+            --secondary-color: #00d4ff;
+            --accent-color: #ff6b00;
+            --dark-bg: #0a0e27;
+            --card-bg: #1a1f3a;
+            --text-color: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --border-color: #2a2f4a;
+            --success-color: #00c853;
+            --gradient-primary: linear-gradient(135deg, #0066ff 0%, #00d4ff 100%);
+            --gradient-hero: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+            --shadow-glow: 0 0 30px rgba(0, 102, 255, 0.3);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--dark-bg);
+            overflow-x: hidden;
+        }
+
+        .hero-section {
+            background: var(--gradient-hero);
+            padding: 4rem 2rem 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: flex;
+            gap: 3rem;
+            align-items: flex-start;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            min-width: 0; /* Important for flex overflow handling */
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+            color: var(--text-color);
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 20px rgba(0, 102, 255, 0.2);
+        }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            color: #58a6ff;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+        }
+
+        .list {
+            margin: 1rem 0 1rem 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .list li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .note {
+            background: rgba(0, 102, 255, 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .note strong {
+            color: var(--secondary-color);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: rgba(0, 102, 255, 0.1);
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .toc-sidebar {
+            position: sticky;
+            top: 6rem;
+            width: 280px;
+            flex-shrink: 0;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .toc-sidebar h3 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .toc-sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc-sidebar li {
+            margin: 0.5rem 0;
+        }
+
+        .toc-sidebar a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: block;
+            padding: 0.25rem 0;
+            font-size: 0.95rem;
+        }
+
+        .toc-sidebar a:hover {
+            color: var(--primary-color);
+            padding-left: 0.5rem;
+        }
+
+        .toc-sidebar a.active {
+            color: var(--primary-color);
+            font-weight: 600;
+            padding-left: 0.5rem;
+            border-left: 2px solid var(--primary-color);
+        }
+
+        /* Scrollbar styling for TOC */
+        .toc-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .toc-sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .toc-sidebar::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .toc-sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+
+        @media (max-width: 1024px) {
+            .toc-sidebar {
+                position: static;
+                width: 100%;
+                max-height: none;
+                order: -1; /* Show TOC before content on mobile */
+            }
+        }
+
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+        }
+
+        .back-to-top:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .back-to-top.show {
+            display: flex;
+        }
+
+        .back-to-top svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .main-content {
+                padding: 2rem 1rem;
+            }
+
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .main-content {
+                padding: 2rem 1.5rem;
+                gap: 2rem;
+            }
+
+            .hero-section {
+                padding: 3rem 1.5rem 2rem;
+            }
+
+            .hero-title {
+                font-size: 2.2rem;
+            }
+
+            .toc-sidebar {
+                width: 280px;
+            }
+
+            .prerequisites-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+                padding: 1.5rem;
+            }
+
+            .hero-section {
+                padding: 2rem 1rem;
+            }
+
+            .hero-title {
+                font-size: 1.8rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .toc-sidebar {
+                width: 100%;
+                margin-bottom: 2rem;
+                position: static;
+                border-radius: 0.75rem;
+            }
+
+            .toc-sidebar ul {
+                columns: 1;
+            }
+
+            .install-methods {
+                grid-template-columns: 1fr;
+            }
+
+            .prerequisites-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .installation-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .code-block {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .code-block code {
+                white-space: pre-wrap;
+                word-break: break-all;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .config-form {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.6rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            h3 {
+                font-size: 1.3rem;
+            }
+
+            .install-card {
+                padding: 1.5rem;
+            }
+
+            .config-form {
+                padding: 1rem;
+            }
+
+            .feature-list li {
+                padding: 0.75rem;
+            }
+
+            .code-block {
+                padding: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Back to top button -->
+    <button class="back-to-top" id="backToTop">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 15l-6-6-6 6"/>
+        </svg>
+        <span>返回顶部</span>
+    </button>
+
+    <div class="hero-section">
+        <div class="hero-container">
+            <h1 class="hero-title">Claude Code Windows 系统完整安装指南</h1>
+            <p class="hero-subtitle">在 Windows 系统上安装 Claude Code 的完整指南，包括三种安装方式和完整的环境配置</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="content-wrapper">
+        <section id="system-requirements" class="section">
+            <h2 class="section-title">系统要求</h2>
+
+            <h3 class="section-subtitle">最低配置</h3>
+            <ul class="list">
+                <li><strong>操作系统</strong>: Windows 10 或更高版本</li>
+                <li><strong>内存</strong>: 至少 4GB RAM（推荐 8GB+）</li>
+                <li><strong>存储空间</strong>: 至少 500MB 可用空间</li>
+                <li><strong>网络</strong>: 需要互联网连接（用于 API 调用和更新）</li>
+            </ul>
+
+            <h3 class="section-subtitle">必需软件</h3>
+            <ul class="list">
+                <li><strong>Git for Windows</strong>: 原生安装版本依赖 Git Bash 运行环境(npm 安装方式不强制要求)</li>
+                <li><strong>PowerShell 5.1+</strong>: 用于执行安装脚本（Windows 10 内置）</li>
+                <li><strong>Node.js</strong>: 如果选择 npm 安装方式,需要安装 Node.js 环境</li>
+            </ul>
+        </section>
+
+        <section id="prerequisites" class="section">
+            <h2 class="section-title">前置准备</h2>
+
+            <h3 class="section-subtitle">步骤 1: 安装 Git for Windows (原生安装方式必需)</h3>
+            <p class="section-description">如果你计划使用<strong>原生安装方式</strong>（方式一或方式二）,Claude Code 在 Windows 上需要 Git Bash 才能正常运行,这是最重要的前置条件。</p>
+
+            <div class="note">
+                <strong>注意</strong>: 如果你选择使用 npm 安装方式(方式三),可以跳过此步骤,不强制要求安装 Git for Windows。
+            </div>
+
+            <div class="card">
+                <h4>下载 Git for Windows</h4>
+                <ol class="list">
+                    <li>访问官方下载页面: <code>https://git-scm.com/downloads/win</code></li>
+                    <li>下载最新的 64 位安装包（通常命名为 <code>Git-&lt;version&gt;-64-bit.exe</code>）</li>
+                    <li>文件大小约 50MB,下载时间取决于网络速度</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h4>安装 Git for Windows</h4>
+                <ol class="list">
+                    <li>双击下载的安装包</li>
+                    <li>在安装向导中,建议使用以下配置:
+                        <ul class="list">
+                            <li><strong>选择组件</strong>: 保持默认选项,确保勾选 "Git Bash Here"</li>
+                            <li><strong>默认编辑器</strong>: 选择你喜欢的编辑器（如 Vim、Notepad++、VS Code）</li>
+                            <li><strong>PATH 环境变量</strong>: 选择 "Git from the command line and also from 3rd-party software"</li>
+                            <li><strong>HTTPS 传输后端</strong>: 选择 "Use the OpenSSL library"</li>
+                            <li><strong>换行符转换</strong>: 选择 "Checkout Windows-style, commit Unix-style line endings"</li>
+                            <li><strong>终端模拟器</strong>: 选择 "Use MinTTY (the default terminal of MSYS2)"</li>
+                        </ul>
+                    </li>
+                    <li>点击 "Install" 开始安装</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h4>验证 Git Bash 安装</h4>
+                <ol class="list">
+                    <li>在开始菜单搜索 "Git Bash"</li>
+                    <li>打开 Git Bash,应该看到类似 Linux 的命令行界面</li>
+                    <li>输入以下命令验证:</li>
+                </ol>
+                <div class="code-block">
+                    <code>git --version</code>
+                </div>
+                <p class="section-description">如果显示 Git 版本号(如 <code>git version 2.43.0.windows.1</code>),说明安装成功</p>
+            </div>
+        </section>
+
+        <section id="installation" class="section">
+            <h2 class="section-title">安装步骤</h2>
+            <p class="section-description">Windows 系统提供多种安装 Claude Code 的方式,可根据需求选择。</p>
+
+            <h3 class="section-subtitle">方式一: 使用 PowerShell 原生安装（推荐）</h3>
+            <p class="section-description">这是最简单快捷的安装方式,适合大多数用户。</p>
+
+            <div class="card">
+                <h4>步骤 1: 打开 PowerShell</h4>
+                <ol class="list">
+                    <li>按 <code>Win + X</code> 键</li>
+                    <li>选择 "Windows PowerShell" 或 "终端"</li>
+                    <li>或者在开始菜单搜索 "PowerShell" 并打开</li>
+                </ol>
+                <div class="note">
+                    <strong>注意</strong>: 不需要以管理员身份运行,普通用户权限即可。
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>步骤 2: 执行安装命令</h4>
+                <p><strong>安装最新稳定版本</strong>:</p>
+                <div class="code-block">
+                    <code>irm https://claude.ai/install.ps1 | iex</code>
+                </div>
+
+                <p><strong>安装指定版本</strong>:</p>
+                <div class="code-block">
+                    <code>& ([scriptblock]::Create((irm https://claude.ai/install.ps1))) 1.0.58</code>
+                </div>
+
+                <p><strong>安装最新开发版</strong>:</p>
+                <div class="code-block">
+                    <code>& ([scriptblock]::Create((irm https://claude.ai/install.ps1))) latest</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>步骤 3: 等待安装完成</h4>
+                <ul class="list">
+                    <li>安装脚本会自动下载 Claude Code 二进制文件</li>
+                    <li>文件将被安装到 <code>C:\Users\&lt;你的用户名&gt;\.local\bin\</code> 目录</li>
+                    <li>整个过程通常需要 30 秒到 2 分钟,取决于网络速度</li>
+                </ul>
+            </div>
+
+            <h3 class="section-subtitle">方式二: 使用 CMD 命令提示符安装</h3>
+            <p class="section-description">如果你更习惯使用传统的命令提示符,也可以使用这种方式。</p>
+
+            <div class="card">
+                <h4>安装稳定版本</h4>
+                <div class="code-block">
+                    <code>curl -fsSL https://claude.ai/install.cmd -o install.cmd && install.cmd && del install.cmd</code>
+                </div>
+            </div>
+
+            <h3 class="section-subtitle">方式三: 使用 Node.js/npm 安装</h3>
+            <p class="section-description">如果你是开发者或需要使用 npm 包管理器,可以通过 Node.js 环境安装 Claude Code。</p>
+
+            <div class="card">
+                <h4>步骤 1: 安装 Node.js 环境</h4>
+                <p><strong>方法一: 官网下载（推荐）</strong></p>
+                <ol class="list">
+                    <li>打开浏览器访问 <code>https://nodejs.org/</code></li>
+                    <li>点击 "LTS" 版本进行下载（推荐长期支持版本）</li>
+                    <li>下载完成后双击 <code>.msi</code> 文件</li>
+                    <li>按照安装向导完成安装,保持默认设置即可</li>
+                </ol>
+
+                <p><strong>验证 Node.js 安装</strong></p>
+                <div class="code-block">
+                    <code>node --version<br>npm --version</code>
+                </div>
+                <p class="section-description">如果显示版本号,说明安装成功。</p>
+            </div>
+
+            <div class="card">
+                <h4>步骤 2: 安装 Claude Code</h4>
+                <p><strong>全局安装 Claude Code</strong>:</p>
+                <div class="code-block">
+                    <code>npm install -g @anthropic-ai/claude-code</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>步骤 3: 验证 Claude Code 安装</h4>
+                <div class="code-block">
+                    <code>claude --version</code>
+                </div>
+                <p class="section-description">如果显示版本号,说明 Claude Code 已成功安装。</p>
+            </div>
+        </section>
+
+        <section id="environment" class="section">
+            <h2 class="section-title">环境配置</h2>
+            <p class="section-description">安装完成后,需要配置环境变量让系统能够找到 <code>claude</code> 命令。</p>
+
+            <h3 class="section-subtitle">配置 PATH 环境变量</h3>
+
+            <div class="card">
+                <h4>方法一: 使用 PowerShell 一键配置（推荐）</h4>
+                <div class="code-block">
+                    <code># 将 Claude Code 添加到用户 PATH 环境变量（永久有效）<br>[Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "User") + ";$env:USERPROFILE\.local\bin", "User")<br><br># 在当前会话立即生效<br>$env:Path += ";$env:USERPROFILE\.local\bin"</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>方法二: 通过系统设置手动配置</h4>
+                <ol class="list">
+                    <li>按 <code>Win + R</code>,输入 <code>sysdm.cpl</code> 并按回车</li>
+                    <li>点击 "高级" 标签,再点击 "环境变量" 按钮</li>
+                    <li>在 "用户变量" 区域,找到 <code>Path</code> 变量并选中它,点击 "编辑"</li>
+                    <li>点击 "新建" 按钮,输入: <code>C:\Users\&lt;你的用户名&gt;\.local\bin</code></li>
+                    <li>点击 "确定" 保存所有对话框</li>
+                    <li><strong>重要</strong>: 重启所有已打开的终端窗口使配置生效</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="api-config" class="section">
+            <h2 class="section-title">API 配置</h2>
+            <p class="section-description">Claude Code 需要 Anthropic API Key 才能正常工作。根据你的网络环境,可以选择直连官方 API 或使用中转服务。</p>
+
+            <h3 class="section-subtitle">获取 API Key</h3>
+
+            <div class="card">
+                <h4>官方 API (需要国际网络)</h4>
+                <ol class="list">
+                    <li>访问 <code>https://console.anthropic.com/</code></li>
+                    <li>登录或注册账号</li>
+                    <li>进入 "API Keys" 页面</li>
+                    <li>点击 "Create Key" 创建新的 API 密钥</li>
+                    <li>复制生成的密钥（格式: <code>sk-ant-api03-...</code>）</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h4>中转 API (国内推荐)</h4>
+                <p class="section-description">如果你在中国大陆无法直接访问 Anthropic API,可以使用中转服务:</p>
+                <ul class="list">
+                    <li>访问中转服务商网站(如 https://api.nekoapi.com/)</li>
+                    <li>注册账号并充值</li>
+                    <li>获取中转 API Key 和 Base URL</li>
+                </ul>
+            </div>
+
+            <h3 class="section-subtitle">配置方式</h3>
+
+            <div class="card">
+                <h4>方法一: PowerShell 环境变量配置（推荐）</h4>
+                <p><strong>临时配置（当前会话有效）</strong></p>
+                <div class="code-block">
+                    <code># 设置 API Base URL（使用中转服务时需要）<br>$env:ANTHROPIC_BASE_URL="https://api.claudecode.net.cn/api/claudecode"<br><br># 设置 API Key<br>$env:ANTHROPIC_API_KEY="sk-ant-api03-你的密钥"<br><br># 设置 Auth Token（与 API Key 保持一致）<br>$env:ANTHROPIC_AUTH_TOKEN="sk-ant-api03-你的密钥"</code>
+                </div>
+
+                <p><strong>永久配置（系统级）</strong></p>
+                <div class="code-block">
+                    <code># 永久设置到用户环境变量<br>[Environment]::SetEnvironmentVariable("ANTHROPIC_BASE_URL", "https://api.claudecode.net.cn/api/claudecode", "User")<br>[Environment]::SetEnvironmentVariable("ANTHROPIC_API_KEY", "sk-ant-api03-你的密钥", "User")<br>[Environment]::SetEnvironmentVariable("ANTHROPIC_AUTH_TOKEN", "sk-ant-api03-你的密钥", "User")</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>配置说明</h4>
+                <ul class="list">
+                    <li><strong>ANTHROPIC_BASE_URL</strong>: API 服务器地址
+                        <ul>
+                            <li>官方 API: <code>https://api.anthropic.com</code> 或不设置此项</li>
+                            <li>中转服务: 使用中转商提供的 URL</li>
+                        </ul>
+                    </li>
+                    <li><strong>ANTHROPIC_API_KEY</strong>: 你的 API 密钥（格式通常为 <code>sk-ant-api03-</code> 开头）</li>
+                    <li><strong>ANTHROPIC_AUTH_TOKEN</strong>: 认证令牌（通常与 API KEY 相同）</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="verification" class="section">
+            <h2 class="section-title">验证安装</h2>
+            <p class="section-description">配置完成后,需要验证 Claude Code 是否正确安装并可以正常使用。</p>
+
+            <div class="card">
+                <h4>步骤 1: 打开终端</h4>
+                <p><strong>如果使用原生安装</strong>:</p>
+                <ul class="list">
+                    <li>在开始菜单搜索并打开 "Git Bash"</li>
+                    <li><strong>重要</strong>: 原生安装版本必须在 Git Bash 中运行,不能直接在 PowerShell 或 CMD 中使用</li>
+                </ul>
+                <p><strong>如果使用 npm 安装</strong>:</p>
+                <ul class="list">
+                    <li>可以使用 PowerShell、CMD 或 Git Bash</li>
+                    <li>推荐使用 PowerShell</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h4>步骤 2: 检查版本</h4>
+                <div class="code-block">
+                    <code>claude --version</code>
+                </div>
+                <p><strong>预期输出</strong>:</p>
+                <div class="code-block">
+                    <code>Claude Code v1.0.58</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>步骤 3: 系统诊断</h4>
+                <div class="code-block">
+                    <code>claude doctor</code>
+                </div>
+                <p class="section-description">此命令会检查:</p>
+                <ul class="list">
+                    <li>Claude Code 版本</li>
+                    <li>安装类型（原生 vs npm）</li>
+                    <li>API 配置状态</li>
+                    <li>网络连接</li>
+                    <li>依赖环境</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h4>步骤 4: 测试运行</h4>
+                <div class="code-block">
+                    <code>claude "Hello, Claude!"</code>
+                </div>
+                <p class="section-description">如果一切正常,Claude 会回复你的问候,说明 API 配置正确且可以正常调用。</p>
+            </div>
+        </section>
+
+        <section id="troubleshooting" class="section">
+            <h2 class="section-title">常见问题</h2>
+
+            <div class="card">
+                <h4>Q1: 提示 "claude: command not found"</h4>
+                <p><strong>原因</strong>: PATH 环境变量未正确配置或终端未重启。</p>
+                <p><strong>解决方法</strong>:</p>
+                <ol class="list">
+                    <li>检查 PATH 是否包含 <code>.local\bin</code> 目录</li>
+                    <li>如果不包含,重新按照配置 PATH 环境变量步骤操作</li>
+                    <li><strong>必须重启终端窗口</strong>才能生效</li>
+                    <li>确保在 Git Bash 中运行,不是在 PowerShell 或 CMD</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h4>Q2: API Key 无效或无法连接</h4>
+                <p><strong>症状</strong>: 运行 <code>claude "test"</code> 时提示认证失败或网络错误。</p>
+                <p><strong>解决方法</strong>:</p>
+                <ol class="list">
+                    <li>检查 API Key 格式是否正确（应以 <code>sk-ant-api03-</code> 开头）</li>
+                    <li>验证环境变量是否设置</li>
+                    <li>如果为空,重新按照 API 配置步骤操作</li>
+                    <li>如果使用中转服务,确认 Base URL 是否正确</li>
+                    <li>运行 <code>claude doctor</code> 检查配置状态</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h4>Q3: Git Bash 中文乱码</h4>
+                <p><strong>解决方法</strong>:</p>
+                <ol class="list">
+                    <li>在 Git Bash 中右键点击标题栏 → Options</li>
+                    <li>进入 "Text" 设置</li>
+                    <li>将 "Character set" 改为 "UTF-8"</li>
+                    <li>保存并重启 Git Bash</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h4>Q4: 杀毒软件误报</h4>
+                <p><strong>症状</strong>: 安装或运行时被杀毒软件拦截。</p>
+                <p><strong>解决方法</strong>:</p>
+                <ol class="list">
+                    <li>将 <code>.local\bin\claude.exe</code> 添加到杀毒软件白名单</li>
+                    <li>或暂时关闭实时保护,完成安装后再开启</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="advanced" class="section">
+            <h2 class="section-title">进阶配置</h2>
+
+            <div class="card">
+                <h4>配置 Shell 环境</h4>
+                <p>编辑 <code>~/.bashrc</code> 添加个性化配置:</p>
+                <div class="code-block">
+                    <code># Claude Code 别名<br>alias cc='claude'<br>alias ccd='claude doctor'<br><br># 自动补全（如果支持）<br>eval "$(claude --bash-completion)"</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>禁用自动更新</h4>
+                <div class="code-block">
+                    <code># PowerShell<br>[Environment]::SetEnvironmentVariable("DISABLE_AUTOUPDATER", "1", "User")</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>手动更新 Claude Code</h4>
+                <div class="code-block">
+                    <code>claude update</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>卸载 Claude Code</h4>
+                <p><strong>1. 删除二进制文件:</strong></p>
+                <div class="code-block">
+                    <code>Remove-Item "$env:USERPROFILE\.local\bin\claude.exe" -Force</code>
+                </div>
+                <p><strong>2. 删除配置文件（可选）:</strong></p>
+                <div class="code-block">
+                    <code>Remove-Item "$env:USERPROFILE\.claude" -Recurse -Force</code>
+                </div>
+                <p><strong>3. 清理 PATH 环境变量</strong></p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">总结</h2>
+            <p class="section-description">完成上述步骤后,你已经在 Windows 系统上成功安装并配置了 Claude Code。现在你可以:</p>
+            <ul class="list">
+                <li>在任意项目目录打开 Git Bash</li>
+                <li>运行 <code>claude</code> 启动交互式会话</li>
+                <li>或直接运行 <code>claude "你的问题"</code> 获取即时回答</li>
+            </ul>
+
+            <div class="card">
+                <h4>快速命令参考</h4>
+                <div class="code-block">
+                    <code>claude                    # 启动交互式会话<br>claude "帮我写一个 Python 脚本"  # 直接提问<br>claude --version          # 查看版本<br>claude doctor             # 系统诊断<br>claude update             # 更新 Claude Code<br>claude --help             # 查看帮助</code>
+                </div>
+            </div>
+
+            <div class="note">
+                <strong>下一步建议</strong>:
+                <ul class="list">
+                    <li>阅读官方文档了解更多功能</li>
+                    <li>尝试在实际项目中使用 Claude Code</li>
+                    <li>探索自定义配置和工作流</li>
+                </ul>
+            </div>
+        </section>
+        </div>
+        <aside class="toc-sidebar">
+            <h3>📋 目录</h3>
+            <ul>
+                <li><a href="#system-requirements">系统要求</a></li>
+                <li><a href="#prerequisites">前置准备</a></li>
+                <li><a href="#installation">安装步骤</a></li>
+                <li><a href="#environment">环境配置</a></li>
+                <li><a href="#api-config">API 配置</a></li>
+                <li><a href="#verification">验证安装</a></li>
+                <li><a href="#troubleshooting">常见问题</a></li>
+                <li><a href="#advanced">进阶配置</a></li>
+            </ul>
+        </aside>
+    </div>
+
+    <footer style="border-top: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); margin-top: 5rem;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 2rem; text-align: center;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                <!-- 版权信息 -->
+                <div style="font-size: 0.875rem; color: var(--text-secondary);" id="copyright-text"></div>
+                <!-- 备案号 -->
+                <div style="font-size: 0.875rem; color: #6b7280;" id="beian-number"></div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // Load config from articles.json
+    fetch('/data/articles.json')
+        .then(response => response.json())
+        .then(data => {
+            const { beianNumber, copyrightText } = data.config;
+
+            document.getElementById('copyright-text').textContent = copyrightText || '© 2025 Halavah\'s Tech. All rights reserved.';
+            if (beianNumber) {
+                document.getElementById('beian-number').textContent = beianNumber;
+            }
+        })
+        .catch(error => console.error('Failed to load config:', error));
+    </script>
+
+    <script>
+    // Smooth scroll and active link tracking
+    document.querySelectorAll('.toc-sidebar a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    // Highlight active section
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                document.querySelectorAll('.toc-sidebar a').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${entry.target.id}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+    }, { rootMargin: '-100px 0px -80% 0px' });
+
+    document.querySelectorAll('section[id]').forEach(section => {
+        observer.observe(section);
+    });
+
+    // Back to top button functionality
+    const backToTop = document.getElementById('backToTop');
+
+    // Show/hide button based on scroll position
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            backToTop.classList.add('show');
+        } else {
+            backToTop.classList.remove('show');
+        }
+    });
+
+    // Smooth scroll to top when button is clicked
+    backToTop.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+    </script>
+</body>
+</html>

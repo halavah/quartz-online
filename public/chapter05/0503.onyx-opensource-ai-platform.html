@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onyx - 开源 AI 平台：多功能聊天 UI，支持任意 LLM</title>
+    <meta name="description" content="Onyx 是一个功能丰富的、自托管聊天 UI，支持任何 LLM。内置代理、RAG、连接器等高级功能，适用于团队和企业。">
+    <meta name="keywords" content="Onyx, AI 平台, LLM, RAG, 代理, 开源, 自托管">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0066ff;
+            --secondary-color: #00d4ff;
+            --accent-color: #ff6b00;
+            --dark-bg: #0a0e27;
+            --card-bg: #1a1f3a;
+            --text-color: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --border-color: #2a2f4a;
+            --success-color: #00c853;
+            --gradient-primary: linear-gradient(135deg, #0066ff 0%, #00d4ff 100%);
+            --gradient-hero: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+            --shadow-glow: 0 0 30px rgba(0, 102, 255, 0.3);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--dark-bg);
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: var(--gradient-hero);
+            padding: 4rem 2rem 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(0, 102, 255, 0.2);
+            color: var(--secondary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            margin-bottom: 1rem;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .meta-item strong {
+            color: var(--text-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: flex;
+            gap: 3rem;
+            align-items: flex-start;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section-subtitle {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+            color: var(--text-color);
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 20px rgba(0, 102, 255, 0.2);
+        }
+
+        .card h3 {
+            color: var(--text-color);
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .feature-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .feature-item .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-item h4 {
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .feature-item p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .code-block code {
+            color: #58a6ff;
+        }
+
+        .code-block .comment {
+            color: #8b949e;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .code-title {
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .copy-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Lists */
+        .list {
+            margin: 1rem 0 1rem 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .list li {
+            margin-bottom: 0.5rem;
+            line-height: 1.8;
+        }
+
+        .list li::marker {
+            color: var(--primary-color);
+        }
+
+        /* Info Box */
+        .info-box {
+            background: rgba(0, 102, 255, 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .info-box strong {
+            color: var(--secondary-color);
+        }
+
+        /* Table of Contents */
+        .toc-sidebar {
+            width: 280px;
+            position: sticky;
+            top: 6rem;
+            align-self: flex-start;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+
+        .toc-sidebar h3 {
+            color: var(--text-color);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .toc-sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc-sidebar li {
+            margin-bottom: 0.75rem;
+        }
+
+        .toc-sidebar a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+            font-size: 0.9rem;
+            display: block;
+            padding: 0.25rem 0;
+        }
+
+        .toc-sidebar a:hover {
+            color: var(--primary-color);
+        }
+
+        .toc-sidebar a.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5);
+        }
+
+        /* Tabs */
+        .tab-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .tab-btn:hover {
+            border-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .toc-sidebar {
+                width: 100%;
+                position: static;
+                margin-bottom: 2rem;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.75rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 2rem 1.5rem;
+            }
+
+            .hero-title {
+                font-size: 1.75rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .main-content {
+                padding: 2rem 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.6rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            h3 {
+                font-size: 1.3rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .code-block {
+                padding: 0.75rem;
+            }
+
+            .feature-item {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" aria-label="返回顶部">↑</button>
+
+    <!-- Hero Section -->
+    <header class="hero-section">
+        <div class="hero-container">
+            <div class="hero-badge">🤖 开源 AI 平台</div>
+            <h1 class="hero-title">Onyx - 企业级 AI 平台</h1>
+            <p class="hero-subtitle">功能丰富的自托管聊天 UI，支持任意 LLM。内置代理、RAG、连接器等高级功能，适用于团队和企业</p>
+
+            <div class="hero-meta">
+                <div class="meta-item">
+                    ⭐ <strong>15.7K+</strong> Stars
+                </div>
+                <div class="meta-item">
+                    🔱 <strong>2.1K+</strong> Forks
+                </div>
+                <div class="meta-item">
+                    📝 <strong>Python / JavaScript</strong>
+                </div>
+                <div class="meta-item">
+                    📄 <strong>MIT</strong> License
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="content-wrapper">
+            <!-- 项目概述 -->
+            <section id="overview" class="section">
+                <h2 class="section-title">项目概述</h2>
+                <p class="section-description">
+                    Onyx 是一个易部署的开源 AI 平台，支持空气隔离环境。它提供功能丰富的聊天 UI，
+                    支持任意 LLM（大语言模型），内置代理、Web 搜索、RAG（检索增强生成）等高级功能。
+                </p>
+                <p class="section-description">
+                    Onyx 适用于从个人到全球企业的团队，提供企业级搜索、安全性和管理 UI。
+                    核心价值包括：自定义代理、40+ 知识源连接器、深度研究能力。
+                </p>
+
+                <div class="info-box">
+                    <strong>核心优势：</strong>完全开源、支持私有部署、兼容所有主流 LLM、提供企业级安全和管理功能
+                </div>
+            </section>
+
+            <!-- 核心特性 -->
+            <section id="features" class="section">
+                <h2 class="section-title">核心特性</h2>
+                <p class="section-description">Onyx 加载了代理、RAG、连接器等先进功能，支持所有 LLM</p>
+
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div class="icon">🤖</div>
+                        <h4>自定义代理</h4>
+                        <p>构建具有独特指令、知识和动作的 AI 代理，满足特定业务需求</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🔍</div>
+                        <h4>RAG（检索增强生成）</h4>
+                        <p>顶级混合搜索 + 知识图谱，支持上传文件和连接器文档</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🌍</div>
+                        <h4>Web 搜索</h4>
+                        <p>使用 Google PSE、Exa 等浏览网页，或使用内置爬虫</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🔬</div>
+                        <h4>深度研究</h4>
+                        <p>通过代理多步搜索获取深入答案，支持复杂问题分析</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">⚡</div>
+                        <h4>动作 & MCP</h4>
+                        <p>让 AI 代理与外部系统交互，扩展功能边界</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">💻</div>
+                        <h4>代码解释器</h4>
+                        <p>执行代码分析数据、渲染图表，支持多种编程语言</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🔌</div>
+                        <h4>40+ 知识源连接器</h4>
+                        <p>连接 Slack、GitHub、Google Drive、Confluence 等企业工具</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🔒</div>
+                        <h4>企业级安全</h4>
+                        <p>支持 SSO、RBAC、审计日志等企业安全功能</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🎨</div>
+                        <h4>精美 UI</h4>
+                        <p>现代化聊天界面，支持深色模式，移动端友好</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 安装指南 -->
+            <section id="installation" class="section">
+                <h2 class="section-title">安装指南</h2>
+                <p class="section-description">支持 Docker、Kubernetes、Terraform 等多种部署方式</p>
+
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="docker">Docker 部署</button>
+                    <button class="tab-btn" data-tab="k8s">Kubernetes 部署</button>
+                    <button class="tab-btn" data-tab="terraform">Terraform 部署</button>
+                </div>
+
+                <div class="tab-content active" id="docker">
+                    <div class="card">
+                        <h3>一键安装脚本</h3>
+                        <p class="section-description">最简单的部署方式，适合快速体验和小型部署</p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Bash</span>
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                            </div>
+                            <pre><code><span class="comment"># 下载并运行一键安装脚本</span>
+curl -fsSL https://raw.githubusercontent.com/onyx-dot-app/onyx/main/deployment/docker_compose/install.sh > install.sh
+chmod +x install.sh
+./install.sh</code></pre>
+                        </div>
+
+                        <div class="info-box">
+                            <strong>安装完成后：</strong>访问 <code>http://localhost:3000</code> 即可开始使用 Onyx
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>手动 Docker Compose 部署</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">docker-compose.yml</span>
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                            </div>
+                            <pre><code>version: '3.8'
+services:
+  api:
+    image: onyxdotapp/onyx-backend:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=onyx
+      - POSTGRES_USER=onyx
+      - POSTGRES_PASSWORD=your_password
+    depends_on:
+      - postgres
+
+  web:
+    image: onyxdotapp/onyx-web:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - API_URL=http://api:8080
+
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=onyx
+      - POSTGRES_USER=onyx
+      - POSTGRES_PASSWORD=your_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="k8s">
+                    <div class="card">
+                        <h3>使用 Helm Chart 部署</h3>
+                        <p class="section-description">适合生产环境的 Kubernetes 部署</p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Bash</span>
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                            </div>
+                            <pre><code><span class="comment"># 添加 Helm 仓库</span>
+helm repo add onyx https://charts.onyx.app
+helm repo update
+
+<span class="comment"># 安装 Onyx</span>
+helm install onyx onyx/onyx \
+  --set postgresql.enabled=true \
+  --set ingress.enabled=true \
+  --set ingress.hosts[0].host=onyx.yourdomain.com</code></pre>
+                        </div>
+                        <p class="section-description">
+                            详细配置请参考 <a href="https://docs.onyx.app/deployment/local/kubernetes" target="_blank" style="color: var(--primary-color);">Kubernetes 部署文档</a>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="terraform">
+                    <div class="card">
+                        <h3>Terraform 部署</h3>
+                        <p class="section-description">集成到现有的 IaC 流程中</p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">main.tf</span>
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                            </div>
+                            <pre><code>module "onyx" {
+  source  = "onyx-dot-app/onyx/aws"
+  version = "1.0.0"
+
+  vpc_id              = var.vpc_id
+  subnet_ids          = var.subnet_ids
+  instance_type       = "t3.large"
+  postgres_password   = var.postgres_password
+  domain_name         = "onyx.yourdomain.com"
+}</code></pre>
+                        </div>
+                        <p class="section-description">
+                            更多信息请参考 <a href="https://docs.onyx.app/deployment/local/terraform" target="_blank" style="color: var(--primary-color);">Terraform 部署文档</a>
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 使用示例 -->
+            <section id="examples" class="section">
+                <h2 class="section-title">使用示例</h2>
+                <p class="section-description">通过 Web UI 或 API 使用 Onyx</p>
+
+                <h3 class="section-subtitle">通过 OpenAI SDK 调用 Onyx API</h3>
+                <div class="card">
+                    <p class="section-description">Onyx 提供 OpenAI 兼容的 API，可以使用 OpenAI SDK 直接调用</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">Python</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre><code>from openai import OpenAI
+import os
+
+<span class="comment"># 配置 Onyx API</span>
+client = OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY"),
+    base_url="http://localhost:8080/openai-assistants",
+    default_headers={
+        "Authorization": f"Bearer {os.environ.get('ONYX_API_KEY')}"
+    },
+)
+
+<span class="comment"># 创建助手</span>
+assistant = client.beta.assistants.create(
+    name="Topic Analyzer",
+    instructions="You are a helpful assistant that analyzes topics by searching through workplace documents.",
+    tools=[{"type": "SearchTool"}],
+    model="gpt-4o",
+)
+
+<span class="comment"># 创建对话线程</span>
+thread = client.beta.threads.create()
+
+<span class="comment"># 发送消息</span>
+message = client.beta.threads.messages.create(
+    thread_id=thread.id,
+    role="user",
+    content="Analyze the recent developments in AI."
+)
+
+<span class="comment"># 运行助手</span>
+run = client.beta.threads.runs.create(
+    thread_id=thread.id,
+    assistant_id=assistant.id
+)
+
+print(f"Assistant created: {assistant.id}")</code></pre>
+                    </div>
+                </div>
+
+                <h3 class="section-subtitle">创建自定义代理</h3>
+                <div class="card">
+                    <p class="section-description">在 Web UI 中创建具有特定知识和功能的代理</p>
+                    <ul class="list">
+                        <li>访问 Onyx Web UI</li>
+                        <li>点击"创建代理"按钮</li>
+                        <li>设置代理名称、描述和指令</li>
+                        <li>添加知识源（文档、连接器等）</li>
+                        <li>配置可用的工具（Web 搜索、代码解释器等）</li>
+                        <li>保存并开始使用</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 知识源连接器 -->
+            <section id="connectors" class="section">
+                <h2 class="section-title">知识源连接器</h2>
+                <p class="section-description">连接 40+ 企业工具和数据源</p>
+
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div class="icon">📝</div>
+                        <h4>文档协作</h4>
+                        <p>Google Drive、Confluence、Notion、SharePoint</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">💬</div>
+                        <h4>通讯工具</h4>
+                        <p>Slack、Microsoft Teams、Discord</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🔧</div>
+                        <h4>开发工具</h4>
+                        <p>GitHub、GitLab、Jira、Linear</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">📊</div>
+                        <h4>数据分析</h4>
+                        <p>Google Sheets、Airtable、Notion Database</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">📧</div>
+                        <h4>邮件服务</h4>
+                        <p>Gmail、Outlook、Exchange</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🗂️</div>
+                        <h4>文件存储</h4>
+                        <p>Dropbox、OneDrive、Box、S3</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 企业功能 -->
+            <section id="enterprise" class="section">
+                <h2 class="section-title">企业功能</h2>
+                <p class="section-description">为企业级部署提供完整的安全和管理功能</p>
+
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div class="icon">🔐</div>
+                        <h4>SSO 单点登录</h4>
+                        <p>支持 SAML、OAuth 2.0、OpenID Connect</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">👥</div>
+                        <h4>RBAC 权限管理</h4>
+                        <p>基于角色的访问控制，细粒度权限管理</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">📋</div>
+                        <h4>审计日志</h4>
+                        <p>完整的操作审计，满足合规要求</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🏢</div>
+                        <h4>多租户支持</h4>
+                        <p>数据隔离，支持多组织部署</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🔒</div>
+                        <h4>数据加密</h4>
+                        <p>传输加密 + 静态数据加密</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">📊</div>
+                        <h4>使用分析</h4>
+                        <p>详细的使用统计和成本分析</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 支持的 LLM -->
+            <section id="llms" class="section">
+                <h2 class="section-title">支持的 LLM</h2>
+                <p class="section-description">Onyx 支持所有主流大语言模型</p>
+
+                <div class="card">
+                    <h3>OpenAI 系列</h3>
+                    <ul class="list">
+                        <li>GPT-4、GPT-4 Turbo、GPT-4o</li>
+                        <li>GPT-3.5 Turbo</li>
+                        <li>支持 Function Calling 和 Vision</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Anthropic Claude</h3>
+                    <ul class="list">
+                        <li>Claude 3.5 Sonnet、Claude 3 Opus</li>
+                        <li>Claude 3 Sonnet、Claude 3 Haiku</li>
+                        <li>支持长上下文（200K tokens）</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>其他模型</h3>
+                    <ul class="list">
+                        <li><strong>Google Gemini</strong> - Gemini Pro、Gemini Flash</li>
+                        <li><strong>Azure OpenAI</strong> - 企业级 OpenAI 服务</li>
+                        <li><strong>开源模型</strong> - Llama 3、Mixtral、Mistral 等</li>
+                        <li><strong>自托管模型</strong> - 通过 Ollama、vLLM 等部署</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 项目信息 -->
+            <section id="project-info" class="section">
+                <h2 class="section-title">项目信息</h2>
+
+                <div class="card">
+                    <h3>开源信息</h3>
+                    <ul class="list">
+                        <li><strong>协议：</strong>MIT 开源协议（CE 版本）</li>
+                        <li><strong>语言：</strong>Python（后端）、TypeScript（前端）</li>
+                        <li><strong>GitHub Stars：</strong>15.7K+</li>
+                        <li><strong>活跃度：</strong>持续更新维护</li>
+                        <li><strong>版本：</strong>CE（社区版）和 EE（企业版）</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>相关链接</h3>
+                    <ul class="list">
+                        <li><a href="https://github.com/onyx-dot-app/onyx" target="_blank" style="color: var(--primary-color);">📦 GitHub 仓库</a></li>
+                        <li><a href="https://docs.onyx.app/" target="_blank" style="color: var(--primary-color);">📚 官方文档</a></li>
+                        <li><a href="https://discord.gg/TDJ59cGV2X" target="_blank" style="color: var(--primary-color);">💬 Discord 社区</a></li>
+                        <li><a href="https://github.com/orgs/onyx-dot-app/projects/2" target="_blank" style="color: var(--primary-color);">🗺️ 开发路线图</a></li>
+                        <li><a href="https://onyx.app" target="_blank" style="color: var(--primary-color);">🌐 官方网站</a></li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>版本对比</h3>
+                    <ul class="list">
+                        <li><strong>CE（社区版）：</strong>完全开源，适合个人和小团队</li>
+                        <li><strong>EE（企业版）：</strong>额外提供 SSO、高级安全、优先支持等功能</li>
+                        <li><strong>Cloud：</strong>官方托管服务，零运维</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+
+        <!-- Table of Contents Sidebar -->
+        <aside class="toc-sidebar">
+            <h3>📋 目录</h3>
+            <ul>
+                <li><a href="#overview">项目概述</a></li>
+                <li><a href="#features">核心特性</a></li>
+                <li><a href="#installation">安装指南</a></li>
+                <li><a href="#examples">使用示例</a></li>
+                <li><a href="#connectors">知识源连接器</a></li>
+                <li><a href="#enterprise">企业功能</a></li>
+                <li><a href="#llms">支持的 LLM</a></li>
+                <li><a href="#project-info">项目信息</a></li>
+            </ul>
+        </aside>
+    </div>
+
+    <!-- Footer -->
+    <footer style="border-top: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); margin-top: 5rem;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 2rem; text-align: center;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                <div style="font-size: 0.875rem; color: var(--text-secondary);" id="copyright-text"></div>
+                <div style="font-size: 0.875rem; color: #6b7280;" id="beian-number"></div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Load config
+        fetch('/data/articles.json')
+            .then(response => response.json())
+            .then(data => {
+                const { beianNumber, copyrightText } = data.config;
+                document.getElementById('copyright-text').textContent = copyrightText || '© 2025 Halavah\'s Tech. All rights reserved.';
+                if (beianNumber) {
+                    document.getElementById('beian-number').textContent = beianNumber;
+                }
+            })
+            .catch(error => console.error('Failed to load config:', error));
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                // Add active class to clicked tab
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        // TOC active link tracking
+        document.querySelectorAll('.toc-sidebar a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Highlight active section
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    document.querySelectorAll('.toc-sidebar a').forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${entry.target.id}`) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, { rootMargin: '-100px 0px -80% 0px' });
+
+        document.querySelectorAll('section[id]').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Back to top button
+        const backToTop = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Copy code function
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block').querySelector('code');
+            const text = codeBlock.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '已复制!';
+                button.style.background = 'var(--success-color)';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'var(--primary-color)';
+                }, 2000);
+            }).catch(err => {
+                console.error('复制失败:', err);
+                button.textContent = '复制失败';
+                setTimeout(() => {
+                    button.textContent = '复制';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

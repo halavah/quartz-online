@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code CLI 完全指南</title>
+    <meta name="description" content="深入掌握Claude Code命令行工具，包含CLI命令大全、高频命令分类、启动参数和自动化技巧">
+    <meta name="keywords" content="Claude Code,CLI,命令行,自动化,批处理,Shell脚本">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0066ff;
+            --secondary-color: #00d4ff;
+            --accent-color: #ff6b00;
+            --dark-bg: #0a0e27;
+            --card-bg: #1a1f3a;
+            --text-color: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --border-color: #2a2f4a;
+            --success-color: #00c853;
+            --gradient-primary: linear-gradient(135deg, #0066ff 0%, #00d4ff 100%);
+            --gradient-hero: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--dark-bg);
+        }
+
+        .hero-section {
+            background: var(--gradient-hero);
+            padding: 4rem 2rem 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(0, 102, 255, 0.2);
+            color: var(--secondary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            margin-bottom: 1rem;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: flex;
+            gap: 3rem;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .toc-sidebar {
+            width: 280px;
+            position: sticky;
+            top: 2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+
+        .toc-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .toc-sidebar ul {
+            list-style: none;
+        }
+
+        .toc-sidebar li {
+            margin-bottom: 0.5rem;
+        }
+
+        .toc-sidebar a {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .toc-sidebar a:hover {
+            background: rgba(0, 102, 255, 0.1);
+            color: var(--primary-color);
+            transform: translateX(4px);
+        }
+
+        .toc-sidebar a.active {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 102, 255, 0.2);
+        }
+
+        .card h4 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            color: #58a6ff;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .list {
+            margin: 1rem 0 1rem 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .list li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .list li strong {
+            color: var(--text-color);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        th {
+            background: rgba(0, 102, 255, 0.1);
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(0, 102, 255, 0.05);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.4);
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: var(--secondary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .back-to-top svg {
+            margin-bottom: 2px;
+        }
+
+        .footer {
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 1024px) {
+            .toc-sidebar {
+                position: static;
+                width: 100%;
+                max-height: none;
+                order: -1;
+                margin-bottom: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            .main-content {
+                padding: 2rem 1rem;
+                flex-direction: column;
+            }
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-container">
+            <span class="hero-badge">CLI指南</span>
+            <h1 class="hero-title">Claude Code CLI 完全指南</h1>
+            <p class="hero-subtitle">深入掌握Claude Code命令行工具，包含CLI命令大全、高频命令分类、启动参数和自动化技巧</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- TOC Sidebar -->
+        <nav class="toc-sidebar">
+            <h2 class="toc-title">📋 目录导航</h2>
+            <ul>
+                <li><a href="#cli-commands">1. CLI命令大全</a></li>
+                <li><a href="#frequent-commands">2. 高频命令分类</a></li>
+                <li><a href="#startup-params">3. 基础启动参数</a></li>
+                <li><a href="#pipe-operations">4. 管道操作技巧</a></li>
+                <li><a href="#batch-automation">5. 批处理与自动化</a></li>
+            </ul>
+        </nav>
+
+        <!-- Content -->
+        <div class="content-wrapper">
+            <!-- Section 1: CLI Commands -->
+            <section id="cli-commands" class="section">
+                <h2 class="section-title">1️⃣ CLI命令大全</h2>
+
+                <div class="card">
+                    <h4>基础CLI命令</h4>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>命令</th>
+                                    <th>描述</th>
+                                    <th>示例</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>claude</code></td>
+                                    <td>启动交互式REPL模式</td>
+                                    <td><code>claude</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>claude "query"</code></td>
+                                    <td>使用初始提示符启动REPL</td>
+                                    <td><code>claude "解释这个项目"</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>claude -p "query"</code></td>
+                                    <td>通过SDK查询后退出</td>
+                                    <td><code>claude -p "解释这个函数"</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>claude -c</code></td>
+                                    <td>继续最近的对话</td>
+                                    <td><code>claude -c</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>claude update</code></td>
+                                    <td>更新至最新版本</td>
+                                    <td><code>claude update</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>claude mcp</code></td>
+                                    <td>配置MCP服务器</td>
+                                    <td><code>claude mcp</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>CLI标志参数</h4>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>标志</th>
+                                    <th>描述</th>
+                                    <th>示例</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>--add-dir</code></td>
+                                    <td>添加额外的工作目录</td>
+                                    <td><code>claude --add-dir ../apps ../lib</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>--allowedTools</code></td>
+                                    <td>允许的工具列表</td>
+                                    <td><code>"Bash(git log:*)" "Write"</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>--print, -p</code></td>
+                                    <td>非交互模式打印响应</td>
+                                    <td><code>claude -p "查询"</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>--model</code></td>
+                                    <td>设置当前会话的模型</td>
+                                    <td><code>claude --model claude-sonnet-4</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>--continue</code></td>
+                                    <td>加载最近的对话</td>
+                                    <td><code>claude --continue</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>--dangerously-skip-permissions</code></td>
+                                    <td>跳过权限提示</td>
+                                    <td><code>claude --dangerously-skip-permissions</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Frequent Commands -->
+            <section id="frequent-commands" class="section">
+                <h2 class="section-title">2️⃣ 高频命令分类</h2>
+
+                <div class="card">
+                    <h4>会话管理类</h4>
+                    <div class="code-block">
+                        <code># 打开当前目录的聊天记录
+claude --resume
+
+# 继续当前目录的上一次聊天
+claude -c
+
+# 清除终端屏幕，保留对话历史
+control + L
+
+# 为项目生成或更新文档CLAUDE.md
+/init
+
+# 给予全部权限（风险大）
+# 开启聊天时赋予权限
+claude -c --dangerously-skip-permissions
+# 聊天时赋予权限
+shift + TAB</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>项目管理类</h4>
+                    <div class="code-block">
+                        <code># 生成或更新项目文档
+/init
+
+# 编辑CLAUDE.md
+/memory
+
+# 查看配置
+/config
+
+# 系统健康检查
+/doctor</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>开发工作流类</h4>
+                    <div class="code-block">
+                        <code># 请求代码审查
+/review
+
+# 查看PR评论
+/pr_comments
+
+# 运行测试
+!npm test
+
+# 构建项目
+!npm run build</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Startup Parameters -->
+            <section id="startup-params" class="section">
+                <h2 class="section-title">3️⃣ 基础启动参数</h2>
+
+                <div class="card">
+                    <h4>标准启动方式</h4>
+                    <div class="code-block">
+                        <code># 直接启动交互模式
+claude
+
+# 带初始问题启动
+claude "帮我分析这个项目结构"
+
+# 一次性执行并退出
+claude -p "解释这个函数"
+
+# 管道输入
+cat file.py | claude -p "优化这段代码"</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>常用启动参数</h4>
+                    <ul class="list">
+                        <li><strong>--resume</strong>: 恢复上次会话</li>
+                        <li><strong>--plan</strong>: 启用计划模式（适合复杂任务）</li>
+                        <li><strong>--architect</strong>: 大型项目架构模式</li>
+                        <li><strong>--verbose</strong>: 启用详细日志记录</li>
+                        <li><strong>--max-turns</strong>: 限制非交互模式下的代理轮次</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 4: Pipe Operations -->
+            <section id="pipe-operations" class="section">
+                <h2 class="section-title">4️⃣ 管道操作技巧</h2>
+
+                <div class="card">
+                    <h4>基础管道操作</h4>
+                    <div class="code-block">
+                        <code># 文件内容作为输入
+cat code.js | claude -p "解释这段代码"
+
+# 日志分析
+tail -100 error.log | claude -p "分析这些错误"
+
+# 配置文件解析
+cat package.json | claude -p "提取依赖信息"
+
+# Git diff分析
+git diff | claude -p "总结代码变更"</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>多步骤管道</h4>
+                    <div class="code-block">
+                        <code># 组合多个命令
+find . -name "*.js" | head -10 | claude -p "分析这些文件"
+
+# Git历史分析
+git log --oneline -20 | claude -p "总结最近的提交"</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Batch Automation -->
+            <section id="batch-automation" class="section">
+                <h2 class="section-title">5️⃣ 批处理与自动化</h2>
+
+                <div class="card">
+                    <h4>Shell脚本集成</h4>
+                    <div class="code-block">
+                        <code>#!/bin/bash
+# auto-review.sh - 自动代码审查脚本
+
+echo "开始代码审查..."
+
+# 获取修改的文件
+CHANGED_FILES=$(git diff --name-only HEAD~1)
+
+# 审查每个文件
+for file in $CHANGED_FILES; do
+    if [[ $file =~ \.(js|ts|jsx|tsx)$ ]]; then
+        echo "审查文件: $file"
+        claude -p "审查这个文件的安全性、性能和最佳实践: $file"
+    fi
+done
+
+# 生成审查报告
+claude -p "基于以上分析生成代码审查报告" > review-report.md</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>定时任务</h4>
+                    <div class="code-block">
+                        <code># 添加到crontab
+# 每天早上9点运行维护脚本
+0 9 * * * /path/to/daily-maintenance.sh
+
+# 每周日凌晨2点深度清理
+0 2 * * 0 /path/to/weekly-cleanup.sh
+
+# 每小时检查项目状态
+0 * * * * cd /project && claude -p "检查项目状态" >> status.log</code>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Back to Top -->
+    <button class="back-to-top" id="backToTop">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M7 14l5-5 5 5" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        回到顶部
+    </button>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <p id="copyright-text">© 2025 Halavah's Tech. All rights reserved.</p>
+            <p id="beian-number"></p>
+        </div>
+    </footer>
+
+    <script>
+        fetch('/data/articles.json')
+            .then(response => response.json())
+            .then(data => {
+                const { beianNumber, copyrightText } = data.config;
+                document.getElementById('copyright-text').textContent =
+                    copyrightText || '© 2025 Halavah\'s Tech. All rights reserved.';
+                if (beianNumber) {
+                    document.getElementById('beian-number').textContent = beianNumber;
+                }
+            })
+            .catch(error => console.error('Failed to load config:', error));
+
+        document.querySelectorAll('.toc-sidebar a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    document.querySelectorAll('.toc-sidebar a').forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${entry.target.id}`) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, { rootMargin: '-100px 0px -80% 0px' });
+
+        document.querySelectorAll('section[id]').forEach(section => {
+            observer.observe(section);
+        });
+
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

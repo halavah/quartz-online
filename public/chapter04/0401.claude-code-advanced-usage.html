@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code Advanced Usage - 高级使用技巧</title>
+    <meta name="description" content="Claude Code的高级功能使用指南，包括插件配置、模型选择、检查点管理等实用技巧，让AI编程助手发挥最大效能">
+    <meta name="keywords" content="claude-code,advanced-usage,ai-programming,plugin-setup,best-practices">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #8b5cf6;
+            --secondary-color: #06b6d4;
+            --accent-color: #f59e0b;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-light: #94a3b8;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --border-color: #e2e8f0;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --shadow-1: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --shadow-2: 0 20px 40px rgba(0, 0, 0, 0.15);
+            --shadow-glow: 0 0 30px rgba(139, 92, 246, 0.3);
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 粒子背景 */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 15s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+            }
+            25% {
+                transform: translateY(-20px) translateX(10px);
+            }
+            50% {
+                transform: translateY(10px) translateX(-10px);
+            }
+            75% {
+                transform: translateY(-15px) translateX(5px);
+            }
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            text-align: center;
+            padding: 4rem 0;
+            position: relative;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            animation: slideDown 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: fadeInScale 1s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeIn 1.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 3rem;
+            margin-bottom: 4rem;
+            box-shadow: var(--shadow-2);
+            position: relative;
+            animation: slideUp 1.2s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 章节样式 */
+        .section {
+            margin-bottom: 3rem;
+            animation: fadeInSection 0.8s ease-out;
+        }
+
+        @keyframes fadeInSection {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--gradient-1);
+            border-radius: 2px;
+        }
+
+        .section-description {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        /* 特性网格 */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-1);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-2);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 表格样式 */
+        .table-container {
+            overflow-x: auto;
+            margin: 2rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-1);
+        }
+
+        th {
+            background: var(--gradient-1);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        /* 代码块样式 */
+        .code-block {
+            background: var(--text-primary);
+            color: #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            position: relative;
+            font-family: Monaco, Consolas, 'Courier New', monospace;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .code-title {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        pre {
+            margin: 0;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+
+        code {
+            color: #e2e8f0;
+        }
+
+        /* Mermaid图表容器 */
+        .mermaid-container {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+            box-shadow: var(--shadow-1);
+        }
+
+        /* 导航目录 */
+        .toc {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .toc h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc li {
+            margin-bottom: 0.75rem;
+        }
+
+        .toc a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .toc a:hover {
+            color: var(--primary-color);
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .toc a::before {
+            content: '▸';
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        /* 警告框样式 */
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--accent-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        .warning-box strong {
+            color: var(--accent-color);
+        }
+
+        /* 按钮样式 */
+        .btn {
+            display: inline-block;
+            background: var(--gradient-1);
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-2);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                padding: 2rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 粒子背景 -->
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-badge">🚀 Claude Code 高级技巧</div>
+            <h1 class="hero-title">Claude Code Advanced Usage</h1>
+            <p class="hero-subtitle">基于实际使用经验的高级功能指南，让AI编程助手发挥最大效能</p>
+        </section>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-wrapper">
+                <!-- 目录导航 -->
+                <nav class="toc">
+                    <h3>📋 目录导航</h3>
+                    <ul>
+                        <li><a href="#section-1">1. Claude Code Chat 插件</a></li>
+                        <li><a href="#section-2">2. 高级功能配置</a></li>
+                        <li><a href="#section-3">3. 模型模式选择</a></li>
+                        <li><a href="#section-4">4. 权限管理</a></li>
+                        <li><a href="#section-5">5. 检查点功能</a></li>
+                        <li><a href="#section-6">6. MCP服务器配置</a></li>
+                        <li><a href="#section-7">7. 常见问题解决</a></li>
+                    </ul>
+                </nav>
+
+                <!-- Section 1 -->
+                <section id="section-1" class="section">
+                    <h2 class="section-title">1. Claude Code Chat 插件</h2>
+                    <p class="section-description">
+                        Claude Code Chat 是VS Code和Cursor的官方插件，提供优雅的聊天界面完成所有AI编程交互。
+                    </p>
+
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">✨</div>
+                            <h3 class="feature-title">主要优势</h3>
+                            <div class="feature-description">
+                                <ul>
+                                    <li>无需终端：告别命令行操作</li>
+                                    <li>恢复检查点：随时撤销更改</li>
+                                    <li>MCP支持：内置服务器管理</li>
+                                    <li>对话历史：自动保存记录</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">⚠️</div>
+                            <h3 class="feature-title">当前限制</h3>
+                            <div class="feature-description">
+                                <ul>
+                                    <li>单任务限制：无法并行任务</li>
+                                    <li>功能bug：部分稳定性问题</li>
+                                    <li>Sub Agents：暂不支持最新功能</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+                            graph TD
+                            A[打开Claude Code面板] --> B{选择操作模式}
+                            B --> C[Plan Mode - 仅讨论]
+                            B --> D[Execute Mode - 执行操作]
+                            C --> E[分析和规划]
+                            D --> F[修改代码]
+                            E --> G[满意后执行]
+                            F --> H[检查结果]
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2 -->
+                <section id="section-2" class="section">
+                    <h2 class="section-title">2. 高级功能配置</h2>
+                    <p class="section-description">
+                        Claude Code提供多种思考模式，根据任务复杂度选择合适的配置。
+                    </p>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>模式</th>
+                                    <th>适用场景</th>
+                                    <th>消耗</th>
+                                    <th>建议</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Think</td>
+                                    <td>简单任务，快速响应</td>
+                                    <td>低</td>
+                                    <td>日常代码格式化、简单bug</td>
+                                </tr>
+                                <tr>
+                                    <td>Think Hard</td>
+                                    <td>中等复杂度任务</td>
+                                    <td>中</td>
+                                    <td>API设计、功能开发</td>
+                                </tr>
+                                <tr>
+                                    <td>Think Harder</td>
+                                    <td>复杂任务，深度思考</td>
+                                    <td>高</td>
+                                    <td>系统架构、算法实现</td>
+                                </tr>
+                                <tr>
+                                    <td>Ultrathink</td>
+                                    <td>创新性任务</td>
+                                    <td>极高</td>
+                                    <td>前沿技术探索、复杂问题</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">模型模式切换</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre><code><span class="comment"># 基础模式（默认）</span>
+/model think
+
+<span class="comment"># 深度思考模式</span>
+/model think-hard
+
+<span class="comment"># 极限思考模式（无预算限制）</span>
+/model ultrathink</code></pre>
+                    </div>
+                </section>
+
+                <!-- Section 3 -->
+                <section id="section-3" class="section">
+                    <h2 class="section-title">3. 模型模式选择</h2>
+                    <p class="section-description">
+                        根据任务需求选择合适的模型配置，获得最佳的性能和效果平衡。
+                    </p>
+
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">🎯</div>
+                            <h3 class="feature-title">快速响应</h3>
+                            <div class="feature-description">
+                                适合简单的代码修复、格式化和日常编程任务。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">🔍</div>
+                            <h3 class="feature-title">深度分析</h3>
+                            <div class="feature-description">
+                                适用于复杂的系统设计、算法实现和技术方案选择。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">💡</div>
+                            <h3 class="feature-title">创新探索</h3>
+                            <div class="feature-description">
+                                用于前沿技术研究、创新性解决方案和复杂问题求解。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 4 -->
+                <section id="section-4" class="section">
+                    <h2 class="section-title">4. 权限管理</h2>
+                    <p class="section-description">
+                        合理配置权限管理，确保代码安全和项目数据保护。
+                    </p>
+
+                    <div class="warning-box">
+                        <strong>重要提示</strong>：始终在受控环境中测试权限配置，避免敏感信息泄露。
+                    </div>
+
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">🔒</div>
+                            <h3 class="feature-title">文件访问控制</h3>
+                            <div class="feature-description">
+                                配置允许Claude访问的文件和目录，保护敏感代码。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">🌐</div>
+                            <h3 class="feature-title">网络访问权限</h3>
+                            <div class="feature-description">
+                                控制外部API调用和网络资源访问范围。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 5 -->
+                <section id="section-5" class="section">
+                    <h2 class="section-title">5. 检查点功能</h2>
+                    <p class="section-description">
+                        利用检查点功能实现版本控制和撤销操作，提高开发效率。
+                    </p>
+
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">↩️</div>
+                            <h3 class="feature-title">版本回溯</h3>
+                            <div class="feature-description">
+                                随时恢复到之前的状态，避免错误修改。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">📝</div>
+                            <h3 class="feature-title">变更记录</h3>
+                            <div class="feature-description">
+                                自动记录所有修改历史，方便追踪和审计。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">🔄</div>
+                            <h3 class="feature-title">分支管理</h3>
+                            <div class="feature-description">
+                                支持多个检查点分支，并行开发不同功能。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 6 -->
+                <section id="section-6" class="section">
+                    <h2 class="section-title">6. MCP服务器配置</h2>
+                    <p class="section-description">
+                        Model Context Protocol服务器扩展Claude Code的功能，提供强大的工具集成能力。
+                    </p>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">MCP服务器配置示例</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre><code><span class="comment"># 添加MCP服务器</span>
+/mcp add https://github.com/example/mcp-server
+
+<span class="comment"># 查看已添加的服务器</span>
+/mcp list
+
+<span class="comment"># 移除MCP服务器</span>
+/mcp remove server-name</code></pre>
+                    </div>
+
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">🔌</div>
+                            <h3 class="feature-title">工具集成</h3>
+                            <div class="feature-description">
+                                集成各种开发工具和服务，扩展AI能力。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">🔧</div>
+                            <h3 class="feature-title">自定义开发</h3>
+                            <div class="feature-description">
+                                支持自定义MCP服务器，满足特定需求。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">🌍</div>
+                            <h3 class="feature-title">社区生态</h3>
+                            <div class="feature-description">
+                                丰富的社区服务器，涵盖各种开发场景。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 7 -->
+                <section id="section-7" class="section">
+                    <h2 class="section-title">7. 常见问题解决</h2>
+                    <p class="section-description">
+                        解决使用过程中常见的问题和错误，确保稳定的使用体验。
+                    </p>
+
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">🔍</div>
+                            <h3 class="feature-title">连接问题</h3>
+                            <div class="feature-description">
+                                检查网络连接和API密钥配置。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">⚡</div>
+                            <h3 class="feature-title">性能优化</div>
+                            <div class="feature-description">
+                                调整模型参数，提高响应速度。
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">🛠️</div>
+                            <h3 class="feature-title">兼容性问题</h></h3>
+                            <div class="feature-description">
+                                解决IDE版本兼容和配置冲突。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CTA Section -->
+                <section class="section">
+                    <div style="text-align: center; margin-top: 3rem;">
+                        <a href="#" class="btn">开始使用高级功能</a>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 创建粒子效果
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+
+                // 随机大小
+                const size = Math.random() * 6 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+
+                // 随机位置
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+
+                // 随机延迟和持续时间
+                particle.style.animationDelay = `${Math.random() * 15}s`;
+                particle.style.animationDuration = `${Math.random() * 10 + 15}s`;
+
+                // 随机不透明度
+                particle.style.opacity = `${Math.random() * 0.3 + 0.1}`;
+
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // 代码复制功能
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const code = codeBlock.querySelector('code');
+            const text = code.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '已复制!';
+                button.style.background = 'rgba(16, 185, 129, 0.8)';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('复制失败:', err);
+                button.textContent = '复制失败';
+                setTimeout(() => {
+                    button.textContent = '复制';
+                }, 2000);
+            });
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 滚动动画
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationDelay = '0s';
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.animationPlayState = 'paused';
+            observer.observe(section);
+        });
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+        });
+    </script>
+</body>
+</html>

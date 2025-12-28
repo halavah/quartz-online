@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xget - 超高性能开发者资源加速引擎</title>
+    <meta name="description" content="Xget 是基于 Cloudflare Workers 的超高性能资源加速引擎，支持 GitHub、npm、PyPI、Docker 等 40+ 平台的统一加速">
+    <meta name="keywords" content="Xget,GitHub加速,npm镜像,PyPI镜像,Docker加速,Cloudflare Workers,开发者工具">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0066ff;
+            --secondary-color: #00d4ff;
+            --accent-color: #ff6b00;
+            --dark-bg: #0a0e27;
+            --card-bg: #1a1f3a;
+            --text-color: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --border-color: #2a2f4a;
+            --success-color: #00c853;
+            --gradient-primary: linear-gradient(135deg, #0066ff 0%, #00d4ff 100%);
+            --gradient-hero: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+            --shadow-glow: 0 0 30px rgba(0, 102, 255, 0.3);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--dark-bg);
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: var(--gradient-hero);
+            padding: 4rem 2rem 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(0, 102, 255, 0.2);
+            color: var(--secondary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            margin-bottom: 1rem;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .meta-item strong {
+            color: var(--text-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: flex;
+            gap: 3rem;
+            align-items: flex-start;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section-subtitle {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+            color: var(--text-color);
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 20px rgba(0, 102, 255, 0.2);
+        }
+
+        .card h3 {
+            color: var(--text-color);
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .feature-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .feature-item .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-item h4 {
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .feature-item p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Platform Grid */
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .platform-tag {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            transition: all 0.2s ease;
+        }
+
+        .platform-tag:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        /* Code Block */
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .code-block code {
+            color: #58a6ff;
+        }
+
+        .code-block .comment {
+            color: #8b949e;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .code-title {
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .copy-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Lists */
+        .list {
+            margin: 1rem 0 1rem 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .list li {
+            margin-bottom: 0.5rem;
+            line-height: 1.8;
+        }
+
+        .list li::marker {
+            color: var(--primary-color);
+        }
+
+        /* Info Box */
+        .info-box {
+            background: rgba(0, 102, 255, 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .info-box.success {
+            background: rgba(0, 200, 83, 0.1);
+            border-left-color: var(--success-color);
+        }
+
+        .info-box.warning {
+            background: rgba(255, 107, 0, 0.1);
+            border-left-color: var(--accent-color);
+        }
+
+        .info-box strong {
+            color: var(--secondary-color);
+        }
+
+        /* Stat Grid */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--success-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Table of Contents */
+        .toc-sidebar {
+            width: 280px;
+            position: sticky;
+            top: 6rem;
+            align-self: flex-start;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+
+        .toc-sidebar h3 {
+            color: var(--text-color);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .toc-sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc-sidebar li {
+            margin-bottom: 0.75rem;
+        }
+
+        .toc-sidebar a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+            font-size: 0.9rem;
+            display: block;
+            padding: 0.25rem 0;
+        }
+
+        .toc-sidebar a:hover {
+            color: var(--primary-color);
+        }
+
+        .toc-sidebar a.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .toc-sidebar {
+                width: 100%;
+                position: static;
+                margin-bottom: 2rem;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.75rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 2rem 1.5rem;
+            }
+
+            .hero-title {
+                font-size: 1.75rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .main-content {
+                padding: 2rem 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .platform-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.6rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            h3 {
+                font-size: 1.3rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .code-block {
+                padding: 0.75rem;
+            }
+
+            .feature-item {
+                padding: 1rem;
+            }
+
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" aria-label="返回顶部">↑</button>
+
+    <!-- Hero Section -->
+    <header class="hero-section">
+        <div class="hero-container">
+            <div class="hero-badge">🚀 超高性能加速引擎</div>
+            <h1 class="hero-title">Xget - 开发者资源加速引擎</h1>
+            <p class="hero-subtitle">基于 Cloudflare Workers 的超高性能资源加速解决方案，支持 GitHub、npm、PyPI、Docker 等 40+ 平台统一加速</p>
+
+            <div class="hero-meta">
+                <div class="meta-item">
+                    ⭐ <strong>6.2K+</strong> Stars
+                </div>
+                <div class="meta-item">
+                    🔱 <strong>616+</strong> Forks
+                </div>
+                <div class="meta-item">
+                    📝 <strong>JavaScript</strong>
+                </div>
+                <div class="meta-item">
+                    📄 <strong>GPL-3.0</strong> License
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="content-wrapper">
+            <!-- 项目概述 -->
+            <section id="overview" class="section">
+                <h2 class="section-title">项目概述</h2>
+                <p class="section-description">
+                    Xget 是一个超高性能、安全的一站式开发者资源加速引擎，基于 Cloudflare Workers 构建。
+                    它利用 Cloudflare 全球 330+ 边缘节点，为开发者提供极速、稳定、安全的资源访问体验。
+                </p>
+
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">&lt; 50ms</div>
+                        <div class="stat-label">平均响应时间</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">330+</div>
+                        <div class="stat-label">全球边缘节点</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">+30%</div>
+                        <div class="stat-label">速度提升</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">40+</div>
+                        <div class="stat-label">支持平台</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 核心特性 -->
+            <section id="features" class="section">
+                <h2 class="section-title">核心特性</h2>
+
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div class="icon">⚡</div>
+                        <h4>极速性能</h4>
+                        <p>基于 HTTP/3 协议，平均响应 < 50ms，传输速度提升 30%</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🌐</div>
+                        <h4>多平台支持</h4>
+                        <p>统一支持 GitHub、npm、PyPI、Docker 等 40+ 开发平台</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🔒</div>
+                        <h4>企业级安全</h4>
+                        <p>HTTPS 强制传输，多层安全防护，确保资源安全可靠</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🎯</div>
+                        <h4>Git 完全兼容</h4>
+                        <p>完整支持 git clone、push、pull 等所有 Git 操作</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">📦</div>
+                        <h4>智能缓存</h4>
+                        <p>边缘缓存优化，显著减少源站压力，提升访问速度</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🚀</div>
+                        <h4>零配置使用</h4>
+                        <p>无需注册，直接替换 URL 即可，支持浏览器扩展</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 支持平台 -->
+            <section id="platforms" class="section">
+                <h2 class="section-title">支持平台</h2>
+                <p class="section-description">覆盖开发者日常使用的所有主流平台和服务</p>
+
+                <h3 class="section-subtitle">代码托管平台</h3>
+                <div class="platform-grid">
+                    <div class="platform-tag">GitHub</div>
+                    <div class="platform-tag">GitLab</div>
+                    <div class="platform-tag">Bitbucket</div>
+                    <div class="platform-tag">Gitea</div>
+                </div>
+
+                <h3 class="section-subtitle">包管理器</h3>
+                <div class="platform-grid">
+                    <div class="platform-tag">npm</div>
+                    <div class="platform-tag">PyPI</div>
+                    <div class="platform-tag">Maven</div>
+                    <div class="platform-tag">Gradle</div>
+                    <div class="platform-tag">RubyGems</div>
+                    <div class="platform-tag">NuGet</div>
+                    <div class="platform-tag">Go Modules</div>
+                    <div class="platform-tag">Rust Crates</div>
+                </div>
+
+                <h3 class="section-subtitle">容器与系统</h3>
+                <div class="platform-grid">
+                    <div class="platform-tag">Docker Hub</div>
+                    <div class="platform-tag">ghcr.io</div>
+                    <div class="platform-tag">Homebrew</div>
+                    <div class="platform-tag">APK</div>
+                </div>
+
+                <h3 class="section-subtitle">AI 服务</h3>
+                <div class="platform-grid">
+                    <div class="platform-tag">OpenAI</div>
+                    <div class="platform-tag">Anthropic</div>
+                    <div class="platform-tag">Gemini</div>
+                    <div class="platform-tag">Hugging Face</div>
+                    <div class="platform-tag">Groq</div>
+                    <div class="platform-tag">Replicate</div>
+                </div>
+            </section>
+
+            <!-- 快速开始 -->
+            <section id="quickstart" class="section">
+                <h2 class="section-title">快速开始</h2>
+                <p class="section-description">无需注册，三步即可开始使用 Xget 加速服务</p>
+
+                <h3 class="section-subtitle">GitHub 资源加速</h3>
+                <div class="card">
+                    <h3>示例：加速 GitHub 文件下载</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">原始 URL</span>
+                        </div>
+                        <pre><code>https://github.com/microsoft/vscode/archive/refs/heads/main.zip</code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">加速 URL</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre><code>https://xget.xi-xu.me/gh/microsoft/vscode/archive/refs/heads/main.zip</code></pre>
+                    </div>
+                </div>
+
+                <h3 class="section-subtitle">Git 仓库克隆加速</h3>
+                <div class="card">
+                    <h3>直接使用 git clone 命令</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">加速克隆</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre><code>git clone https://xget.xi-xu.me/gh/microsoft/vscode.git</code></pre>
+                    </div>
+                    <div class="info-box">
+                        <strong>提示：</strong>将 <code>github.com</code> 替换为 <code>xget.xi-xu.me/gh</code> 即可实现加速
+                    </div>
+                </div>
+            </section>
+
+            <!-- 包管理器配置 -->
+            <section id="package-managers" class="section">
+                <h2 class="section-title">包管理器配置</h2>
+                <p class="section-description">一次配置，永久加速。支持 npm、pip、Docker 等主流包管理器</p>
+
+                <h3 class="section-subtitle">npm 镜像配置</h3>
+                <div class="card">
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">配置命令</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre><code><span class="comment"># 设置 npm 镜像源</span>
+npm config set registry https://xget.xi-xu.me/npm/
+
+<span class="comment"># 验证配置</span>
+npm config get registry</code></pre>
+                    </div>
+                </div>
+
+                <h3 class="section-subtitle">pip 镜像配置</h3>
+                <div class="card">
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">配置命令</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre><code><span class="comment"># 设置 pip 镜像源</span>
+pip config set global.index-url https://xget.xi-xu.me/pypi/simple/
+pip config set global.trusted-host xget.xi-xu.me</code></pre>
+                    </div>
+                </div>
+
+                <h3 class="section-subtitle">Git 全局配置</h3>
+                <div class="card">
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">自动加速所有 Git 操作</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre><code><span class="comment"># GitHub 加速</span>
+git config --global url."https://xget.xi-xu.me/gh/".insteadOf "https://github.com/"
+
+<span class="comment"># GitLab 加速</span>
+git config --global url."https://xget.xi-xu.me/gl/".insteadOf "https://gitlab.com/"</code></pre>
+                    </div>
+                    <div class="info-box success">
+                        <strong>自动加速：</strong>配置后，所有 <code>git clone</code>、<code>git pull</code> 等操作都将自动使用加速服务
+                    </div>
+                </div>
+
+                <h3 class="section-subtitle">Docker 镜像加速</h3>
+                <div class="card">
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">使用示例</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre><code><span class="comment"># 拉取 GitHub Container Registry 镜像</span>
+docker pull xget.xi-xu.me/cr/ghcr/nginxinc/nginx-unprivileged:latest</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI API 加速 -->
+            <section id="ai-acceleration" class="section">
+                <h2 class="section-title">AI API 加速</h2>
+                <p class="section-description">加速 OpenAI、Anthropic、Gemini 等 AI 服务的 API 访问</p>
+
+                <h3 class="section-subtitle">OpenAI API 加速</h3>
+                <div class="card">
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">URL 替换</span>
+                        </div>
+                        <pre><code><span class="comment"># 原始 URL</span>
+https://api.openai.com/v1/chat/completions
+
+<span class="comment"># 加速 URL</span>
+https://xget.xi-xu.me/ip/openai/v1/chat/completions</code></pre>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">Python 使用示例</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre><code>import openai
+
+<span class="comment"># 配置加速端点</span>
+openai.api_base = "https://xget.xi-xu.me/ip/openai"
+openai.api_key = "your-api-key"
+
+<span class="comment"># 正常调用</span>
+response = openai.ChatCompletion.create(
+    model="gpt-4",
+    messages=[{"role": "user", "content": "Hello!"}]
+)</code></pre>
+                    </div>
+                </div>
+
+                <h3 class="section-subtitle">���持的 AI 服务</h3>
+                <ul class="list">
+                    <li><strong>OpenAI</strong> - GPT-4、GPT-3.5 等模型</li>
+                    <li><strong>Anthropic</strong> - Claude 系列模型</li>
+                    <li><strong>Google Gemini</strong> - Gemini Pro、Flash 等</li>
+                    <li><strong>Hugging Face</strong> - 开源模型推理</li>
+                    <li><strong>Groq</strong> - 超高速推理服务</li>
+                    <li><strong>Replicate</strong> - 模型部署平台</li>
+                </ul>
+            </section>
+
+            <!-- 自部署指南 -->
+            <section id="self-deploy" class="section">
+                <h2 class="section-title">自部署到 Cloudflare Workers</h2>
+                <p class="section-description">完全免费，每天 10 万次请求额度，拥有独立加速域名</p>
+
+                <div class="card">
+                    <h3>部署步骤</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">命令行部署</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre><code><span class="comment"># 1. 克隆项目</span>
+git clone https://github.com/xixu-me/Xget.git
+cd Xget
+
+<span class="comment"># 2. 安装依赖</span>
+npm install
+
+<span class="comment"># 3. 登录 Cloudflare</span>
+npx wrangler login
+
+<span class="comment"># 4. 部署到 Workers</span>
+npm run deploy</code></pre>
+                    </div>
+
+                    <div class="info-box success">
+                        <strong>部署完成！</strong>你将获得一个专属加速域名，例如：<code>https://xget.your-subdomain.workers.dev</code>
+                    </div>
+                </div>
+
+                <h3 class="section-subtitle">自部署优势</h3>
+                <ul class="list">
+                    <li><strong>完全免费</strong> - Cloudflare Workers 免费套餐每天 10 万次请求</li>
+                    <li><strong>全球加速</strong> - 自动部署到全球 330+ 边缘节点</li>
+                    <li><strong>自定义域名</strong> - 可绑定自己的域名</li>
+                    <li><strong>数据安全</strong> - 完全控制，数据不经过第三方</li>
+                    <li><strong>零维护成本</strong> - Cloudflare 自动处理扩展和维护</li>
+                </ul>
+            </section>
+
+            <!-- 浏览器扩展 -->
+            <section id="browser-extension" class="section">
+                <h2 class="section-title">浏览器扩展 - Xget Now</h2>
+                <p class="section-description">自动重定向，无需手动修改 URL</p>
+
+                <div class="card">
+                    <h3>扩展功能</h3>
+                    <ul class="list">
+                        <li><strong>自动 URL 重定向</strong> - 访问支持的平台时自动使用 Xget 加速</li>
+                        <li><strong>自定义实例</strong> - 可配置使用自己部署的 Xget 实例</li>
+                        <li><strong>平台偏好设置</strong> - 灵活控制哪些平台启用加速</li>
+                        <li><strong>黑白名单管理</strong> - 精细化控制加速规则</li>
+                        <li><strong>隐私安全</strong> - 所有操作在本地完成，不上传数据</li>
+                    </ul>
+
+                    <div class="info-box">
+                        <strong>支持浏览器：</strong>Chrome、Edge、Firefox、Safari 等主流浏览器
+                    </div>
+
+                    <div style="margin-top: 1.5rem;">
+                        <a href="https://github.com/xixu-me/Xget-Now" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--gradient-primary); color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                            📥 下载浏览器扩展
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 技术特性 -->
+            <section id="tech-features" class="section">
+                <h2 class="section-title">技术特性详解</h2>
+
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div class="icon">🌐</div>
+                        <h4>HTTP/3 协议</h4>
+                        <p>基于 QUIC 传输，连接延迟降低 40%，弱网环境表现优异</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">📦</div>
+                        <h4>智能压缩</h4>
+                        <p>支持 gzip、brotli 压缩，自动选择最优算法，效率提升 60%</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🔗</div>
+                        <h4>零延迟预连接</h4>
+                        <p>连接预热机制，消除 TCP/TLS 握手开销，毫秒级响应</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">⚡</div>
+                        <h4>并行分片下载</h4>
+                        <p>支持 Range 请求，多线程并行下载，大文件速度倍增</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🎯</div>
+                        <h4>智能路由</h4>
+                        <p>基于 Argo 智能路由，自动选择最优路径，避开拥堵节点</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🔄</div>
+                        <h4>自动重试</h4>
+                        <p>最大 3 次重试，智能错误恢复，提高下载成功率</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 使用场景 -->
+            <section id="use-cases" class="section">
+                <h2 class="section-title">典型使用场景</h2>
+
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div class="icon">💻</div>
+                        <h4>日常开发</h4>
+                        <p>GitHub 克隆、npm 安装、Docker 拉取，提升开发效率</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🤖</div>
+                        <h4>AI 开发</h4>
+                        <p>Hugging Face 模型下载、AI API 调用加速</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🏗️</div>
+                        <h4>CI/CD 集成</h4>
+                        <p>GitHub Actions、GitLab CI 构建加速</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">📱</div>
+                        <h4>移动开发</h4>
+                        <p>Android SDK、移动开发工具快速下载</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🔬</div>
+                        <h4>学术研究</h4>
+                        <p>arXiv 论文、学术数据集高速获取</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🌍</div>
+                        <h4>跨境协作</h4>
+                        <p>解决地理限制，全球开发者无障碍访问</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 项目信息 -->
+            <section id="project-info" class="section">
+                <h2 class="section-title">项目信息</h2>
+
+                <div class="card">
+                    <h3>开源信息</h3>
+                    <ul class="list">
+                        <li><strong>协议：</strong>GPL-3.0 开源协议</li>
+                        <li><strong>语言：</strong>JavaScript</li>
+                        <li><strong>平台：</strong>Cloudflare Workers</li>
+                        <li><strong>GitHub Stars：</strong>6200+</li>
+                        <li><strong>活跃度：</strong>持续更新维护</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>相关链接</h3>
+                    <ul class="list">
+                        <li><a href="https://github.com/xixu-me/Xget" target="_blank" style="color: var(--primary-color);">📦 GitHub 仓库</a></li>
+                        <li><a href="https://xget.xi-xu.me" target="_blank" style="color: var(--primary-color);">🚀 在线体验</a></li>
+                        <li><a href="https://xuc.xi-xu.me" target="_blank" style="color: var(--primary-color);">🔄 URL 转换器</a></li>
+                        <li><a href="https://github.com/xixu-me/Xget-Now" target="_blank" style="color: var(--primary-color);">🔌 浏览器扩展</a></li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+
+        <!-- Table of Contents Sidebar -->
+        <aside class="toc-sidebar">
+            <h3>📋 目录</h3>
+            <ul>
+                <li><a href="#overview">项目概述</a></li>
+                <li><a href="#features">核心特性</a></li>
+                <li><a href="#platforms">支持平台</a></li>
+                <li><a href="#quickstart">快速开始</a></li>
+                <li><a href="#package-managers">包管理器配置</a></li>
+                <li><a href="#ai-acceleration">AI API 加速</a></li>
+                <li><a href="#self-deploy">自部署指南</a></li>
+                <li><a href="#browser-extension">浏览器扩展</a></li>
+                <li><a href="#tech-features">技术特性</a></li>
+                <li><a href="#use-cases">使用场景</a></li>
+                <li><a href="#project-info">项目信息</a></li>
+            </ul>
+        </aside>
+    </div>
+
+    <!-- Footer -->
+    <footer style="border-top: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); margin-top: 5rem;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 2rem; text-align: center;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                <div style="font-size: 0.875rem; color: var(--text-secondary);" id="copyright-text"></div>
+                <div style="font-size: 0.875rem; color: #6b7280;" id="beian-number"></div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Load config
+        fetch('/data/articles.json')
+            .then(response => response.json())
+            .then(data => {
+                const { beianNumber, copyrightText } = data.config;
+                document.getElementById('copyright-text').textContent = copyrightText || '© 2025 Halavah\'s Tech. All rights reserved.';
+                if (beianNumber) {
+                    document.getElementById('beian-number').textContent = beianNumber;
+                }
+            })
+            .catch(error => console.error('Failed to load config:', error));
+
+        // TOC active link tracking
+        document.querySelectorAll('.toc-sidebar a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Highlight active section
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    document.querySelectorAll('.toc-sidebar a').forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${entry.target.id}`) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, { rootMargin: '-100px 0px -80% 0px' });
+
+        document.querySelectorAll('section[id]').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Back to top button
+        const backToTop = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Copy code function
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block').querySelector('code');
+            const text = codeBlock.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '已复制!';
+                button.style.background = 'var(--success-color)';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'var(--primary-color)';
+                }, 2000);
+            }).catch(err => {
+                console.error('复制失败:', err);
+                button.textContent = '复制失败';
+                setTimeout(() => {
+                    button.textContent = '复制';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

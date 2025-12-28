@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CC-Switch - Claude Code与Codex配置切换神器 | AI编程助手配置管理</title>
+    <meta name="description" content="CC-Switch 是一款桌面应用，专为Claude Code和Codex设计，提供可视化配置管理、多设备同步、一键切换等功能，让AI编程助手配置更简单">
+    <meta name="keywords" content="CC-Switch,Claude Code,Codex,配置管理,桌面应用,多设备同步,farion1231,一键切换">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}:root{--primary-color:#3b82f6;--primary-dark:#2563eb;--secondary-color:#10b981;--accent-color:#f59e0b;--success-color:#10b981;--background-color:#0f0f1a;--surface-color:#1a1a2e;--surface-light:#252542;--text-color:#e2e8f0;--text-muted:#94a3b8;--border-color:#334155;--gradient-primary:linear-gradient(135deg,#3b82f6 0%,#10b981 100%);--gradient-hero:linear-gradient(135deg,#1a1a2e 0%,#0f0f1a 50%,#1e1b4b 100%);--gradient-accent:linear-gradient(135deg,#f59e0b 0%,#ef4444 100%);--glow-primary:0 0 40px rgba(59,130,246,0.3);--glow-secondary:0 0 40px rgba(16,185,129,0.2);--glow-accent:0 0 40px rgba(245,158,11,0.3)}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;line-height:1.7;color:var(--text-color);background:var(--background-color);overflow-x:hidden}.container{width:100%;max-width:1200px;margin:0 auto;padding:0 1.5rem}.hero-section{position:relative;min-height:100vh;display:flex;align-items:center;background:var(--gradient-hero);overflow:hidden}.hero-section::before{content:"";position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 20% 80%,rgba(59,130,246,0.15) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(16,185,129,0.1) 0%,transparent 50%),radial-gradient(circle at 50% 50%,rgba(245,158,11,0.05) 0%,transparent 50%);pointer-events:none}.particles{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;pointer-events:none}.particle{position:absolute;width:4px;height:4px;background:var(--primary-color);border-radius:50%;opacity:0.3;animation:float 15s infinite ease-in-out}.particle:nth-child(2){left:20%;animation-delay:-2s;background:var(--secondary-color)}.particle:nth-child(3){left:40%;animation-delay:-4s}.particle:nth-child(4){left:60%;animation-delay:-6s;background:var(--accent-color)}.particle:nth-child(5){left:80%;animation-delay:-8s;background:var(--secondary-color)}.particle:nth-child(6){left:10%;animation-delay:-10s}.particle:nth-child(7){left:70%;animation-delay:-12s;background:var(--accent-color)}.particle:nth-child(8){left:90%;animation-delay:-14s}@keyframes float{0%,100%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:0.3}90%{opacity:0.3}100%{transform:translateY(-100vh) scale(1);opacity:0}}.hero-container{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;padding:2rem 0}.hero-content{animation:fadeInUp 0.8s ease-out}@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}.hero-badge{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);padding:0.5rem 1rem;border-radius:50px;font-size:0.875rem;color:var(--primary-color);margin-bottom:1.5rem}.hero-badge::before{content:"";width:8px;height:8px;background:var(--primary-color);border-radius:50%;animation:pulse 2s infinite}@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.2)}}.hero-title{font-size:3.5rem;font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.hero-subtitle{font-size:1.25rem;color:var(--text-muted);margin-bottom:2rem;max-width:500px}.hero-stats{display:flex;gap:2rem;margin-bottom:2rem}.stat-item{text-align:center}.stat-number{display:block;font-size:1.5rem;font-weight:700;color:var(--text-color)}.stat-label{font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em}.hero-actions{display:flex;gap:1rem;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.875rem 1.75rem;border:none;border-radius:12px;font-weight:600;font-size:1rem;text-decoration:none;cursor:pointer;transition:all 0.3s ease}.btn-primary{background:var(--gradient-primary);color:white;box-shadow:var(--glow-primary)}.btn-primary:hover{transform:translateY(-3px);box-shadow:0 10px 40px rgba(59,130,246,0.4)}.btn-secondary{background:var(--surface-light);color:var(--text-color);border:1px solid var(--border-color)}.btn-secondary:hover{background:var(--surface-color);border-color:var(--primary-color);transform:translateY(-3px)}.hero-visual{position:relative;display:flex;justify-content:center;align-items:center;animation:fadeInUp 0.8s ease-out 0.2s both}.switch-diagram{position:relative;width:100%;max-width:450px;aspect-ratio:1}.switch-core{position:absolute;inset:35%;background:var(--gradient-primary);border-radius:20px;display:flex;align-items:center;justify-content:center;box-shadow:var(--glow-primary);animation:rotate 30s linear infinite}.switch-icon{font-size:3rem;color:white}.config-switch{position:absolute;width:60px;height:30px;background:var(--surface-light);border:2px solid var(--primary-color);border-radius:30px;display:flex;align-items:center;padding:2px;cursor:pointer;transition:all 0.3s ease}.config-switch-handle{width:24px;height:24px;background:var(--primary-color);border-radius:50%;transition:all 0.3s ease}.config-switch.active{background:var(--primary-color)}.config-switch.active .config-switch-handle{transform:translateX(30px);background:white}.config-switch:nth-child(2){top:10%;left:50%;transform:translateX(-50%);animation:switchAnimation1 4s infinite ease-in-out}.config-switch:nth-child(3){top:50%;right:10%;transform:translateY(-50%);animation:switchAnimation2 4s infinite ease-in-out 1s}.config-switch:nth-child(4){bottom:10%;left:50%;transform:translateX(-50%);animation:switchAnimation3 4s infinite ease-in-out 2s}.config-switch:nth-child(5){top:50%;left:10%;transform:translateY(-50%);animation:switchAnimation4 4s infinite ease-in-out 3s}@keyframes switchAnimation1{0%,100%{transform:translateX(-50%) rotate(0deg)}50%{transform:translateX(-50%) rotate(180deg)}}@keyframes switchAnimation2{0%,100%{transform:translateY(-50%) rotate(0deg)}50%{transform:translateY(-50%) rotate(180deg)}}@keyframes switchAnimation3{0%,100%{transform:translateX(-50%) rotate(0deg)}50%{transform:translateX(-50%) rotate(180deg)}}@keyframes switchAnimation4{0%,100%{transform:translateY(-50%) rotate(0deg)}50%{transform:translateY(-50%) rotate(180deg)}}@keyframes rotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}.main-content{position:relative;z-index:1}section{padding:5rem 0}.section-header{text-align:center;margin-bottom:4rem}.section-badge{display:inline-block;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);padding:0.375rem 1rem;border-radius:50px;font-size:0.75rem;color:var(--primary-color);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem}.section-title{font-size:2.5rem;font-weight:700;margin-bottom:1rem;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.section-subtitle{font-size:1.125rem;color:var(--text-muted);max-width:600px;margin:0 auto}.overview-section{background:linear-gradient(180deg,var(--background-color) 0%,var(--surface-color) 100%)}.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}.overview-content h3{font-size:1.75rem;margin-bottom:1rem;color:var(--text-color)}.overview-content p{color:var(--text-muted);margin-bottom:1.5rem}.overview-list{list-style:none}.overview-list li{display:flex;align-items:flex-start;gap:0.75rem;margin-bottom:1rem;color:var(--text-muted)}.overview-list li::before{content:"✓";color:var(--secondary-color);font-weight:bold}.architecture-diagram{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.arch-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;align-items:center}.arch-node{padding:1rem;background:var(--surface-color);border:2px solid var(--border-color);border-radius:10px;text-align:center;font-weight:600;color:var(--text-color);transition:all 0.3s ease;min-height:80px;display:flex;align-items:center;justify-content:center}.arch-node:hover{border-color:var(--primary-color);transform:scale(1.05)}.arch-arrow{text-align:center;font-size:1.5rem;color:var(--primary-color)}.features-section{background:var(--surface-color)}.features-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem}.feature-card{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color);position:relative;overflow:hidden}.feature-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--gradient-primary);transform:scaleX(0);transition:transform 0.3s ease}.feature-card:hover{transform:translateY(-5px);border-color:var(--primary-color);box-shadow:var(--glow-primary)}.feature-card:hover::before{transform:scaleX(1)}.feature-icon{width:60px;height:60px;background:rgba(59,130,246,0.1);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.75rem;margin-bottom:1.5rem}.feature-title{font-size:1.25rem;font-weight:600;margin-bottom:0.75rem;color:var(--text-color)}.feature-description{color:var(--text-muted);font-size:0.95rem}.feature-list{margin-top:1rem;list-style:none}.feature-list li{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;color:var(--text-muted);font-size:0.875rem}.feature-list li::before{content:"→";color:var(--secondary-color);font-weight:bold}.installation-section{background:var(--background-color)}.install-tabs{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.tab-buttons{display:flex;gap:0.5rem;margin-bottom:2rem;background:var(--surface-color);padding:0.5rem;border-radius:12px}.tab-btn{flex:1;padding:0.875rem 1.5rem;border:none;background:transparent;color:var(--text-muted);font-weight:600;border-radius:8px;cursor:pointer;transition:all 0.3s ease}.tab-btn.active{background:var(--gradient-primary);color:white}.tab-btn:hover:not(.active){color:var(--text-color);background:rgba(59,130,246,0.1)}.tab-content{display:none}.tab-content.active{display:block;animation:fadeIn 0.3s ease}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.install-step{margin-bottom:1.5rem}.install-step:last-child{margin-bottom:0}.install-step h4{color:var(--text-color);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem}.step-number{width:28px;height:28px;background:var(--gradient-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-weight:700}.code-block{position:relative;background:#0d1117;border-radius:12px;overflow:hidden;border:1px solid var(--border-color)}.code-header{display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;background:#161b22;border-bottom:1px solid var(--border-color)}.code-lang{font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em}.copy-btn{background:var(--primary-color);color:white;border:none;padding:0.375rem 0.75rem;border-radius:6px;font-size:0.75rem;cursor:pointer;transition:all 0.2s ease}.copy-btn:hover{background:var(--primary-dark)}.code-content{padding:1rem;overflow-x:auto}.code-content pre{margin:0;font-family:"Fira Code","Monaco","Consolas",monospace;font-size:0.875rem;line-height:1.6}.code-content code{color:#e6edf3}.usage-section{background:linear-gradient(180deg,var(--surface-color) 0%,var(--background-color) 100%)}.usage-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.usage-features{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.usage-features h3{font-size:1.5rem;margin-bottom:1.5rem;color:var(--text-color)}.usage-item{display:flex;align-items:flex-start;gap:1rem;padding:1rem;background:var(--surface-color);border-radius:12px;margin-bottom:0.75rem;border:1px solid var(--border-color);transition:all 0.3s ease}.usage-item:hover{border-color:var(--primary-color);transform:translateX(5px)}.usage-item:last-child{margin-bottom:0}.usage-icon{width:36px;height:36px;background:rgba(16,185,129,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.usage-item-title{font-weight:600;color:var(--text-color);margin-bottom:0.25rem;font-size:0.95rem}.usage-item-desc{font-size:0.85rem;color:var(--text-muted)}.usage-examples{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.usage-examples h3{font-size:1.5rem;margin-bottom:1.5rem;color:var(--text-color)}.config-example{background:var(--surface-color);border-radius:10px;padding:1rem;margin-bottom:1rem;font-family:"Fira Code",monospace;font-size:0.875rem;color:var(--text-color)}.sync-section{background:var(--surface-color)}.sync-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem}.sync-card{background:var(--surface-light);border-radius:16px;padding:1.5rem;border:1px solid var(--border-color)}.sync-title{font-size:1.1rem;font-weight:600;color:var(--text-color);margin-bottom:1rem}.sync-content{color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem}.sync-flow{background:var(--surface-color);border-radius:10px;padding:1rem;margin-top:1rem;font-family:"Fira Code",monospace;font-size:0.8rem;color:var(--text-muted);text-align:center}.troubleshooting-section{background:var(--background-color)}.troubleshooting-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem}.trouble-card{background:var(--surface-light);border-radius:16px;padding:1.5rem;border:1px solid var(--border-color)}.trouble-title{font-size:1.1rem;font-weight:600;color:var(--text-color);margin-bottom:1rem}.trouble-content{color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem}.trouble-solution{background:var(--surface-color);border-radius:8px;padding:0.75rem;border-left:3px solid var(--accent-color)}.changelog-section{background:linear-gradient(180deg,var(--background-color) 0%,var(--surface-color) 100%)}.changelog-timeline{max-width:800px;margin:0 auto}.changelog-item{display:flex;gap:1rem;padding-bottom:2rem;border-bottom:1px solid var(--border-color);margin-bottom:2rem}.changelog-item:last-child{border-bottom:none}.changelog-version{flex-shrink:0;width:120px;padding:0.5rem 1rem;background:var(--gradient-primary);color:white;border-radius:20px;font-weight:600;text-align:center}.changelog-content{flex:1}.changelog-title{font-size:1.1rem;font-weight:600;color:var(--text-color);margin-bottom:0.5rem}.changelog-features{list-style:none}.changelog-features li{display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.25rem;color:var(--text-muted);font-size:0.9rem}.footer{background:var(--surface-color);padding:3rem 0;border-top:1px solid var(--border-color)}.footer-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}.footer-info{color:var(--text-muted);font-size:0.9rem}.footer-info a{color:var(--primary-color);text-decoration:none}.footer-info a:hover{text-decoration:underline}.footer-stats{color:var(--text-muted);font-size:0.875rem}.footer-links a:hover{color:var(--primary-color)}@media (max-width:1024px){.hero-container{grid-template-columns:1fr;text-align:center}.hero-subtitle{margin:0 auto 2rem}.hero-stats{justify-content:center}.hero-actions{justify-content:center}.hero-visual{order:-1}.switch-diagram{max-width:300px}.features-grid{grid-template-columns:1fr}.overview-grid,.usage-grid,.sync-grid{grid-template-columns:1fr}.arch-flow{grid-template-columns:1fr}.troubleshooting-grid{grid-template-columns:1fr}}@media (max-width:768px){.hero-title{font-size:2.5rem}.section-title{font-size:2rem}.tab-buttons{flex-direction:column}}@media (max-width:480px){.hero-title{font-size:2rem}.hero-stats{flex-wrap:wrap;gap:1rem}.btn{width:100%;justify-content:center}section{padding:3rem 0}}
+    </style>
+</head>
+<body>
+    <header class="hero-section">
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+        <div class="container">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="hero-badge">配置切换神器</div>
+                    <h1 class="hero-title">CC-Switch</h1>
+                    <p class="hero-subtitle">专业的AI编程助手配置管理工具，支持Claude Code和Codex的一键切换、多设备同步、可视化配置管理，让复杂的配置变得简单易用</p>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">v3.8</span>
+                            <span class="stat-label">版本</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">18000+</span>
+                            <span class="stat-label">代码行数</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">SSOT</span>
+                            <span class="stat-label">设计理念</span>
+                        </div>
+                    </div>
+                    <div class="hero-actions">
+                        <a href="https://github.com/farion1231/cc-switch" target="_blank" class="btn btn-primary">
+                            <span>查看源码</span>
+                        </a>
+                        <a href="#installation" class="btn btn-secondary">
+                            <span>快速开始</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="switch-diagram">
+                        <div class="switch-core">
+                            <span class="switch-icon">⚙️</span>
+                        </div>
+                        <div class="config-switch"></div>
+                        <div class="config-switch active"></div>
+                        <div class="config-switch"></div>
+                        <div class="config-switch active"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="overview-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">项目概述</span>
+                    <h2 class="section-title">什么是 CC-Switch？</h2>
+                    <p class="section-subtitle">专为AI编程助手用户设计的配置管理工具，解决多工具配置切换难题</p>
+                </div>
+                <div class="overview-grid">
+                    <div class="overview-content">
+                        <h3>一站式配置管理</h3>
+                        <p>CC-Switch 是一款专为 AI 编程助手用户设计的配置管理工具，解决了在 Claude Code、Codex、Gemini 等多个 AI 编程工具之间切换时配置繁琐的问题。通过直观的图形界面和强大的配置管理功能，让用户能够轻松管理多个编程助手的配置。</p>
+                        <ul class="overview-list">
+                            <li>一键切换不同AI编程助手配置</li>
+                            <li>多设备云端同步，保持配置一致性</li>
+                            <li>可视化界面，告别复杂环境变量</li>
+                            <li>AES加密存储，保障API密钥安全</li>
+                            <li>单数据源（SSOT）设计理念</li>
+                            <li>原子操作和事务回滚机制</li>
+                        </ul>
+                    </div>
+                    <div class="architecture-diagram">
+                        <h3 style="text-align:center;color:var(--text-color);margin-bottom:1.5rem;">技术架构</h3>
+                        <div class="arch-flow">
+                            <div class="arch-node">Frontend<br>(Electron/React)</div>
+                            <div class="arch-arrow">↓</div>
+                            <div class="arch-node">Backend<br>(Node.js/TS)</div>
+                            <div class="arch-arrow">↓</div>
+                            <div class="arch-node">Config<br>Engine</div>
+                        </div>
+                        <div class="arch-flow" style="margin-top:1rem;">
+                            <div style="grid-column:2;text-align:center;">
+                                <div style="font-size:0.75rem;color:var(--text-muted);">↓</div>
+                                <div style="font-size:0.75rem;color:var(--text-muted);">Storage • Encryption • Sync • Validation</div>
+                            </div>
+                        </div>
+                        <div class="arch-flow" style="margin-top:1rem;">
+                            <div style="grid-column:2;">
+                                <div class="arch-node">Cloud Storage<br>(Encrypted)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">核心功能</span>
+                    <h2 class="section-title">功能特性</h2>
+                    <p class="section-subtitle">全面的配置管理功能，让AI编程助手使用更便捷</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔄</div>
+                        <h3 class="feature-title">一键配置切换</h3>
+                        <p class="feature-description">在不同AI编程助手间快速切换配置，支持配置预设、智能检测和配置验证</p>
+                        <ul class="feature-list">
+                            <li>快速切换 Claude Code、Codex、Gemini</li>
+                            <li>保存常用配置组合，快速应用</li>
+                            <li>自动检测当前环境配置状态</li>
+                            <li>切换前验证配置有效性</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📱</div>
+                        <h3 class="feature-title">多设备同步</h3>
+                        <p class="feature-description">配置信息加密存储在云端，实时同步到所有设备，支持离线模式和冲突解决</p>
+                        <ul class="feature-list">
+                            <li>云端加密存储配置信息</li>
+                            <li>配置变更实时同步到所有设备</li>
+                            <li>支持离线模式，联网后自动同步</li>
+                            <li>智能处理配置冲突</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <h3 class="feature-title">可视化管理</h3>
+                        <p class="feature-description">直观的图形界面，按功能模块分类管理配置，支持批量操作和配置模板</p>
+                        <ul class="feature-list">
+                            <li>图形化配置管理界面</li>
+                            <li>按功能模块分类管理配置</li>
+                            <li>支持批量导入、导出、修改</li>
+                            <li>提供常用配置模板</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <h3 class="feature-title">安全保障</h3>
+                        <p class="feature-description">所有敏感信息AES加密存储，安全的API密钥管理，支持密码保护和生物识别</p>
+                        <ul class="feature-list">
+                            <li>所有敏感信息 AES 加密存储</li>
+                            <li>安全的 API 密钥管理机制</li>
+                            <li>支持密码保护和生物识别</li>
+                            <li>记录所有配置变更操作</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3 class="feature-title">高级功能</h3>
+                        <p class="feature-description">原子操作、事务回滚、自动备份恢复、性能监控等企业级功能</p>
+                        <ul class="feature-list">
+                            <li>配置更新的原子写入，防止损坏</li>
+                            <li>配置错误时自动回滚到稳定状态</li>
+                            <li>自动备份配置，支持一键恢复</li>
+                            <li>实时监控配置工具性能</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🛠️</div>
+                        <h3 class="feature-title">开发者友好</h3>
+                        <p class="feature-description">提供CLI命令行接口、开放API、插件系统和脚本支持</p>
+                        <ul class="feature-list">
+                            <li>提供完整的命令行接口</li>
+                            <li>开放API供第三方工具集成</li>
+                            <li>支持插件扩展功能</li>
+                            <li>支持自动化脚本操作</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="installation-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">安装指南</span>
+                    <h2 class="section-title">快速开始</h2>
+                    <p class="section-subtitle">多种安装方式，支持Windows、macOS、Linux平台</p>
+                </div>
+                <div class="install-tabs">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" onclick="switchTab(event, 'official-install')">官方安装包</button>
+                        <button class="tab-btn" onclick="switchTab(event, 'package-manager')">包管理器</button>
+                        <button class="tab-btn" onclick="switchTab(event, 'source-build')">源码编译</button>
+                    </div>
+                    <div id="official-install" class="tab-content active">
+                        <div class="install-step">
+                            <h4><span class="step-number">1</span> Windows 安装</h4>
+                            <p>访问 GitHub Releases 下载 <code>CC-Switch-Setup-x.x.x.exe</code>，运行安装程序按提示完成安装</p>
+                        </div>
+                        <div class="install-step">
+                            <h4><span class="step-number">2</span> macOS 安装</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># 使用 Homebrew 安装（推荐）
+brew tap farion1231/ccswitch
+brew install --cask cc-switch
+
+# 或手动下载安装
+# 下载 CC-Switch-x.x.x.dmg
+# 双击挂载并拖拽到 Applications 文件夹</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="install-step">
+                            <h4><span class="step-number">3</span> Linux 安装</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># Ubuntu/Debian
+wget https://github.com/farion1231/cc-switch/releases/latest/download/cc-switch_x.x.x_amd64.deb
+sudo dpkg -i cc-switch_x.x.x_amd64.deb
+
+# 或使用 AppImage
+wget https://github.com/farion1231/cc-switch/releases/latest/download/cc-switch-x.x.x.AppImage
+chmod +x cc-switch-x.x.x.AppImage
+./cc-switch-x.x.x.AppImage</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="package-manager" class="tab-content">
+                        <div class="install-step">
+                            <h4><span class="step-number">1</span> npm 安装</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># npm 全局安装
+npm install -g @ccswitch/cli
+
+# yarn 全局安装
+yarn global add @ccswitch/cli
+
+# 验证安装
+cc-switch --version</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="install-step">
+                            <h4><span class="step-number">2</span> 首次配置</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># 启动应用
+cc-switch
+
+# 创建账户
+# 导入现有配置
+# 设置同步</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="source-build" class="tab-content">
+                        <div class="install-step">
+                            <h4><span class="step-number">1</span> 克隆仓库</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># 克隆仓库
+git clone https://github.com/farion1231/cc-switch.git
+cd cc-switch
+
+# 安装依赖
+npm install</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="install-step">
+                            <h4><span class="step-number">2</span> 开发和构建</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># 开发模式运行
+npm run dev
+
+# 构建生产版本
+npm run build
+npm run package</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="usage-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">使用方法</span>
+                    <h2 class="section-title">如何使用</h2>
+                    <p class="section-subtitle">掌握图形界面和命令行的使用方法</p>
+                </div>
+                <div class="usage-grid">
+                    <div class="usage-features">
+                        <h3>命令行操作</h3>
+                        <div class="usage-item">
+                            <div class="usage-icon">📋</div>
+                            <div>
+                                <div class="usage-item-title">查看配置</div>
+                                <div class="usage-item-desc">查看所有可用的配置列表</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">🔄</div>
+                            <div>
+                                <div class="usage-item-title">切换配置</div>
+                                <div class="usage-item-desc">一键切换到指定配置</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">➕</div>
+                            <div>
+                                <div class="usage-item-title">添加配置</div>
+                                <div class="usage-item-desc">添加新的AI编程助手配置</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">🗑️</div>
+                            <div>
+                                <div class="usage-item-title">删除配置</div>
+                                <div class="usage-item-desc">删除不需要的配置项</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">📤</div>
+                            <div>
+                                <div class="usage-item-title">导入导出</div>
+                                <div class="usage-item-desc">配置文件的导入和导出</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">✅</div>
+                            <div>
+                                <div class="usage-item-title">验证配置</div>
+                                <div class="usage-item-desc">验证配置的有效性</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="usage-examples">
+                        <h3>配置示例</h3>
+                        <div class="config-example">
+                            <strong>基础命令：</strong><br>
+                            cc-switch list<br>
+                            cc-switch switch claude-code-prod<br>
+                            cc-switch add --name gemini-dev --provider gemini --api-key your-key<br>
+                            cc-switch delete --name old-config<br>
+                            cc-switch export --file backup.json<br>
+                            cc-switch import --file backup.json
+                        </div>
+                        <div class="config-example">
+                            <strong>配置管理：</strong><br>
+                            # 查看所有配置<br>
+                            cc-switch list<br><br>
+                            # 切换到指定配置<br>
+                            cc-switch switch claude-code-prod<br><br>
+                            # 添加新配置<br>
+                            cc-switch add --name gemini-dev --provider gemini --api-key your-key<br><br>
+                            # 验证配置<br>
+                            cc-switch validate --name claude-code-prod
+                        </div>
+                        <div class="config-example">
+                            <strong>自动化脚本：</strong><br>
+                            #!/bin/bash<br>
+                            # 开发环境配置切换脚本<br><br>
+                            # 切换到开发配置<br>
+                            cc-switch switch dev-environment<br><br>
+                            # 验证配置<br>
+                            if cc-switch validate --name dev-environment; then<br>
+                            &nbsp;&nbsp;echo "开发环境配置切换成功"<br>
+                            else<br>
+                            &nbsp;&nbsp;echo "配置切换失败，请检查配置"<br>
+                            &nbsp;&nbsp;exit 1<br>
+                            fi
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="sync-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">多设备同步</span>
+                    <h2 class="section-title">云端同步</h2>
+                    <p class="section-subtitle">安全的云端同步机制，确保多设备配置一致性</p>
+                </div>
+                <div class="sync-grid">
+                    <div class="sync-card">
+                        <h3 class="sync-title">加密同步流程</h3>
+                        <p class="sync-content">采用端到端加密，确保配置数据在传输和存储过程中的安全性</p>
+                        <div class="sync-flow">
+                            Device A (配置变更)<br>
+                            ↓ (本地加密)<br>
+                            Encrypted Data<br>
+                            ↓ (HTTPS 传输)<br>
+                            Cloud Storage<br>
+                            ↓ (推送通知)<br>
+                            Device B (接收通知)<br>
+                            ↓ (下载并解密)<br>
+                            Configuration Updated
+                        </div>
+                    </div>
+                    <div class="sync-card">
+                        <h3 class="sync-title">冲突解决策略</h3>
+                        <p class="sync-content">智能冲突检测和解决机制，确保数据完整性</p>
+                        <ul style="list-style:none;color:var(--text-muted);font-size:0.9rem;">
+                            <li>• 时间戳优先：最新的配置覆盖旧的</li>
+                            <li>• 用户选择：提供界面让用户手动选择</li>
+                            <li>• 智能合并：自动合并非冲突的配置项</li>
+                            <li>• 版本保留：保留冲突的两个版本</li>
+                        </ul>
+                    </div>
+                    <div class="sync-card">
+                        <h3 class="sync-title">离线支持</h3>
+                        <p class="sync-content">完整的离线模式支持，网络恢复后自动同步</p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">bash</span>
+                            </div>
+                            <div class="code-content">
+                                <pre><code># 启用离线模式
+cc-switch offline enable
+
+# 查看待同步项目
+cc-switch offline queue
+
+# 手动触发同步
+cc-switch sync now</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sync-card">
+                        <h3 class="sync-title">自定义同步服务器</h3>
+                        <p class="sync-content">支持自定义同步服务器，满足企业级需求</p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">bash</span>
+                            </div>
+                            <div class="code-content">
+                                <pre><code># 设置自定义同步服务器
+cc-switch sync config --endpoint https://your-sync-server.com
+
+# 设置加密密钥
+cc-switch sync config --encryption-key your-key
+
+# 启用同步
+cc-switch sync enable</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="troubleshooting-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">故障排除</span>
+                    <h2 class="section-title">常见问题</h2>
+                    <p class="section-subtitle">解决使用过程中可能遇到的问题</p>
+                </div>
+                <div class="troubleshooting-grid">
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">应用无法启动</h3>
+                        <p class="trouble-content">检查系统要求，重置配置，或重新安装应用</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong> 使用 --check-system 检查系统要求，--hard 重置配置，或重新安装 CLI 工具
+                        </div>
+                    </div>
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">配置切换失败</h3>
+                        <p class="trouble-content">检查配置有效性，查看详细错误信息，重置环境变量</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong> 验证配置名称正确性，使用 --verbose 查看详细错误，重置环境变量
+                        </div>
+                    </div>
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">同步问题</h3>
+                        <p class="trouble-content">检查网络连接，强制同步，重新认证</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong> 测试连接状态，使用 --force 强制同步，重新登录账户
+                        </div>
+                    </div>
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">配置丢失</h3>
+                        <p class="trouble-content">查看备份历史，恢复配置，从云端恢复</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong> 列出备份历史，按时间戳恢复配置，或从云端同步恢复
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="changelog-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">更新日志</span>
+                    <h2 class="section-title">版本历史</h2>
+                    <p class="section-subtitle">持续更新优化，不断提升用户体验</p>
+                </div>
+                <div class="changelog-timeline">
+                    <div class="changelog-item">
+                        <div class="changelog-version">v3.8.0</div>
+                        <div class="changelog-content">
+                            <div class="changelog-title">最新版本</div>
+                            <ul class="changelog-features">
+                                <li>🎉 重大架构升级，重构数据持久化层</li>
+                                <li>🚀 全新用户界面，提升用户体验</li>
+                                <li>✨ 新增配置模板功能</li>
+                                <li>🔧 优化原子操作和事务回滚机制</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="changelog-item">
+                        <div class="changelog-version">v3.7.0</div>
+                        <div class="changelog-content">
+                            <div class="changelog-title">功能增强</div>
+                            <ul class="changelog-features">
+                                <li>🚀 新增6大核心功能，新增18000行代码</li>
+                                <li>🔄 实现前后端分离架构</li>
+                                <li>💾 原子写入和事务回滚功能</li>
+                                <li>📊 配置变更历史和审计日志</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="changelog-item">
+                        <div class="changelog-version">v3.6.0</div>
+                        <div class="changelog-content">
+                            <div class="changelog-title">界面优化</div>
+                            <ul class="changelog-features">
+                                <li>🌙 深色主题支持</li>
+                                <li>📱 响应式界面设计</li>
+                                <li>🔍 全局搜索功能</li>
+                                <li>🚨 配置冲突智能检测</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="changelog-item">
+                        <div class="changelog-version">v3.5.0</div>
+                        <div class="changelog-content">
+                            <div class="changelog-title">同步功能</div>
+                            <ul class="changelog-features">
+                                <li>☁️ 云端同步功能</li>
+                                <li>🔒 增强的加密机制</li>
+                                <li>📈 性能监控面板</li>
+                                <li>🧪 配置沙箱环境</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p>&copy; 2025 CC-Switch. 开源项目，采用 <a href="https://github.com/farion1231/cc-switch/blob/main/LICENSE" target="_blank">MIT 许可证</a></p>
+                </div>
+                <div class="footer-stats">
+                    <p>18000+ 行代码 | 6大核心功能 | SSOT 设计理念 | AI编程助手配置管理神器</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function switchTab(event, tabId) {
+            const buttons = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
+
+            buttons.forEach(btn => btn.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const code = codeBlock.querySelector('code').textContent;
+
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = '已复制';
+                setTimeout(() => {
+                    button.textContent = '复制';
+                }, 2000);
+            });
+        }
+
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Add parallax effect to particles
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const particles = document.querySelector('.particles');
+            particles.style.transform = `translateY(${scrolled * 0.5}px)`;
+        });
+
+        // Animate config switches
+        document.querySelectorAll('.config-switch').forEach((switchEl, index) => {
+            setInterval(() => {
+                switchEl.classList.toggle('active');
+            }, 2000 + index * 500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1849 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Planning Methodology - AI项目规划方法论</title>
+    <meta name="description" content="基于Claude Code的AI项目规划方法论，包括需求分析、技术选型、架构设计、团队协作等全流程指导">
+    <style>
+        :root {
+            --primary-color: #10b981;
+            --secondary-color: #8b5cf6;
+            --accent-color: #f59e0b;
+            --info-color: #3b82f6;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --error-color: #dc2626;
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --border-color: #475569;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --gradient-planning: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        /* 背景粒子效果 */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        /* 头部样式 */
+        .hero-header {
+            background: var(--gradient-planning);
+            padding: 4rem 2rem 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 3rem;
+        }
+
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 8s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 导航目录 */
+        .toc-container {
+            max-width: 1200px;
+            margin: 0 auto 3rem;
+            padding: 0 2rem;
+        }
+
+        .toc-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .toc-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+            border-color: var(--primary-color);
+        }
+
+        .toc-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .toc-item {
+            padding: 0.8rem 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .toc-item:hover {
+            background: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .toc-item a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc-item:hover a {
+            color: var(--text-primary);
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        /* 区块样式 */
+        .section {
+            margin-bottom: 4rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        .section:nth-child(1) { animation-delay: 0.1s; }
+        .section:nth-child(2) { animation-delay: 0.2s; }
+        .section:nth-child(3) { animation-delay: 0.3s; }
+        .section:nth-child(4) { animation-delay: 0.4s; }
+        .section:nth-child(5) { animation-delay: 0.5s; }
+        .section:nth-child(6) { animation-delay: 0.6s; }
+        .section:nth-child(7) { animation-delay: 0.7s; }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+            padding-left: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* 对比卡片 */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .comparison-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .comparison-card.traditional {
+            border-color: var(--error-color);
+        }
+
+        .comparison-card.ai-assisted {
+            border-color: var(--primary-color);
+        }
+
+        .comparison-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .comparison-card.traditional::before {
+            background: var(--error-color);
+        }
+
+        .comparison-card.ai-assisted::before {
+            background: var(--primary-color);
+        }
+
+        .comparison-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .comparison-card.traditional:hover {
+            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.2);
+        }
+
+        .comparison-card.ai-assisted:hover {
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .comparison-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .comparison-icon {
+            font-size: 2.5rem;
+        }
+
+        .comparison-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .comparison-list {
+            list-style: none;
+        }
+
+        .comparison-item {
+            display: flex;
+            align-items: start;
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .comparison-item:hover {
+            transform: translateX(5px);
+        }
+
+        .comparison-bullet {
+            color: var(--primary-color);
+            margin-right: 1rem;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .comparison-content {
+            flex: 1;
+            color: var(--text-secondary);
+        }
+
+        /* 阶段卡片 */
+        .phase-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .phase-card {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .phase-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+
+        .phase-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.3);
+        }
+
+        .phase-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background: var(--primary-color);
+            color: var(--text-primary);
+            border-radius: 50%;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .phase-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .phase-description {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .phase-features {
+            list-style: none;
+        }
+
+        .phase-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .phase-feature::before {
+            content: '✓';
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* 优先级矩阵 */
+        .priority-matrix {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .matrix-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .matrix-quadrant {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .matrix-quadrant:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .matrix-quadrant.must {
+            border-color: var(--error-color);
+        }
+
+        .matrix-quadrant.should {
+            border-color: var(--warning-color);
+        }
+
+        .matrix-quadrant.could {
+            border-color: var(--info-color);
+        }
+
+        .matrix-quadrant.wont {
+            border-color: var(--text-muted);
+        }
+
+        .quadrant-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .quadrant-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .quadrant-badge.must {
+            background: var(--error-color);
+        }
+
+        .quadrant-badge.should {
+            background: var(--warning-color);
+        }
+
+        .quadrant-badge.could {
+            background: var(--info-color);
+        }
+
+        .quadrant-badge.wont {
+            background: var(--text-muted);
+        }
+
+        .quadrant-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .quadrant-list {
+            list-style: none;
+        }
+
+        .quadrant-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* 技术栈卡片 */
+        .tech-stack-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .tech-stack-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .tech-stack-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+            border-color: var(--secondary-color);
+        }
+
+        .stack-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stack-icon {
+            font-size: 2rem;
+        }
+
+        .stack-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stack-details {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .stack-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .stack-item:hover {
+            transform: translateX(5px);
+            background: var(--border-color);
+        }
+
+        .stack-label {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .stack-value {
+            color: var(--primary-color);
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+        }
+
+        /* 代码块 */
+        .code-block {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .code-title {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .copy-btn {
+            background: var(--primary-color);
+            color: var(--text-primary);
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-color);
+            transform: scale(1.05);
+        }
+
+        .copy-btn.copied {
+            background: var(--accent-color);
+        }
+
+        pre {
+            color: var(--text-secondary);
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        /* 团队结构 */
+        .team-structure {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .team-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .team-role {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .team-role:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+            border-color: var(--info-color);
+        }
+
+        .role-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .role-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .role-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* 进度跟踪 */
+        .progress-tracker {
+            margin: 2rem 0;
+        }
+
+        .milestone {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .milestone::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--primary-color);
+        }
+
+        .milestone-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .milestone-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .milestone-duration {
+            padding: 0.3rem 0.8rem;
+            background: var(--bg-tertiary);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .milestone-content {
+            color: var(--text-secondary);
+        }
+
+        .deliverables {
+            margin-top: 1rem;
+        }
+
+        .deliverables-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .deliverable-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .deliverable-item::before {
+            content: '•';
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* 风险管理 */
+        .risk-management {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .risk-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .risk-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.2);
+            border-color: var(--warning-color);
+        }
+
+        .risk-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .risk-icon {
+            font-size: 1.5rem;
+            color: var(--warning-color);
+        }
+
+        .risk-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .risk-description {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .risk-level {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .risk-level.high {
+            background: var(--error-color);
+            color: var(--text-primary);
+        }
+
+        .risk-level.medium {
+            background: var(--warning-color);
+            color: var(--text-primary);
+        }
+
+        .risk-level.low {
+            background: var(--info-color);
+            color: var(--text-primary);
+        }
+
+        /* Checklist */
+        .checklist {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .checklist-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checklist-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .checklist-section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .checklist-items {
+            list-style: none;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: start;
+            margin-bottom: 0.8rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .checklist-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .checklist-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary-color);
+            border-radius: 4px;
+            margin-right: 1rem;
+            flex-shrink: 0;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .checkitem-content {
+            flex: 1;
+            color: var(--text-secondary);
+        }
+
+        /* 统计数据 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(139, 92, 246, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .matrix-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tech-stack-container {
+                grid-template-columns: 1fr;
+            }
+
+            .team-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- 头部 -->
+    <header class="hero-header">
+        <h1 class="hero-title">Project Planning Methodology</h1>
+        <p class="hero-subtitle">AI项目规划方法论，让AI辅助开发更加高效和可控</p>
+    </header>
+
+    <!-- 导航目录 -->
+    <div class="toc-container">
+        <div class="toc-card">
+            <h2 class="toc-title">📋 课程目录</h2>
+            <div class="toc-grid">
+                <div class="toc-item">
+                    <a href="#section-1">1. AI项目规划概述</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-2">2. 需求分析阶段</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-3">3. 技术选型策略</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-4">4. 架构设计流程</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-5">5. 团队协作模式</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-6">6. 项目执行监控</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-7">7. 最佳实践总结</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="container">
+        <!-- 统计数据 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">85%</div>
+                <div class="stat-label">需求准确性提升</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">60%</div>
+                <div class="stat-label">开发时间缩短</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">75%</div>
+                <div class="stat-label">风险降低</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">90%</div>
+                <div class="stat-label">团队协作效率</div>
+            </div>
+        </div>
+
+        <!-- 第1节：AI项目规划概述 -->
+        <section id="section-1" class="section">
+            <div class="section-header">
+                <h2 class="section-title">1. AI项目规划概述</h2>
+                <p class="section-subtitle">对比传统规划与AI辅助规划的差异和优势</p>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="comparison-card traditional">
+                    <div class="comparison-header">
+                        <div class="comparison-icon">😫</div>
+                        <div class="comparison-title">传统开发痛点</div>
+                    </div>
+                    <ul class="comparison-list">
+                        <li class="comparison-item">
+                            <div class="comparison-bullet">•</div>
+                            <div class="comparison-content">需求理解偏差，人工沟通容易出现理解误差</div>
+                        </li>
+                        <li class="comparison-item">
+                            <div class="comparison-bullet">•</div>
+                            <div class="comparison-content">技术选型困难，缺乏全面的技术对比分析</div>
+                        </li>
+                        <li class="comparison-item">
+                            <div class="comparison-bullet">•</div>
+                            <div class="comparison-content">架构设计复杂，需要考虑的因素众多</div>
+                        </li>
+                        <li class="comparison-item">
+                            <div class="comparison-bullet">•</div>
+                            <div class="comparison-content">进度控制困难，难以准确评估工作量</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="comparison-card ai-assisted">
+                    <div class="comparison-header">
+                        <div class="comparison-icon">✨</div>
+                        <div class="comparison-title">AI辅助优势</div>
+                    </div>
+                    <ul class="comparison-list">
+                        <li class="comparison-item">
+                            <div class="comparison-bullet">•</div>
+                            <div class="comparison-content">智能需求分析，AI帮助澄清和细化需求</div>
+                        </li>
+                        <li class="comparison-item">
+                            <div class="comparison-bullet">•</div>
+                            <div class="comparison-content">全面技术调研，自动分析技术方案优劣</div>
+                        </li>
+                        <li class="comparison-item">
+                            <div class="comparison-bullet">•</div>
+                            <div class="comparison-content">架构优化建议，基于最佳实践的设计建议</div>
+                        </li>
+                        <li class="comparison-item">
+                            <div class="comparison-bullet">•</div>
+                            <div class="comparison-content">动态进度跟踪，实时监控项目健康状况</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第2节：需求分析阶段 -->
+        <section id="section-2" class="section">
+            <div class="section-header">
+                <h2 class="section-title">2. 需求分析阶段</h2>
+                <p class="section-subtitle">AI辅助需求澄清和优先级排序</p>
+            </div>
+
+            <div class="phase-cards">
+                <div class="phase-card">
+                    <div class="phase-number">1</div>
+                    <div class="phase-title">功能性需求</div>
+                    <div class="phase-description">系统必须实现的核心业务功能</div>
+                    <ul class="phase-features">
+                        <li class="phase-feature">用户注册登录</li>
+                        <li class="phase-feature">数据管理操作</li>
+                        <li class="phase-feature">业务流程处理</li>
+                    </ul>
+                </div>
+
+                <div class="phase-card">
+                    <div class="phase-number">2</div>
+                    <div class="phase-title">非功能性需求</div>
+                    <div class="phase-description">系统质量属性和约束条件</div>
+                    <ul class="phase-features">
+                        <li class="phase-feature">性能要求</li>
+                        <li class="phase-feature">安全要求</li>
+                        <li class="phase-feature">可用性要求</li>
+                    </ul>
+                </div>
+
+                <div class="phase-card">
+                    <div class="phase-number">3</div>
+                    <div class="phase-title">约束性需求</div>
+                    <div class="phase-description">技术和业务限制条件</div>
+                    <ul class="phase-features">
+                        <li class="phase-feature">技术约束</li>
+                        <li class="phase-feature">时间约束</li>
+                        <li class="phase-feature">资源约束</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="priority-matrix">
+                <h3 class="matrix-title">
+                    <span>🎯</span>
+                    需求优先级矩阵 (MoSCoW)
+                </h3>
+                <div class="matrix-grid">
+                    <div class="matrix-quadrant must">
+                        <div class="quadrant-header">
+                            <span class="quadrant-badge must">Must Have</span>
+                            <div class="quadrant-title">必须有</div>
+                        </div>
+                        <ul class="quadrant-list">
+                            <li class="quadrant-item">核心业务功能</li>
+                            <li class="quadrant-item">基础安全要求</li>
+                            <li class="quadrant-item">法规合规需求</li>
+                        </ul>
+                    </div>
+
+                    <div class="matrix-quadrant should">
+                        <div class="quadrant-header">
+                            <span class="quadrant-badge should">Should Have</span>
+                            <div class="quadrant-title">应该有</div>
+                        </div>
+                        <ul class="quadrant-list">
+                            <li class="quadrant-item">重要业务功能</li>
+                            <li class="quadrant-item">性能优化</li>
+                            <li class="quadrant-item">用户体验改善</li>
+                        </ul>
+                    </div>
+
+                    <div class="matrix-quadrant could">
+                        <div class="quadrant-header">
+                            <span class="quadrant-badge could">Could Have</span>
+                            <div class="quadrant-title">可以有</div>
+                        </div>
+                        <ul class="quadrant-list">
+                            <li class="quadrant-item">增值功能</li>
+                            <li class="quadrant-item">锦上添花特性</li>
+                            <li class="quadrant-item">创新功能</li>
+                        </ul>
+                    </div>
+
+                    <div class="matrix-quadrant wont">
+                        <div class="quadrant-header">
+                            <span class="quadrant-badge wont">Won't Have</span>
+                            <div class="quadrant-title">暂时不做</div>
+                        </div>
+                        <ul class="quadrant-list">
+                            <li class="quadrant-item">超出范围需求</li>
+                            <li class="quadrant-item">低价值功能</li>
+                            <li class="quadrant-item">未来版本功能</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第3节：技术选型策略 -->
+        <section id="section-3" class="section">
+            <div class="section-header">
+                <h2 class="section-title">3. 技术选型策略</h2>
+                <p class="section-subtitle">基于AI分析的技术决策框架和推荐</p>
+            </div>
+
+            <div class="tech-stack-container">
+                <div class="tech-stack-card">
+                    <div class="stack-header">
+                        <div class="stack-icon">🚀</div>
+                        <div class="stack-title">小型项目技术栈</div>
+                    </div>
+                    <div class="stack-details">
+                        <div class="stack-item">
+                            <span class="stack-label">前端</span>
+                            <span class="stack-value">React + TypeScript + TailwindCSS</span>
+                        </div>
+                        <div class="stack-item">
+                            <span class="stack-label">后端</span>
+                            <span class="stack-value">Node.js + Express + SQLite</span>
+                        </div>
+                        <div class="stack-item">
+                            <span class="stack-label">部署</span>
+                            <span class="stack-value">Vercel + Railway</span>
+                        </div>
+                        <div class="stack-item">
+                            <span class="stack-label">CMS</span>
+                            <span class="stack-value">Strapi/Contentful</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-stack-card">
+                    <div class="stack-header">
+                        <div class="stack-icon">⚡</div>
+                        <div class="stack-title">中型项目技术栈</div>
+                    </div>
+                    <div class="stack-details">
+                        <div class="stack-item">
+                            <span class="stack-label">前端</span>
+                            <span class="stack-value">Next.js + TypeScript + Ant Design</span>
+                        </div>
+                        <div class="stack-item">
+                            <span class="stack-label">后端</span>
+                            <span class="stack-value">Node.js/NestJS + PostgreSQL</span>
+                        </div>
+                        <div class="stack-item">
+                            <span class="stack-label">部署</span>
+                            <span class="stack-value">AWS/DigitalOcean</span>
+                        </div>
+                        <div class="stack-item">
+                            <span class="stack-label">监控</span>
+                            <span class="stack-value">Sentry + LogRocket</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-stack-card">
+                    <div class="stack-header">
+                        <div class="stack-icon">🏗️</div>
+                        <div class="stack-title">大型项目技术栈</div>
+                    </div>
+                    <div class="stack-details">
+                        <div class="stack-item">
+                            <span class="stack-label">前端</span>
+                            <span class="stack-value">React/Vue + Micro Frontends</span>
+                        </div>
+                        <div class="stack-item">
+                            <span class="stack-label">后端</span>
+                            <span class="stack-value">Microservices + Kubernetes</span>
+                        </div>
+                        <div class="stack-item">
+                            <span class="stack-label">数据库</span>
+                            <span class="stack-value">PostgreSQL + Redis + MongoDB</span>
+                        </div>
+                        <div class="stack-item">
+                            <span class="stack-label">部署</span>
+                            <span class="stack-value">AWS/GCP + CI/CD</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Claude Code技术分析提示词</span>
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                </div>
+                <pre># Claude Code技术分析提示词
+请帮我分析以下技术方案的优劣：
+
+项目类型：[Web应用/移动应用/桌面应用/系统工具]
+核心需求：[性能/安全/开发效率/维护性]
+团队能力：[前端水平/后端水平/DevOps能力]
+
+对比方案：
+1. 方案A：[具体技术栈]
+2. 方案B：[具体技术栈]
+3. 方案C：[具体技术栈]
+
+请从以下维度进行对比分析：
+- 开发效率
+- 运行性能
+- 学习成本
+- 社区支持
+- 长期维护</pre>
+            </div>
+        </section>
+
+        <!-- 第4节：架构设计流程 -->
+        <section id="section-4" class="section">
+            <div class="section-header">
+                <h2 class="section-title">4. 架构设计流程</h2>
+                <p class="section-subtitle">模块化设计和API规范</p>
+            </div>
+
+            <div class="phase-cards">
+                <div class="phase-card">
+                    <div class="phase-number">S</div>
+                    <div class="phase-title">SOLID原则</div>
+                    <div class="phase-description">面向对象设计的五个基本原则</div>
+                    <ul class="phase-features">
+                        <li class="phase-feature">单一职责原则</li>
+                        <li class="phase-feature">开闭原则</li>
+                        <li class="phase-feature">里氏替换原则</li>
+                        <li class="phase-feature">接口隔离原则</li>
+                        <li class="phase-feature">依赖倒置原则</li>
+                    </ul>
+                </div>
+
+                <div class="phase-card">
+                    <div class="phase-number">D</div>
+                    <div class="phase-title">DRY原则</div>
+                    <div class="phase-description">避免重复代码</div>
+                    <ul class="phase-features">
+                        <li class="phase-feature">避免重复代码</li>
+                        <li class="phase-feature">抽象公共逻辑</li>
+                        <li class="phase-feature">组件复用</li>
+                    </ul>
+                </div>
+
+                <div class="phase-card">
+                    <div class="phase-number">K</div>
+                    <div class="phase-title">KISS原则</div>
+                    <div class="phase-description">保持简单</div>
+                    <ul class="phase-features">
+                        <li class="phase-feature">保持简单</li>
+                        <li class="phase-feature">避免过度设计</li>
+                        <li class="phase-feature">清晰易懂</li>
+                    </ul>
+                </div>
+
+                <div class="phase-card">
+                    <div class="phase-number">Y</div>
+                    <div class="phase-title">YAGNI原则</div>
+                    <div class="phase-description">只做需要的</div>
+                    <ul class="phase-features">
+                        <li class="phase-feature">只做需要的</li>
+                        <li class="phase-feature">避免过度工程</li>
+                        <li class="phase-feature">迭代开发</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Claude Code架构设计提示词</span>
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                </div>
+                <pre># Claude Code架构设计提示词
+请帮我设计项目架构：
+
+项目类型：[Web应用/移动应用/微服务]
+业务复杂度：[简单/中等/复杂]
+用户规模：[小型/中型/大型]
+性能要求：[一般/高性能/极高性能]
+
+请提供：
+1. 整体架构图
+2. 核心模块划分
+3. 数据流转设计
+4. 技术栈推荐
+5. 关键设计决策</pre>
+            </div>
+        </section>
+
+        <!-- 第5节：团队协作模式 -->
+        <section id="section-5" class="section">
+            <div class="section-header">
+                <h2 class="section-title">5. 团队协作模式</h2>
+                <p class="section-subtitle">团队结构设计和协作流程</p>
+            </div>
+
+            <div class="team-structure">
+                <h3 class="team-title">
+                    <span>👥</span>
+                    典型项目团队角色
+                </h3>
+                <div class="team-grid">
+                    <div class="team-role">
+                        <div class="role-icon">📋</div>
+                        <div class="role-name">项目经理</div>
+                        <div class="role-description">需求管理、进度控制、风险管控</div>
+                    </div>
+                    <div class="team-role">
+                        <div class="role-icon">🔧</div>
+                        <div class="role-name">技术负责人</div>
+                        <div class="role-description">架构设计、技术决策、代码审查</div>
+                    </div>
+                    <div class="team-role">
+                        <div class="role-icon">🎨</div>
+                        <div class="role-name">前端开发</div>
+                        <div class="role-description">用户界面、交互设计、前端架构</div>
+                    </div>
+                    <div class="team-role">
+                        <div class="role-icon">⚙️</div>
+                        <div class="role-name">后端开发</div>
+                        <div class="role-description">服务端逻辑、API开发、数据库设计</div>
+                    </div>
+                    <div class="team-role">
+                        <div class="role-icon">🔍</div>
+                        <div class="role-name">测试工程师</div>
+                        <div class="role-description">测试用例、质量保证、自动化测试</div>
+                    </div>
+                    <div class="team-role">
+                        <div class="role-icon">🚀</div>
+                        <div class="role-name">DevOps工程师</div>
+                        <div class="role-description">部署运维、性能优化、安全防护</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第6节：项目执行监控 -->
+        <section id="section-6" class="section">
+            <div class="section-header">
+                <h2 class="section-title">6. 项目执行监控</h2>
+                <p class="section-subtitle">进度跟踪、风险管理和质量保证</p>
+            </div>
+
+            <div class="progress-tracker">
+                <div class="milestone">
+                    <div class="milestone-header">
+                        <div class="milestone-title">阶段1：需求设计</div>
+                        <div class="milestone-duration">2周</div>
+                    </div>
+                    <div class="milestone-content">
+                        完成需求分析和系统设计
+                    </div>
+                    <div class="deliverables">
+                        <div class="deliverables-title">交付物：</div>
+                        <div class="deliverable-item">需求规格说明书</div>
+                        <div class="deliverable-item">系统架构设计</div>
+                        <div class="deliverable-item">技术选型报告</div>
+                    </div>
+                </div>
+
+                <div class="milestone">
+                    <div class="milestone-header">
+                        <div class="milestone-title">阶段2：核心开发</div>
+                        <div class="milestone-duration">6周</div>
+                    </div>
+                    <div class="milestone-content">
+                        实现核心功能和业务逻辑
+                    </div>
+                    <div class="deliverables">
+                        <div class="deliverables-title">交付物：</div>
+                        <div class="deliverable-item">核心功能模块</div>
+                        <div class="deliverable-item">API接口实现</div>
+                        <div class="deliverable-item">基础测试用例</div>
+                    </div>
+                </div>
+
+                <div class="milestone">
+                    <div class="milestone-header">
+                        <div class="milestone-title">阶段3：功能完善</div>
+                        <div class="milestone-duration">4周</div>
+                    </div>
+                    <div class="milestone-content">
+                        完善功能细节和用户体验
+                    </div>
+                    <div class="deliverables">
+                        <div class="deliverables-title">交付物：</div>
+                        <div class="deliverable-item">完整功能实现</div>
+                        <div class="deliverable-item">系统测试报告</div>
+                        <div class="deliverable-item">用户手册</div>
+                    </div>
+                </div>
+
+                <div class="milestone">
+                    <div class="milestone-header">
+                        <div class="milestone-title">阶段4：测试部署</div>
+                        <div class="milestone-duration">2周</div>
+                    </div>
+                    <div class="milestone-content">
+                        系统测试和生产环境部署
+                    </div>
+                    <div class="deliverables">
+                        <div class="deliverables-title">交付物：</div>
+                        <div class="deliverable-item">性能优化</div>
+                        <div class="deliverable-item">安全测试</div>
+                        <div class="deliverable-item">生产环境部署</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="risk-management">
+                <div class="risk-card">
+                    <div class="risk-header">
+                        <div class="risk-icon">⚠️</div>
+                        <div class="risk-title">技术风险</div>
+                    </div>
+                    <div class="risk-description">
+                        新技术学习成本、技术方案可行性、性能瓶颈
+                    </div>
+                    <span class="risk-level high">高风险</span>
+                </div>
+
+                <div class="risk-card">
+                    <div class="risk-header">
+                        <div class="risk-icon">👥</div>
+                        <div class="risk-title">人员风险</div>
+                    </div>
+                    <div class="risk-description">
+                        团队成员流动、技能匹配、沟通协作
+                    </div>
+                    <span class="risk-level medium">中风险</span>
+                </div>
+
+                <div class="risk-card">
+                    <div class="risk-header">
+                        <div class="risk-icon">⏰</div>
+                        <div class="risk-title">时间风险</div>
+                    </div>
+                    <div class="risk-description">
+                        进度延期、需求变更、资源不足
+                    </div>
+                    <span class="risk-level high">高风险</span>
+                </div>
+
+                <div class="risk-card">
+                    <div class="risk-header">
+                        <div class="risk-icon">📋</div>
+                        <div class="risk-title">需求风险</div>
+                    </div>
+                    <div class="risk-description">
+                        需求不明确、范围蔓延、期望管理
+                    </div>
+                    <span class="risk-level medium">中风险</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第7节：最佳实践总结 -->
+        <section id="section-7" class="section">
+            <div class="section-header">
+                <h2 class="section-title">7. 最佳实践总结</h2>
+                <p class="section-subtitle">项目规划Checklist和常见陷阱避免</p>
+            </div>
+
+            <div class="checklist">
+                <h3 class="checklist-title">
+                    <span>✅</span>
+                    启动阶段Checklist
+                </h3>
+
+                <div class="checklist-section">
+                    <h4 class="checklist-section-title">需求分析</h4>
+                    <ul class="checklist-items">
+                        <li class="checklist-item">
+                            <div class="checklist-checkbox"></div>
+                            <div class="checkitem-content">明确项目目标和范围</div>
+                        </li>
+                        <li class="checklist-item">
+                            <div class="checklist-checkbox"></div>
+                            <div class="checkitem-content">识别关键干系人</div>
+                        </li>
+                        <li class="checklist-item">
+                            <div class="checklist-checkbox"></div>
+                            <div class="checkitem-content">收集和梳理需求</div>
+                        </li>
+                        <li class="checklist-item">
+                            <div class="checklist-checkbox"></div>
+                            <div class="checkitem-content">评估需求可行性</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="checklist-section">
+                    <h4 class="checklist-section-title">技术选型</h4>
+                    <ul class="checklist-items">
+                        <li class="checklist-item">
+                            <div class="checklist-checkbox"></div>
+                            <div class="checkitem-content">调研技术方案</div>
+                        </li>
+                        <li class="checklist-item">
+                            <div class="checklist-checkbox"></div>
+                            <div class="checkitem-content">评估技术风险</div>
+                        </li>
+                        <li class="checklist-item">
+                            <div class="checklist-checkbox"></div>
+                            <div class="checkitem-content">确认团队能力</div>
+                        </li>
+                        <li class="checklist-item">
+                            <div class="checklist-checkbox"></div>
+                            <div class="checkitem-content">制定技术规范</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="checklist-section">
+                    <h4 class="checklist-section-title">架构设计</h4>
+                    <ul class="checklist-items">
+                        <li class="checklist-item">
+                            <div class="checklist-checkbox"></div>
+                            <div class="checkitem-content">设计系统架构</div>
+                        </li>
+                        <li class="checklist-item">
+                            <div class="checklist-checkbox"></div>
+                            <div class="checkitem-content">定义模块接口</div>
+                        </li>
+                        <li class="checklist-item">
+                            <div class="checklist-checkbox"></div>
+                            <div class="checkitem-content">选择设计模式</div>
+                        </li>
+                        <li class="checklist-item">
+                            <div class="checklist-checkbox"></div>
+                            <div class="checkitem-content">评审设计方案</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="comparison-grid" style="margin-top: 2rem;">
+                <div class="comparison-card">
+                    <div class="comparison-header">
+                        <div class="comparison-icon">🚫</div>
+                        <div class="comparison-title">常见陷阱</div>
+                    </div>
+                    <ul class="comparison-list">
+                        <li class="comparison-item">
+                            <div class="comparison-bullet">•</div>
+                            <div class="comparison-content">需求范围不断扩大（Scope Creep）</div>
+                        </li>
+                        <li class="comparison-item">
+                            <div class="comparison-bullet">•</div>
+                            <div class="comparison-content">过度分析导致决策延迟</div>
+                        </li>
+                        <li class="comparison-item">
+                            <div class="comparison-bullet">•</div>
+                            <div class="comparison-content">追求最新技术而忽视实用性</div>
+                        </li>
+                        <li class="comparison-item">
+                            <div class="comparison-bullet">•</div>
+                            <div class="comparison-content">过度依赖特定厂商</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="comparison-card ai-assisted">
+                    <div class="comparison-header">
+                        <div class="comparison-icon">✅</div>
+                        <div class="comparison-title">解决方案</div>
+                    </div>
+                    <ul class="comparison-list">
+                        <li class="comparison-item">
+                            <div class="comparison-bullet">•</div>
+                            <div class="comparison-content">建立需求变更控制流程</div>
+                        </li>
+                        <li class="comparison-item">
+                            <div class="comparison-bullet">•</div>
+                            <div class="comparison-content">设置决策时间限制</div>
+                        </li>
+                        <li class="comparison-item">
+                            <div class="comparison-bullet">•</div>
+                            <div class="comparison-content">优先考虑团队能力和项目需求</div>
+                        </li>
+                        <li class="comparison-item">
+                            <div class="comparison-bullet">•</div>
+                            <div class="comparison-content">选择标准和开源技术</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // 粒子背景效果
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function createParticle() {
+            return {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                radius: Math.random() * 2 + 1,
+                opacity: Math.random() * 0.5 + 0.2
+            };
+        }
+
+        function initParticles() {
+            particles = [];
+            const particleCount = Math.min(100, (canvas.width * canvas.height) / 15000);
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(createParticle());
+            }
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(particle => {
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(16, 185, 129, ${particle.opacity})`;
+                ctx.fill();
+
+                particle.x += particle.vx;
+                particle.y += particle.vy;
+
+                if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
+                if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+            });
+
+            // 连接临近的粒子
+            particles.forEach((p1, i) => {
+                particles.slice(i + 1).forEach(p2 => {
+                    const distance = Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+                    if (distance < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = `rgba(16, 185, 129, ${0.2 * (1 - distance / 120)})`;
+                        ctx.stroke();
+                    }
+                });
+            });
+
+            requestAnimationFrame(drawParticles);
+        }
+
+        // 复制代码功能
+        function copyCode(button) {
+            const codeBlock = button.parentElement.parentElement;
+            const code = codeBlock.querySelector('pre').textContent;
+
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = '已复制';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.textContent = '复制';
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('.toc-item a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+
+                if (targetSection) {
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Checklist交互
+        document.querySelectorAll('.checklist-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('click', function() {
+                this.style.backgroundColor = this.style.backgroundColor === 'var(--primary-color)'
+                    ? 'transparent'
+                    : 'var(--primary-color)';
+
+                if (this.style.backgroundColor === 'var(--primary-color)') {
+                    this.innerHTML = '✓';
+                    this.style.color = 'var(--text-primary)';
+                    this.style.display = 'flex';
+                    this.style.alignItems = 'center';
+                    this.style.justifyContent = 'center';
+                } else {
+                    this.innerHTML = '';
+                }
+            });
+        });
+
+        // 卡片悬停效果增强
+        document.querySelectorAll('.phase-card, .tech-stack-card, .team-role').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // 初始化
+        window.addEventListener('load', () => {
+            setCanvasSize();
+            initParticles();
+            drawParticles();
+
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(30px)';
+                section.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                observer.observe(section);
+            });
+        });
+
+        window.addEventListener('resize', () => {
+            setCanvasSize();
+            initParticles();
+        });
+    </script>
+</body>
+</html>

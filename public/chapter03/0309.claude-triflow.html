@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude-Triflow - 三流式代码生成框架</title>
+    <meta name="description" content="Claude-Triflow 是一个创新的代码生成框架，通过三流式工作流（规划、编码、优化）提升代码质量和开发效率">
+    <meta name="keywords" content="claude-triflow,代码生成,三流式工作流,AI编程,开发框架,工作流优化">
+    <style>
+        :root {
+            --primary-color: #10b981;
+            --secondary-color: #3b82f6;
+            --accent-color: #8b5cf6;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --gradient-1: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+            --gradient-2: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            --gradient-3: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            --glow-color: rgba(16, 185, 129, 0.5);
+            --particle-color: rgba(16, 185, 129, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 粒子背景 */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--particle-color);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* 头部 */
+        .header {
+            padding: 80px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-1);
+            opacity: 0.1;
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+
+        .title {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                filter: drop-shadow(0 0 20px var(--glow-color));
+            }
+            to {
+                filter: drop-shadow(0 0 30px var(--glow-color));
+            }
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 三流式演示 */
+        .triflow-demo {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 40px;
+            margin: 40px 0;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .triflow-demo::before {
+            content: '三流式工作流';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: var(--bg-primary);
+            padding: 0 10px;
+            color: var(--primary-color);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .flow-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .flow-step {
+            flex: 1;
+            text-align: center;
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            margin: 0 10px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .flow-step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .flow-step:first-child {
+            margin-left: 0;
+        }
+
+        .flow-step:last-child {
+            margin-right: 0;
+        }
+
+        .flow-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .flow-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .flow-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .flow-arrow {
+            font-size: 2rem;
+            color: var(--primary-color);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* 目录 */
+        .toc {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 40px;
+            margin: 40px 0;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toc::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--gradient-1);
+        }
+
+        .toc-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .toc-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .toc-item {
+            padding: 12px 20px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toc-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-2);
+            opacity: 0.1;
+            transition: left 0.3s ease;
+        }
+
+        .toc-item:hover::before {
+            left: 0;
+        }
+
+        .toc-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .toc-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 内容部分 */
+        .section {
+            margin: 60px 0;
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .section:nth-child(2) { animation-delay: 0.1s; }
+        .section:nth-child(3) { animation-delay: 0.2s; }
+        .section:nth-child(4) { animation-delay: 0.3s; }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subsection {
+            margin: 40px 0;
+            padding-left: 20px;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .subsection-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+        }
+
+        .sub-subsection {
+            margin: 30px 0;
+        }
+
+        .sub-subsection-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        /* 特性卡片 */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .feature-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 架构图 */
+        .architecture-diagram {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 40px;
+            margin: 40px 0;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            text-align: center;
+        }
+
+        .arch-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--text-primary);
+        }
+
+        .arch-flow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .arch-layer {
+            background: var(--bg-tertiary);
+            padding: 20px 30px;
+            border-radius: 12px;
+            border: 2px solid var(--primary-color);
+            min-width: 300px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .arch-layer:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .arch-arrow {
+            font-size: 2rem;
+            color: var(--primary-color);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* 代码块 */
+        .code-block {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--gradient-1);
+        }
+
+        .code-block pre {
+            color: var(--text-primary);
+            font-family: 'Fira Code', 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        /* 列表 */
+        ul, ol {
+            margin: 20px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 10px 0;
+            color: var(--text-secondary);
+        }
+
+        li strong {
+            color: var(--text-primary);
+        }
+
+        /* 引用块 */
+        blockquote {
+            border-left: 4px solid var(--primary-color);
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 0 12px 12px 0;
+            color: var(--text-secondary);
+        }
+
+        /* 表格 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* 提示框 */
+        .tip {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .tip::before {
+            content: '💡';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-size: 1.5rem;
+            background: var(--bg-primary);
+            padding: 0 10px;
+        }
+
+        /* 性能指标 */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .metric-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .header {
+                padding: 40px 0;
+            }
+
+            .title {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .toc {
+                padding: 20px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .flow-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .flow-step {
+                margin: 10px 0;
+            }
+
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- 粒子背景 -->
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <h1 class="title">Claude-Triflow</h1>
+            <p class="subtitle">创新的代码生成框架，通过规划、编码、优化三流式工作流，显著提升AI代码生成质量和开发效率</p>
+
+            <!-- 三流式演示 -->
+            <div class="triflow-demo">
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-icon">🧠</div>
+                        <div class="flow-title">规划流</div>
+                        <div class="flow-desc">需求分析、架构设计、模块规划</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-icon">💻</div>
+                        <div class="flow-title">编码流</div>
+                        <div class="flow-desc">代码生成、语法检查、类型安全</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-icon">⚡</div>
+                        <div class="flow-title">优化流</div>
+                        <div class="flow-desc">性能优化、代码重构、安全检查</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 目录 -->
+        <nav class="toc">
+            <h2 class="toc-title">目录导航</h2>
+            <div class="toc-list">
+                <div class="toc-item">
+                    <a href="#什么是-claude-triflow" class="toc-link">1. 什么是 Claude-Triflow？</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#三流式工作流" class="toc-link">2. 三流式工作流</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#核心架构" class="toc-link">3. 核心架构</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#安装指南" class="toc-link">4. 安装指南</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#使用方法" class="toc-link">5. 使用方法</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#工作流配置" class="toc-link">6. 工作流配置</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#高级功能" class="toc-link">7. 高级功能</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#最佳实践" class="toc-link">8. 最佳实践</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 内容 -->
+        <main>
+            <!-- 1. 什么是 Claude-Triflow？ -->
+            <section id="什么是-claude-triflow" class="section">
+                <h2 class="section-title">1. 什么是 Claude-Triflow？</h2>
+                <p>Claude-Triflow 是一个专为 AI 代码生成设计的创新框架，通过将代码生成过程分解为三个独立的流（规划流、编码流、优化流），显著提升生成代码的质量、可维护性和性能。该框架基于对软件开发过程的深入理解，模拟了人类开发者的思维模式和工作流程。</p>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">核心理念</h3>
+                    <ul>
+                        <li><strong>三流分离</strong>：将复杂的代码生成任务分解为三个专门的流</li>
+                        <li><strong>迭代优化</strong>：每个流都可以独立迭代和优化</li>
+                        <li><strong>质量保证</strong>：内置多层次的质量检查和验证机制</li>
+                        <li><strong>可扩展性</strong>：支持自定义流和插件扩展</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">解决的问题</h3>
+                    <ul>
+                        <li><strong>代码质量不稳定</strong>：传统AI生成的代码质量参差不齐</li>
+                        <li><strong>缺乏结构化</strong>：生成的代码缺乏清晰的架构和组织</li>
+                        <li><strong>优化困难</strong>：生成的代码难以进一步优化和改进</li>
+                        <li><strong>维护性差</strong>：生成代码的可读性和维护性不佳</li>
+                        <li><strong>性能问题</strong>：生成的代码可能存在性能瓶颈</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 2. 三流式工作流 -->
+            <section id="三流式工作流" class="section">
+                <h2 class="section-title">2. 三流式工作流</h2>
+
+                <div class="features">
+                    <div class="feature-card">
+                        <div class="feature-icon">🧠</div>
+                        <h3 class="feature-title">规划流 (Planning Flow)</h3>
+                        <p class="feature-description">
+                            规划流负责代码的整体设计和架构规划，确保生成代码的结构合理性和可扩展性。包括需求分析、架构设计、模块规划和依赖分析。
+                        </p>
+                        <ul>
+                            <li><strong>需求分析</strong>：理解和解析用户需求</li>
+                            <li><strong>架构设计</strong>：设计代码的整体架构</li>
+                            <li><strong>模块规划</strong>：规划代码模块和组织结构</li>
+                            <li><strong>依赖分析</strong>：分析和处理模块间依赖关系</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">💻</div>
+                        <h3 class="feature-title">编码流 (Coding Flow)</h3>
+                        <p class="feature-description">
+                            编码流负责具体的代码实现，基于规划流的输出进行代码编写。包括代码生成、语法检查、类型安全和注释生成。
+                        </p>
+                        <ul>
+                            <li><strong>代码生成</strong>：根据设计方案生成具体代码</li>
+                            <li><strong>语法检查</strong>：确保生成代码的语法正确性</li>
+                            <li><strong>类型安全</strong>：保证类型安全和一致性</li>
+                            <li><strong>注释生成</strong>：自动生成代码注释和文档</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3 class="feature-title">优化流 (Optimization Flow)</h3>
+                        <p class="feature-description">
+                            优化流负责对生成的代码进行性能优化和质量改进。包括性能优化、代码重构、安全检查和最佳实践应用。
+                        </p>
+                        <ul>
+                            <li><strong>性能优化</strong>：识别和优化性能瓶颈</li>
+                            <li><strong>代码重构</strong>：改进代码结构和设计</li>
+                            <li><strong>安全检查</strong>：检查和修复安全问题</li>
+                            <li><strong>最佳实践</strong>：应用编程最佳实践</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. 核心架构 -->
+            <section id="核心架构" class="section">
+                <h2 class="section-title">3. 核心架构</h2>
+
+                <div class="architecture-diagram">
+                    <h3 class="arch-title">系统架构图</h3>
+                    <div class="arch-flow">
+                        <div class="arch-layer">Claude-Triflow Framework</div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-layer">Integration Layer (Flow Coordinator, Quality Assurer, Result Merger, Output Manager)</div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-layer">Core Engine (Router Module, Provider Manager, Context Manager, Plugin System)</div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-layer">Three Flows (Planning, Coding, Optimization)</div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-layer">AI Providers (OpenAI API, Anthropic API, Custom APIs, Local Models)</div>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">技术栈</h3>
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">后端技术</h4>
+                        <ul>
+                            <li><strong>语言</strong>：Python 3.9+</li>
+                            <li><strong>框架</strong>：FastAPI, Flask</li>
+                            <li><strong>数据库</strong>：PostgreSQL, Redis</li>
+                            <li><strong>消息队列</strong>：RabbitMQ, Celery</li>
+                            <li><strong>缓存</strong>：Redis, Memcached</li>
+                        </ul>
+                    </div>
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">前端技术</h4>
+                        <ul>
+                            <li><strong>框架</strong>：React, Vue.js</li>
+                            <li><strong>UI库</strong>：Ant Design, Element UI</li>
+                            <li><strong>状态管理</strong>：Redux, Vuex</li>
+                            <li><strong>构建工具</strong>：Webpack, Vite</li>
+                        </ul>
+                    </div>
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">AI集成</h4>
+                        <ul>
+                            <li><strong>Claude API</strong>：主要的AI代码生成引擎</li>
+                            <li><strong>OpenAI API</strong>：辅助代码生成和分析</li>
+                            <li><strong>自定义模型</strong>：专门训练的代码优化模型</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. 安装指南 -->
+            <section id="安装指南" class="section">
+                <h2 class="section-title">4. 安装指南</h2>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">系统要求</h3>
+                    <ul>
+                        <li><strong>最低要求</strong>：Python 3.9 或更高版本、Node.js 16.0 或更高版本、内存 8GB RAM、存储空间 10GB 可用空间</li>
+                        <li><strong>推荐配置</strong>：Python 3.11 或更高版本、Node.js 18.0 或更高版本、内存 16GB RAM 或更高、存储空间 50GB 可用空间、GPU NVIDIA GPU（可选）</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">安装方式</h3>
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">使用 pip 安装</h4>
+                        <div class="code-block">
+                            <pre># 安装核心框架
+pip install claude-triflow
+
+# 安装开发工具
+pip install claude-triflow[dev]
+
+# 安装所有依赖
+pip install claude-triflow[all]</pre>
+                        </div>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">从源码安装</h4>
+                        <div class="code-block">
+                            <pre># 克隆仓库
+git clone https://github.com/claude-triflow/claude-triflow.git
+cd claude-triflow
+
+# 创建虚拟环境
+python -m venv venv
+source venv/bin/activate  # Linux/macOS
+# 或
+venv\Scripts\activate     # Windows
+
+# 安装依赖
+pip install -r requirements.txt
+
+# 安装框架
+pip install -e .</pre>
+                        </div>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">使用 Docker 安装</h4>
+                        <div class="code-block">
+                            <pre># 拉取镜像
+docker pull claude-triflow/claude-triflow:latest
+
+# 运行容器
+docker run -d \
+  --name claude-triflow \
+  -p 8000:8000 \
+  -v $(pwd)/data:/app/data \
+  claude-triflow/claude-triflow:latest</pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. 使用方法 -->
+            <section id="使用方法" class="section">
+                <h2 class="section-title">5. 使用方法</h2>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">Python API 使用</h3>
+                    <div class="code-block">
+                        <pre>from claude_triflow import TriflowGenerator
+
+# 初始化生成器
+generator = TriflowGenerator(
+    api_key="your-api-key",
+    config_path="./config.yaml"
+)
+
+# 生成代码
+result = generator.generate(
+    prompt="创建一个RESTful API服务",
+    language="python",
+    flows=["planning", "coding", "optimization"]
+)
+
+# 获取结果
+print(result.architecture)  # 规划流结果
+print(result.code)         # 编码流结果
+print(result.optimized)    # 优化流结果</pre>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">高级用法</h3>
+                    <div class="code-block">
+                        <pre>from claude_triflow import TriflowGenerator, FlowConfig
+
+# 自定义流配置
+flow_config = FlowConfig(
+    planning=PlanningConfig(
+        max_iterations=5,
+        detail_level="high"
+    ),
+    coding=CodingConfig(
+        style_guide="pep8",
+        include_tests=True
+    ),
+    optimization=OptimizationConfig(
+        optimization_level="aggressive",
+        focus=["performance", "security"]
+    )
+)
+
+# 创建生成器
+generator = TriflowGenerator(
+    flow_config=flow_config
+)
+
+# 异步生成
+async def generate_code():
+    result = await generator.generate_async(
+        prompt="高性能数据处理管道",
+        language="python"
+    )
+    return result
+
+# 运行异步生成
+import asyncio
+result = asyncio.run(generate_code())</pre>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">Web界面使用</h3>
+                    <p>启动Web服务，通过浏览器界面使用 Claude-Triflow。</p>
+                    <div class="code-block">
+                        <pre># 启动Web界面
+triflow web --port 8080 --host 0.0.0.0
+
+# 使用Docker启动
+docker-compose up -d</pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. 工作流配置 -->
+            <section id="工作流配置" class="section">
+                <h2 class="section-title">6. 工作流配置</h2>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">流配置</h3>
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">规划流配置</h4>
+                        <div class="code-block">
+                            <pre>planning:
+  # 基础设置
+  enabled: true
+  max_iterations: 3
+  timeout: 300
+
+  # 分析设置
+  analysis:
+    detail_level: "high"  # low, medium, high
+    include_dependencies: true
+    generate_diagrams: true
+
+  # 设计设置
+  design:
+    architecture_pattern: "layered"  # layered, microservices, monolith
+    design_principles: ["SOLID", "DRY", "KISS"]
+    include_performance_considerations: true</pre>
+                        </div>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">编码流配置</h4>
+                        <div class="code-block">
+                            <pre>coding:
+  # 基础设置
+  enabled: true
+  max_iterations: 5
+  timeout: 600
+
+  # 代码生成设置
+  generation:
+    language: "python"
+    style_guide: "pep8"
+    include_type_hints: true
+    include_docstrings: true
+
+  # 测试设置
+  testing:
+    framework: "pytest"
+    coverage_threshold: 80
+    include_integration_tests: true</pre>
+                        </div>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">优化流配置</h4>
+                        <div class="code-block">
+                            <pre>optimization:
+  # 基础设置
+  enabled: true
+  max_iterations: 2
+  timeout: 300
+
+  # 优化设置
+  optimization:
+    level: "standard"  # light, standard, aggressive
+    focus: ["performance", "security", "maintainability"]
+    apply_refactoring: true
+
+  # 分析设置
+  analysis:
+    static_analysis: true
+    security_scan: true
+    performance_profiling: true</pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. 高级功能 -->
+            <section id="高级功能" class="section">
+                <h2 class="section-title">7. 高级功能</h2>
+
+                <div class="features">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔌</div>
+                        <h3 class="feature-title">插件系统</h3>
+                        <p class="feature-description">
+                            支持创建和使用自定义插件，扩展框架功能。包括插件加载、API接口、事件系统和安全沙箱。
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">📦</div>
+                        <h3 class="feature-title">批量处理</h3>
+                        <p class="feature-description">
+                            支持批量处理多个代码生成任务，提高工作效率。包括并行处理、任务队列管理和进度监控。
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <h3 class="feature-title">模板系统</h3>
+                        <p class="feature-description">
+                            提供模板功能，支持创建和应用代码生成模板。包括模板创建、变量替换和模板库管理。
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🔄</div>
+                        <h3 class="feature-title">自定义流</h3>
+                        <p class="feature-description">
+                            支持创建自定义工作流，满足特定需求。包括流注册、生命周期管理和事件处理。
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. 最佳实践 -->
+            <section id="最佳实践" class="section">
+                <h2 class="section-title">8. 最佳实践</h2>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">提示词优化</h3>
+                    <p><strong>有效的提示词结构：</strong></p>
+                    <ol>
+                        <li><strong>明确的目标</strong>：清楚地描述要实现的功能</li>
+                        <li><strong>技术要求</strong>：指定编程语言、框架和约束</li>
+                        <li><strong>质量标准</strong>：明确代码质量和性能要求</li>
+                        <li><strong>上下文信息</strong>：提供相关的背景和约束条件</li>
+                    </ol>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">工作流优化</h3>
+                    <ol>
+                        <li><strong>逐步细化</strong>：从粗粒度到细粒度逐步细化需求</li>
+                        <li><strong>质量门控</strong>：每个流完成后进行质量检查</li>
+                        <li><strong>反馈循环</strong>：根据结果调整后续流的策略</li>
+                        <li><strong>版本管理</strong>：保存每个阶段的中间结果</li>
+                    </ol>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">性能指标</h3>
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">50%+</div>
+                            <div class="metric-label">代码质量提升</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">70%+</div>
+                            <div class="metric-label">减少重构需求</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">3x</div>
+                            <div class="metric-label">开发效率提升</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">90%+</div>
+                            <div class="metric-label">最佳实践遵循率</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tip">
+                    <p><strong>提示</strong>: Claude-Triflow 是一个活跃开发的开源项目，通过三流式工作流显著提升AI代码生成质量。如果你觉得有用，请考虑给项目一个 Star，或者参与贡献代码！</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // 创建粒子效果
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('.toc-link').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 初始化
+        createParticles();
+
+        // 滚动时的渐入效果
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // 观察所有section
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(30px)';
+            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>

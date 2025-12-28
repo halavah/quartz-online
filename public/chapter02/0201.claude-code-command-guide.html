@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code 常用命令指南 - 10分钟掌握所有常用命令</title>
+    <meta name="description" content="10分钟掌握Claude Code所有常用命令,附一份Claude Code命令自查表,包括基础命令、实用技巧和提问技巧">
+    <meta name="keywords" content="Claude Code,命令指南,快捷键,提问技巧,开发工具,AI编程">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0066ff;
+            --secondary-color: #00d4ff;
+            --accent-color: #ff6b00;
+            --dark-bg: #0a0e27;
+            --card-bg: #1a1f3a;
+            --text-color: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --border-color: #2a2f4a;
+            --success-color: #00c853;
+            --warning-color: #ff9800;
+            --gradient-primary: linear-gradient(135deg, #0066ff 0%, #00d4ff 100%);
+            --gradient-hero: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+            --shadow-glow: 0 0 30px rgba(0, 102, 255, 0.3);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--dark-bg);
+            overflow-x: hidden;
+        }
+
+        .hero-section {
+            background: var(--gradient-hero);
+            padding: 4rem 2rem 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(0, 102, 255, 0.2);
+            color: var(--secondary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            margin-bottom: 1rem;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: flex;
+            gap: 3rem;
+            align-items: flex-start;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .toc-sidebar {
+            width: 280px;
+            position: sticky;
+            top: 2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+            order: 2;
+        }
+
+        .toc-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .toc-sidebar ul {
+            list-style: none;
+        }
+
+        .toc-sidebar li {
+            margin-bottom: 0.5rem;
+        }
+
+        .toc-sidebar a {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .toc-sidebar a:hover {
+            background: rgba(0, 102, 255, 0.1);
+            color: var(--primary-color);
+            transform: translateX(4px);
+        }
+
+        .toc-sidebar a.active {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .toc-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .toc-sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .toc-sidebar::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        .command-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .command-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .command-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .command-name {
+            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .command-name::before {
+            content: '▸';
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .command-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .tips-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .tips-list li {
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            background: var(--card-bg);
+            border-left: 4px solid var(--primary-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            transition: all 0.3s ease;
+        }
+
+        .tips-list li:hover {
+            background: rgba(0, 102, 255, 0.1);
+            transform: translateX(8px);
+        }
+
+        .tips-list li strong {
+            color: var(--text-color);
+            font-size: 1.05rem;
+        }
+
+        .tips-list li code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+        }
+
+        .info-box {
+            background: rgba(0, 102, 255, 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+        }
+
+        .info-box.success {
+            background: rgba(0, 200, 83, 0.1);
+            border-left-color: var(--success-color);
+        }
+
+        .info-box.warning {
+            background: rgba(255, 152, 0, 0.1);
+            border-left-color: var(--warning-color);
+        }
+
+        .info-box strong {
+            color: var(--text-color);
+        }
+
+        .info-box code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+        }
+
+        .quick-ref-table {
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+
+        .quick-ref-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .quick-ref-table th {
+            background: rgba(0, 102, 255, 0.2);
+            color: var(--text-color);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .quick-ref-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .quick-ref-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .quick-ref-table tr:hover {
+            background: rgba(0, 102, 255, 0.05);
+        }
+
+        .quick-ref-table code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+            white-space: nowrap;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.4);
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: var(--secondary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .back-to-top svg {
+            margin-bottom: 2px;
+        }
+
+        .footer {
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .footer-container p {
+            margin: 0.5rem 0;
+        }
+
+        @media (max-width: 1024px) {
+            .toc-sidebar {
+                position: static;
+                width: 100%;
+                max-height: none;
+                order: -1;
+                margin-bottom: 2rem;
+            }
+
+            .command-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .main-content {
+                padding: 2rem 1rem;
+                flex-direction: column;
+            }
+
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.6rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .command-card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-container">
+            <span class="hero-badge">快速上手指南</span>
+            <h1 class="hero-title">Vibe Coding 之 Claude Code 常用命令指南</h1>
+            <p class="hero-subtitle">10分钟掌握Claude Code所有常用命令,附一份 Claude Code 命令自查表</p>
+        </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- TOC Sidebar -->
+        <nav class="toc-sidebar">
+            <h2 class="toc-title">📋 目录导航</h2>
+            <ul>
+                <li><a href="#basic-commands">1. 基础命令 - 5分钟上手</a></li>
+                <li><a href="#practical-tips">2. 实用技巧</a></li>
+                <li><a href="#questioning-skills">3. 提问技巧</a></li>
+                <li><a href="#quick-reference">4. 命令速查表</a></li>
+            </ul>
+        </nav>
+
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Section 1: 基础命令 -->
+            <section id="basic-commands" class="section">
+                <h2 class="section-title">1️⃣ 基础命令 - 5分钟上手</h2>
+                <p class="section-description">先从最简单的开始,这些命令能满足你80%的需求。</p>
+
+                <div class="command-grid">
+                    <div class="command-card">
+                        <div class="command-name">claude</div>
+                        <p class="command-desc">启动Claude Code交互模式,开始与AI对话进行编程</p>
+                    </div>
+
+                    <div class="command-card">
+                        <div class="command-name">/model</div>
+                        <p class="command-desc">选择不同的AI模型 (Sonnet, Opus, Haiku),根据任务复杂度选择</p>
+                    </div>
+
+                    <div class="command-card">
+                        <div class="command-name">/resume</div>
+                        <p class="command-desc">恢复上次对话,继续之前未完成的工作</p>
+                    </div>
+
+                    <div class="command-card">
+                        <div class="command-name">/mcp</div>
+                        <p class="command-desc">查看和管理MCP (Model Context Protocol) 服务器配置</p>
+                    </div>
+
+                    <div class="command-card">
+                        <div class="command-name">/compact</div>
+                        <p class="command-desc">压缩当前对话历史,减少token使用,优化性能</p>
+                    </div>
+
+                    <div class="command-card">
+                        <div class="command-name">/init</div>
+                        <p class="command-desc">初始化项目配置,设置Claude Code在当前项目中的工作环境</p>
+                    </div>
+
+                    <div class="command-card">
+                        <div class="command-name">/clear</div>
+                        <p class="command-desc">清理当前会话,开始全新的对话</p>
+                    </div>
+
+                    <div class="command-card">
+                        <div class="command-name">/cost</div>
+                        <p class="command-desc">查看当前会话的token使用量和费用统计</p>
+                    </div>
+                </div>
+
+                <div class="info-box success">
+                    <strong>💡 小贴士:</strong> 使用 <code>/model</code> 切换到 Haiku 模型可以大幅降低简单任务的成本,而 Opus 模型适合复杂的架构设计任务。
+                </div>
+            </section>
+
+            <!-- Section 2: 实用技巧 -->
+            <section id="practical-tips" class="section">
+                <h2 class="section-title">2️⃣ 实用技巧</h2>
+                <p class="section-description">这些技巧能让你的工作效率翻倍。</p>
+
+                <ul class="tips-list">
+                    <li>
+                        <strong>Control + C</strong> - 终止当前输出<br>
+                        当Claude的回答太长或方向错误时,立即按下此快捷键终止输出,节省时间和token
+                    </li>
+
+                    <li>
+                        <strong>Alt/Command + V</strong> - 粘贴图片到终端<br>
+                        直接在对话中粘贴截图、设计稿或报错界面,Claude能识别图片内容并提供针对性建议
+                    </li>
+
+                    <li>
+                        <strong>CLAUDE.md</strong> - 项目全局说明文档<br>
+                        在项目根目录创建 <code>CLAUDE.md</code> 文件,写入项目架构、编码规范、常用命令等信息。Claude会自动读取这个文件,就像给AI配了一份"项目使用手册"
+                    </li>
+                </ul>
+
+                <div class="info-box">
+                    <strong>📂 CLAUDE.md 示例内容:</strong><br>
+                    项目技术栈: React + TypeScript + Vite<br>
+                    代码风格: ESLint + Prettier<br>
+                    测试命令: npm test<br>
+                    部署命令: npm run build
+                </div>
+            </section>
+
+            <!-- Section 3: 提问技巧 -->
+            <section id="questioning-skills" class="section">
+                <h2 class="section-title">3️⃣ 提问技巧</h2>
+                <p class="section-description">好的提问方式能让Claude更准确地理解你的需求。</p>
+
+                <ul class="tips-list">
+                    <li>
+                        <strong>明确具体</strong><br>
+                        ❌ 不好: "有问题"<br>
+                        ✅ 好的: "登录接口返回500错误,请求体为 {username: 'test', password: '123456'},后端日志显示数据库连接超时"
+                    </li>
+
+                    <li>
+                        <strong>提供上下文</strong><br>
+                        ❌ 不好: "帮我写个组件"<br>
+                        ✅ 好的: "我在用React + TypeScript开发一个电商网站,需要一个商品卡片组件,要展示商品图片、标题、价格和购买按钮"
+                    </li>
+
+                    <li>
+                        <strong>分步骤</strong><br>
+                        ❌ 不好: "帮我做一个完整的用户系统"<br>
+                        ✅ 好的:
+                        <ol style="margin-top: 0.5rem; padding-left: 1.5rem; color: var(--text-secondary);">
+                            <li>先帮我设计数据库表结构</li>
+                            <li>然后实现用户注册接口</li>
+                            <li>接着实现登录和JWT token验证</li>
+                            <li>最后添加用户信息修改功能</li>
+                        </ol>
+                    </li>
+
+                    <li>
+                        <strong>包含报错信息</strong><br>
+                        出现错误时,不要只说"报错了",要把完整的错误堆栈、报错行数、相关代码一起提供给Claude
+                    </li>
+
+                    <li>
+                        <strong>说明期望结果</strong><br>
+                        除了描述问题,还要说明你期望的结果是什么,这样Claude能更好地调整解决方案
+                    </li>
+                </ul>
+
+                <div class="info-box warning">
+                    <strong>⚠️ 注意:</strong> 避免一次性提出太多需求。如果任务复杂,建议分解成多个小任务逐步完成,这样能获得更准确的结果。
+                </div>
+            </section>
+
+            <!-- Section 4: 命令速查表 -->
+            <section id="quick-reference" class="section">
+                <h2 class="section-title">4️⃣ 命令速查表</h2>
+                <p class="section-description">打印或收藏此表,随时查阅。</p>
+
+                <div class="quick-ref-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 30%;">命令/快捷键</th>
+                                <th style="width: 70%;">功能说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>claude</code></td>
+                                <td>启动交互模式</td>
+                            </tr>
+                            <tr>
+                                <td><code>/model</code></td>
+                                <td>切换AI模型</td>
+                            </tr>
+                            <tr>
+                                <td><code>/resume</code></td>
+                                <td>恢复上次对话</td>
+                            </tr>
+                            <tr>
+                                <td><code>/mcp</code></td>
+                                <td>查看MCP配置</td>
+                            </tr>
+                            <tr>
+                                <td><code>/compact</code></td>
+                                <td>压缩对话历史</td>
+                            </tr>
+                            <tr>
+                                <td><code>/init</code></td>
+                                <td>初始化项目</td>
+                            </tr>
+                            <tr>
+                                <td><code>/clear</code></td>
+                                <td>清理当前会话</td>
+                            </tr>
+                            <tr>
+                                <td><code>/cost</code></td>
+                                <td>查看token用量</td>
+                            </tr>
+                            <tr>
+                                <td><code>Ctrl + C</code></td>
+                                <td>终止当前输出</td>
+                            </tr>
+                            <tr>
+                                <td><code>Alt/Cmd + V</code></td>
+                                <td>粘贴图片</td>
+                            </tr>
+                            <tr>
+                                <td><code>CLAUDE.md</code></td>
+                                <td>项目全局说明文档</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="info-box success">
+                    <strong>🎉 恭喜!</strong> 你已经掌握了Claude Code的核心命令。现在就去实践吧,在实际项目中使用这些技巧,你会发现AI编程原来可以这么高效!
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M7 14l5-5 5 5" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        回到顶部
+    </button>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <p id="copyright-text">© 2025 Halavah's Tech. All rights reserved.</p>
+            <p id="beian-number"></p>
+        </div>
+    </footer>
+
+    <script>
+        // 1. 加载配置文件
+        fetch('/config.json')
+            .then(response => response.json())
+            .then(data => {
+                const { beianNumber, copyrightText } = data.config;
+                document.getElementById('copyright-text').textContent =
+                    copyrightText || '© 2025 Halavah\'s Tech. All rights reserved.';
+                if (beianNumber) {
+                    document.getElementById('beian-number').textContent = beianNumber;
+                }
+            })
+            .catch(error => console.error('Failed to load config:', error));
+
+        // 2. TOC 点击平滑滚动
+        document.querySelectorAll('.toc-sidebar a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 3. TOC 激活状态跟踪
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    document.querySelectorAll('.toc-sidebar a').forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${entry.target.id}`) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, {
+            rootMargin: '-100px 0px -80% 0px'
+        });
+
+        document.querySelectorAll('section[id]').forEach(section => {
+            observer.observe(section);
+        });
+
+        // 4. 回到顶部按钮
+        const backToTop = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

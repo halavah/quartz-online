@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCStatusLine - Claude Code 美观状态行工具</title>
+    <meta name="description" content="CCStatusLine 为Claude Code CLI提供美观且高度可定制的状态行，支持Powerline主题、多种配置选项、自定义颜色和小组件">
+    <meta name="keywords" content="ccstatusline,claude-code,状态行,powerline,终端美化,cli工具">
+    <style>
+        :root {
+            --primary-color: #8b5cf6;
+            --secondary-color: #3b82f6;
+            --accent-color: #06b6d4;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --gradient-1: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+            --gradient-2: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+            --gradient-3: linear-gradient(135deg, #06b6d4 0%, #10b981 100%);
+            --glow-color: rgba(139, 92, 246, 0.5);
+            --particle-color: rgba(139, 92, 246, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 粒子背景 */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--particle-color);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* 头部 */
+        .header {
+            padding: 80px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-1);
+            opacity: 0.1;
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+
+        .title {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                filter: drop-shadow(0 0 20px var(--glow-color));
+            }
+            to {
+                filter: drop-shadow(0 0 30px var(--glow-color));
+            }
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 状态行演示 */
+        .statusline-demo {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 40px 0;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .statusline-demo::before {
+            content: 'Powerline Status Line Demo';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: var(--bg-primary);
+            padding: 0 10px;
+            color: var(--primary-color);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .statusline {
+            display: flex;
+            align-items: center;
+            background: var(--bg-tertiary);
+            padding: 8px 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .segment {
+            padding: 8px 16px;
+            position: relative;
+            color: white;
+            font-weight: 500;
+        }
+
+        .segment:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 12px 0 12px 12px;
+            border-color: transparent transparent transparent currentColor;
+            z-index: 1;
+        }
+
+        .segment.model {
+            background: #8b5cf6;
+        }
+
+        .segment.git {
+            background: #10b981;
+        }
+
+        .segment.tokens {
+            background: #f59e0b;
+        }
+
+        .segment.time {
+            background: #06b6d4;
+        }
+
+        /* 目录 */
+        .toc {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 40px;
+            margin: 40px 0;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toc::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--gradient-1);
+        }
+
+        .toc-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .toc-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .toc-item {
+            padding: 12px 20px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toc-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-2);
+            opacity: 0.1;
+            transition: left 0.3s ease;
+        }
+
+        .toc-item:hover::before {
+            left: 0;
+        }
+
+        .toc-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .toc-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 内容部分 */
+        .section {
+            margin: 60px 0;
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .section:nth-child(2) { animation-delay: 0.1s; }
+        .section:nth-child(3) { animation-delay: 0.2s; }
+        .section:nth-child(4) { animation-delay: 0.3s; }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subsection {
+            margin: 40px 0;
+            padding-left: 20px;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .subsection-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+        }
+
+        .sub-subsection {
+            margin: 30px 0;
+        }
+
+        .sub-subsection-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        /* 特性卡片 */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .feature-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 代码块 */
+        .code-block {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--gradient-1);
+        }
+
+        .code-block pre {
+            color: var(--text-primary);
+            font-family: 'Fira Code', 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        /* 列表 */
+        ul, ol {
+            margin: 20px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 10px 0;
+            color: var(--text-secondary);
+        }
+
+        li strong {
+            color: var(--text-primary);
+        }
+
+        /* 引用块 */
+        blockquote {
+            border-left: 4px solid var(--primary-color);
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 0 12px 12px 0;
+            color: var(--text-secondary);
+        }
+
+        /* 表格 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* 提示框 */
+        .tip {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .tip::before {
+            content: '💡';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-size: 1.5rem;
+            background: var(--bg-primary);
+            padding: 0 10px;
+        }
+
+        /* 配置示例 */
+        .config-example {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            border-left: 3px solid var(--accent-color);
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .header {
+                padding: 40px 0;
+            }
+
+            .title {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .toc {
+                padding: 20px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .statusline {
+                font-size: 12px;
+            }
+
+            .segment {
+                padding: 6px 12px;
+            }
+        }
+
+        /* 滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- 粒子背景 -->
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <h1 class="title">CCStatusLine</h1>
+            <p class="subtitle">为Claude Code CLI提供美观且高度可定制的状态行，支持Powerline主题、多种配置选项、自定义颜色和小组件</p>
+
+            <!-- 状态行演示 -->
+            <div class="statusline-demo">
+                <div class="statusline">
+                    <span class="segment model">🤖 Claude-3</span>
+                    <span class="segment git">📁 main</span>
+                    <span class="segment tokens">📊 1500/10000</span>
+                    <span class="segment time">🕐 14:35:22</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 目录 -->
+        <nav class="toc">
+            <h2 class="toc-title">目录导航</h2>
+            <div class="toc-list">
+                <div class="toc-item">
+                    <a href="#什么是-ccstatusline" class="toc-link">1. 什么是 CCStatusLine？</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#核心功能特性" class="toc-link">2. 核心功能特性</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#系统架构" class="toc-link">3. 系统架构</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#安装指南" class="toc-link">4. 安装指南</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#配置说明" class="toc-link">5. 配置说明</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#使用方法" class="toc-link">6. 使用方法</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#故障排除" class="toc-link">7. 故障排除</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 内容 -->
+        <main>
+            <!-- 1. 什么是 CCStatusLine？ -->
+            <section id="什么是-ccstatusline" class="section">
+                <h2 class="section-title">1. 什么是 CCStatusLine？</h2>
+                <p>CCStatusLine 是专为 Claude Code CLI 设计的美观状态行工具，旨在为用户提供丰富的信息展示和高度可定制的界面体验。通过支持 Powerline 风格的主题和多种小组件，CCStatusLine 让终端界面更加美观和实用。</p>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">核心价值</h3>
+                    <ul>
+                        <li><strong>美观界面</strong>：Powerline 风格的美观状态行</li>
+                        <li><strong>高度定制</strong>：支持自定义颜色、布局和小组件</li>
+                        <li><strong>信息丰富</strong>：显示模型信息、Git分支、Token使用情况等</li>
+                        <li><strong>易于使用</strong>：简单的配置和直观的界面</li>
+                        <li><strong>轻量高效</strong>：不影响命令行工具的性能</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">设计理念</h3>
+                    <p>CCStatusLine 遵循简洁而强大的设计原则：</p>
+                    <ul>
+                        <li><strong>视觉美观</strong>：现代化的终端界面设计</li>
+                        <li><strong>功能实用</strong>：显示开发者关心的关键信息</li>
+                        <li><strong>配置灵活</strong>：满足不同用户的个性化需求</li>
+                        <li><strong>性能优先</strong>：最小化资源占用</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 2. 核心功能特性 -->
+            <section id="核心功能特性" class="section">
+                <h2 class="section-title">2. 核心功能特性</h2>
+
+                <div class="features">
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <h3 class="feature-title">Powerline 主题支持</h3>
+                        <p class="feature-description">
+                            内置多种预置的 Powerline 风格主题，支持创建和分享自定义主题，每个小组件都可以单独配置颜色，提供丰富的图标和符号选择
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🔧</div>
+                        <h3 class="feature-title">高度可定制性</h3>
+                        <p class="feature-description">
+                            支持添加、删除、重新排序状态行小组件，灵活的布局和分隔符配置，可配置的伸缩分隔符行为，根据条件显示或隐藏特定信息
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3 class="feature-title">信息显示</h3>
+                        <p class="feature-description">
+                            显示当前使用的 AI 模型、Git 分支名称和提交状态、实时显示 Token 消耗情况、当前会话的相关信息、CPU、内存等系统信息
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3 class="feature-title">性能优化</h3>
+                        <p class="feature-description">
+                            轻量设计最小化性能影响，智能缓存提高响应速度，非阻塞的状态更新，高效的资源使用和管理
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🛠️</div>
+                        <h3 class="feature-title">开发者友好</h3>
+                        <p class="feature-description">
+                            直观的配置文件格式，配置更改即时生效的热重载功能，详细的调试信息和日志，支持扩展功能的插件接口
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🌈</div>
+                        <h3 class="feature-title">主题系统</h3>
+                        <p class="feature-description">
+                            支持 default、dark、light、minimal 等内置主题，完全自定义的颜色方案，支持配置热重载和实时预览
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. 系统架构 -->
+            <section id="系统架构" class="section">
+                <h2 class="section-title">3. 系统架构</h2>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">技术架构</h3>
+                    <div class="code-block">
+                        <pre>Claude Code CLI
+    ↓
+CCStatusLine Engine
+    ├── Widget Manager
+    ├── Theme Engine
+    ├── Config Parser
+    └── Renderer
+    ↓
+Terminal Output</pre>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">核心组件</h3>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">Widget Manager（小组件管理器）</h4>
+                        <ul>
+                            <li><strong>小组件注册</strong>：管理和注册各种小组件</li>
+                            <li><strong>生命周期管理</strong>：管理小组件的创建、更新和销毁</li>
+                            <li><strong>事件处理</strong>：处理小组件的事件和交互</li>
+                            <li><strong>数据绑定</strong>：绑定数据源到小组件</li>
+                        </ul>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">Theme Engine（主题引擎）</h4>
+                        <ul>
+                            <li><strong>主题解析</strong>：解析和应用主题配置</li>
+                            <li><strong>颜色管理</strong>：管理和渲染颜色</li>
+                            <li><strong>图标处理</strong>：处理图标和符号</li>
+                            <li><strong>样式计算</strong>：计算最终的显示样式</li>
+                        </ul>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">Config Parser（配置解析器）</h4>
+                        <ul>
+                            <li><strong>配置文件解析</strong>：解析 YAML/JSON 配置文件</li>
+                            <li><strong>配置验证</strong>：验证配置的正确性</li>
+                            <li><strong>热重载</strong>：监控配置文件变化</li>
+                            <li><strong>默认值处理</strong>：处理配置的默认值</li>
+                        </ul>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">Renderer（渲染器）</h4>
+                        <ul>
+                            <li><strong>终端渲染</strong>：渲染到终端输出</li>
+                            <li><strong>格式化</strong>：格式化显示内容</li>
+                            <li><strong>布局计算</strong>：计算布局和位置</li>
+                            <li><strong>输出优化</strong>：优化输出性能</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. 安装指南 -->
+            <section id="安装指南" class="section">
+                <h2 class="section-title">4. 安装指南</h2>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">系统要求</h3>
+                    <ul>
+                        <li><strong>支持平台</strong>：Linux (Ubuntu 18.04+, CentOS 7+, Debian 9+)、macOS (10.15+)、Windows (10 1903+ 通过 WSL)</li>
+                        <li><strong>依赖要求</strong>：Node.js 16.0.0+、Bun (推荐)、Claude Code 最新版本</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">安装方式</h3>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">使用 Bun 安装（推荐）</h4>
+                        <div class="code-block">
+                            <pre># 克隆仓库
+git clone https://github.com/sirmalloc/ccstatusline.git
+cd ccstatusline
+
+# 安装依赖
+bun install
+
+# 启动 TUI 模式
+bun run src/ccstatusline.ts</pre>
+                        </div>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">使用 npm 安装</h4>
+                        <div class="code-block">
+                            <pre># 克隆仓库
+git clone https://github.com/sirmalloc/ccstatusline.git
+cd ccstatusline
+
+# 安装依赖
+npm install
+
+# 构建项目
+npm run build
+
+# 启动应用
+npm start</pre>
+                        </div>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">全局安装</h4>
+                        <div class="code-block">
+                            <pre># 使用 npm 全局安装
+npm install -g ccstatusline
+
+# 使用 bun 全局安装
+bun install -g ccstatusline
+
+# 验证安装
+ccstatusline --version</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">初始配置</h3>
+                    <div class="code-block">
+                        <pre># 初始化配置
+ccstatusline init
+
+# 这将在 ~/.config/ccstatusline/ 目录下创建默认配置文件</pre>
+                    </div>
+
+                    <div class="config-example">
+                        <strong>基础配置文件：</strong><br>
+                        # ~/.config/ccstatusline/config.yaml<br>
+                        theme: "default"<br>
+                        layout: "powerline"<br><br>
+                        widgets:<br>
+                        &nbsp;&nbsp;- type: "model"<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;position: "left"<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;color: "blue"<br><br>
+                        &nbsp;&nbsp;- type: "git"<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;position: "left"<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;color: "green"<br><br>
+                        &nbsp;&nbsp;- type: "tokens"<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;position: "right"<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;color: "yellow"<br><br>
+                        &nbsp;&nbsp;- type: "time"<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;position: "right"<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;color: "cyan"<br><br>
+                        separators:<br>
+                        &nbsp;&nbsp;type: "arrow"<br>
+                        &nbsp;&nbsp;color: "gray"
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. 配置说明 -->
+            <section id="配置说明" class="section">
+                <h2 class="section-title">5. 配置说明</h2>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">主题配置</h3>
+                    <div class="config-example">
+                        <strong>内置主题：</strong><br>
+                        # 主题选择<br>
+                        theme: "default"  # default, dark, light, minimal<br><br>
+                        # 或自定义主题<br>
+                        custom_theme:<br>
+                        &nbsp;&nbsp;background: "#1e1e1e"<br>
+                        &nbsp;&nbsp;foreground: "#ffffff"<br>
+                        &nbsp;&nbsp;accent: "#61afef"<br>
+                        &nbsp;&nbsp;success: "#98c379"<br>
+                        &nbsp;&nbsp;warning: "#e5c07b"<br>
+                        &nbsp;&nbsp;error: "#e06c75"
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">小组件配置</h3>
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">模型小组件</h4>
+                        <div class="config-example">
+                            widgets:<br>
+                            &nbsp;&nbsp;- type: "model"<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;position: "left"<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;format: "{model} ({provider})"<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;color: "blue"<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;show_provider: true<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;max_length: 20
+                        </div>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">Git 小组件</h4>
+                        <div class="config-example">
+                            widgets:<br>
+                            &nbsp;&nbsp;- type: "git"<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;position: "left"<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;color: "green"<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;show_branch: true<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;show_status: true<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;show_ahead_behind: true
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. 使用方法 -->
+            <section id="使用方法" class="section">
+                <h2 class="section-title">6. 使用方法</h2>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">基础使用</h3>
+                    <div class="code-block">
+                        <pre># 使用默认配置启动
+ccstatusline
+
+# 指定配置文件启动
+ccstatusline --config /path/to/config.yaml
+
+# 启动特定主题
+ccstatusline --theme dark
+
+# 启用调试模式
+ccstatusline --debug</pre>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">配置管理</h3>
+                    <div class="code-block">
+                        <pre># 显示当前配置
+ccstatusline config show
+
+# 验证配置文件
+ccstatusline config validate
+
+# 重置为默认配置
+ccstatusline config reset</pre>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">集成使用</h3>
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">与 Shell 集成</h4>
+                        <div class="code-block">
+                            <pre># 添加到 .bashrc 或 .zshrc
+eval "$(ccstatusline init bash)"
+# 或
+eval "$(ccstatusline init zsh)"</pre>
+                        </div>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">与 Claude Code 集成</h4>
+                        <div class="code-block">
+                            <pre># 启动 Claude Code 时自动加载状态行
+alias claude='ccstatusline && claude'</pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. 故障排除 -->
+            <section id="故障排除" class="section">
+                <h2 class="section-title">7. 故障排除</h2>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">常见问题</h3>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">状态行不显示</h4>
+                        <div class="code-block">
+                            <pre># 检查安装
+ccstatusline --version
+
+# 验证配置
+ccstatusline config validate
+
+# 检查权限
+ls -la ~/.config/ccstatusline/
+
+# 启用调试模式
+ccstatusline --debug</pre>
+                        </div>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">主题加载失败</h4>
+                        <div class="code-block">
+                            <pre># 检查主题文件
+ccstatusline theme validate theme-name
+
+# 重新加载主题
+ccstatusline theme reload theme-name
+
+# 重置主题
+ccstatusline theme reset</pre>
+                        </div>
+                    </div>
+
+                    <div class="sub-subsection">
+                        <h4 class="sub-subsection-title">性能问题</h4>
+                        <div class="code-block">
+                            <pre># 检查性能统计
+ccstatusline --stats
+
+# 清理缓存
+ccstatusline cache clear
+
+# 优化配置
+ccstatusline optimize</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tip">
+                    <p><strong>提示</strong>: CCStatusLine 是一个活跃开发的开源项目，如果你觉得有用，请考虑给项目一个 Star（目前已获得 2.22k+ stars）！让 Claude Code 的终端体验更加美观和实用！</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // 创建粒子效果
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('.toc-link').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 初始化
+        createParticles();
+
+        // 滚动时的渐入效果
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // 观察所有section
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(30px)';
+            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>

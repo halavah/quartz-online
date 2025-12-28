@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphiti MCP Server - AI知识图谱服务器</title>
+    <meta name="description" content="Graphiti MCP Server 是gifflet开发的AI知识图谱服务器，使用Neo4j构建知识网络，提供智能知识管理、语义检索、图谱可视化等功能，是AI代理的知识管理和检索解决方案">
+    <meta name="keywords" content="graphiti-mcp-server,gifflet,知识图谱,neo4j,语义检索,智能管理,图谱可视化,ai代理">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #00bc78;
+            --secondary-color: #0088cc;
+            --accent-color: #ff6b6b;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --gradient-1: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            --gradient-2: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 背景动画 */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 80%, rgba(0, 188, 120, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 136, 204, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 107, 107, 0.2) 0%, transparent 50%);
+            animation: particlesMove 20s ease-in-out infinite;
+        }
+
+        @keyframes particlesMove {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(1deg); }
+            66% { transform: translateY(20px) rotate(-1deg); }
+        }
+
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .floating-element:nth-child(1) {
+            width: 120px;
+            height: 120px;
+            left: 10%;
+            top: 20%;
+            animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+            width: 80px;
+            height: 80px;
+            right: 15%;
+            top: 30%;
+            animation-delay: 2s;
+        }
+
+        .floating-element:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            left: 60%;
+            bottom: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(180deg); }
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 导航栏 */
+        nav {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Hero 部分 */
+        .hero {
+            padding: 8rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 188, 120, 0.1), transparent);
+            border-radius: 50%;
+            animation: heroGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes heroGlow {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 知识图谱演示 */
+        .graph-demo {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .graph-demo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-1);
+        }
+
+        .graph-visualization {
+            background: rgba(15, 23, 42, 0.95);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            margin: 3rem 0;
+        }
+
+        .graph-header {
+            background: rgba(30, 41, 59, 0.9);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .graph-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .graph-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .control-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .control-dot:hover {
+            opacity: 0.8;
+        }
+
+        .control-close { background: #ef4444; }
+        .control-minimize { background: #f59e0b; }
+        .control-maximize { background: #10b981; }
+
+        .graph-body {
+            padding: 2rem;
+            min-height: 400px;
+            position: relative;
+        }
+
+        .graph-canvas {
+            width: 100%;
+            height: 400px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 知识节点 */
+        .knowledge-node {
+            position: absolute;
+            background: rgba(0, 188, 120, 0.2);
+            border: 2px solid rgba(0, 188, 120, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: nodeFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes nodeFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .knowledge-node:hover {
+            transform: scale(1.1);
+            background: rgba(0, 188, 120, 0.3);
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 25px rgba(0, 188, 120, 0.3);
+        }
+
+        .node-person {
+            width: 80px;
+            height: 80px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 188, 120, 0.3);
+        }
+
+        .node-project {
+            width: 60px;
+            height: 60px;
+            top: 30%;
+            left: 30%;
+            background: rgba(0, 136, 204, 0.3);
+            border-color: rgba(0, 136, 204, 0.5);
+        }
+
+        .node-company {
+            width: 60px;
+            height: 60px;
+            top: 70%;
+            left: 30%;
+            background: rgba(255, 107, 107, 0.3);
+            border-color: rgba(255, 107, 107, 0.5);
+        }
+
+        .node-skill {
+            width: 50px;
+            height: 50px;
+            top: 30%;
+            right: 30%;
+            background: rgba(245, 158, 11, 0.3);
+            border-color: rgba(245, 158, 11, 0.5);
+        }
+
+        .node-tool {
+            width: 50px;
+            height: 50px;
+            top: 70%;
+            right: 30%;
+            background: rgba(139, 92, 246, 0.3);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        /* 关系连线 */
+        .relationship-line {
+            position: absolute;
+            background: linear-gradient(90deg,
+                rgba(255, 255, 255, 0.3),
+                rgba(255, 255, 255, 0.1));
+            height: 2px;
+            transform-origin: left center;
+            animation: linePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes linePulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .line-1 {
+            width: 150px;
+            top: 45%;
+            left: 35%;
+            transform: rotate(-30deg);
+        }
+
+        .line-2 {
+            width: 150px;
+            top: 65%;
+            left: 35%;
+            transform: rotate(30deg);
+        }
+
+        .line-3 {
+            width: 180px;
+            top: 35%;
+            right: 25%;
+            transform: rotate(-150deg);
+        }
+
+        .line-4 {
+            width: 180px;
+            bottom: 25%;
+            right: 25%;
+            transform: rotate(-120deg);
+        }
+
+        /* 功能特性 */
+        .features {
+            padding: 4rem 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 188, 120, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 188, 120, 0.2);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1.5rem;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 系统架构 */
+        .architecture {
+            padding: 4rem 0;
+        }
+
+        .arch-diagram {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 3rem;
+            margin: 2rem 0;
+        }
+
+        .arch-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .arch-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .arch-box:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 188, 120, 0.3);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .arch-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+            font-size: 1.1rem;
+        }
+
+        .arch-items {
+            list-style: none;
+            text-align: left;
+        }
+
+        .arch-items li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        .arch-items li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+        }
+
+        /* 知识操作演示 */
+        .knowledge-operations {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .knowledge-operations::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-2);
+        }
+
+        .operation-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .operation-step {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .operation-step:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 188, 120, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 188, 120, 0.2);
+        }
+
+        .step-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1.5rem;
+            background: var(--gradient-2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+        }
+
+        .step-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* 安装指南 */
+        .install-section {
+            padding: 4rem 0;
+        }
+
+        .install-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .install-method {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .install-method:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 188, 120, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 188, 120, 0.2);
+        }
+
+        .install-method::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-2);
+        }
+
+        .method-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .method-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        /* 代码示例 */
+        .code-example {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .code-title {
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .copy-button {
+            background: rgba(0, 188, 120, 0.2);
+            border: 1px solid rgba(0, 188, 120, 0.3);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background: rgba(0, 188, 120, 0.3);
+            border-color: rgba(0, 188, 120, 0.5);
+        }
+
+        .copy-button.copied {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: var(--success-color);
+        }
+
+        pre {
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Neo4j 配置表格 */
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .config-table th,
+        .config-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .config-table th {
+            background: rgba(0, 188, 120, 0.1);
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .config-table tr:hover {
+            background: rgba(0, 188, 120, 0.05);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 3rem 0;
+            margin-top: 6rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--text-primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .operation-steps {
+                grid-template-columns: 1fr;
+            }
+
+            .arch-container {
+                grid-template-columns: 1fr;
+            }
+
+            .knowledge-node {
+                transform: scale(0.8);
+            }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 188, 120, 0.5);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 188, 120, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景动画 -->
+    <div class="bg-animation">
+        <div class="particles"></div>
+        <div class="floating-elements">
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+        </div>
+    </div>
+
+    <!-- 导航栏 -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">🕸️ Graphiti MCP Server</div>
+            <ul class="nav-links">
+                <li><a href="#demo">知识图谱</a></li>
+                <li><a href="#features">功能特性</a></li>
+                <li><a href="#architecture">系统架构</a></li>
+                <li><a href="#install">安装指南</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero 部分 -->
+    <section class="hero">
+        <div class="container">
+            <h1>Graphiti MCP Server</h1>
+            <p class="subtitle">一个强大的AI代理知识图谱服务器，使用Neo4j构建并与模型上下文协议(MCP)集成，提供智能知识管理和检索功能</p>
+        </div>
+    </section>
+
+    <!-- 知识图谱演示 -->
+    <section id="demo" class="container">
+        <div class="graph-demo">
+            <h2 style="text-align: center; margin-bottom: 3rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                AI知识图谱可视化演示
+            </h2>
+
+            <div class="graph-visualization">
+                <div class="graph-header">
+                    <div class="graph-title">Neo4j Knowledge Graph - Interactive Visualization</div>
+                    <div class="graph-controls">
+                        <div class="control-dot control-close"></div>
+                        <div class="control-dot control-minimize"></div>
+                        <div class="control-dot control-maximize"></div>
+                    </div>
+                </div>
+                <div class="graph-body">
+                    <div class="graph-canvas">
+                        <!-- 知识节点 -->
+                        <div class="knowledge-node node-person">Person</div>
+                        <div class="knowledge-node node-project">Project</div>
+                        <div class="knowledge-node node-company">Company</div>
+                        <div class="knowledge-node node-skill">Skill</div>
+                        <div class="knowledge-node node-tool">Tool</div>
+
+                        <!-- 关系连线 -->
+                        <div class="relationship-line line-1"></div>
+                        <div class="relationship-line line-2"></div>
+                        <div class="relationship-line line-3"></div>
+                        <div class="relationship-line line-4"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 知识操作流程 -->
+            <div class="knowledge-operations">
+                <h3 style="text-align: center; margin-bottom: 2rem; font-size: 1.8rem; color: var(--text-primary);">
+                    知识图谱操作流程
+                </h3>
+
+                <div class="operation-steps">
+                    <div class="operation-step">
+                        <div class="step-icon">📝</div>
+                        <div class="step-title">知识抽取</div>
+                        <div class="step-description">从文本中自动抽取实体和关系，构建知识网络</div>
+                    </div>
+
+                    <div class="operation-step">
+                        <div class="step-icon">🔗</div>
+                        <div class="step-title">关系建立</div>
+                        <div class="step-description">建立实体间的语义关系，形成结构化知识图谱</div>
+                    </div>
+
+                    <div class="operation-step">
+                        <div class="step-icon">🔍</div>
+                        <div class="step-title">智能检索</div>
+                        <div class="step-description">基于语义关系的智能知识检索和路径查询</div>
+                    </div>
+
+                    <div class="operation-step">
+                        <div class="step-icon">📊</div>
+                        <div class="step-title">分析洞察</div>
+                        <div class="step-description">知识统计分析、社区发现和趋势预测</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 功能特性 -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                核心功能特性
+            </h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
+                完整的AI知识图谱管理解决方案
+            </p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🕸️</div>
+                    <h3 class="feature-title">知识图谱构建</h3>
+                    <p class="feature-description">自动知识抽取、图谱构建、关系推理和知识融合，构建结构化知识网络</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3 class="feature-title">智能检索</h3>
+                    <p class="feature-description">语义搜索、路径查询、相似性分析和上下文检索，智能知识发现</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">可视化分析</h3>
+                    <p class="feature-description">图谱可视化、关系网络、知识统计和趋势分析，直观知识洞察</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">实时更新</h3>
+                    <p class="feature-description">增量更新、变更追踪、一致性维护和版本管理，动态知识演化</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 class="feature-title">安全与隐私</h3>
+                    <p class="feature-description">访问控制、数据加密、审计日志和隐私保护，安全知识管理</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3 class="feature-title">高性能</h3>
+                    <p class="feature-description">分布式架构、查询优化、缓存机制和并发处理，大规模知识处理</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 系统架构 -->
+    <section id="architecture" class="architecture">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                系统架构
+            </h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
+                基于Neo4j的图数据库架构设计
+            </p>
+
+            <div class="arch-diagram">
+                <div class="arch-container">
+                    <div class="arch-box">
+                        <div class="arch-title">Knowledge Engine</div>
+                        <ul class="arch-items">
+                            <li>实体识别</li>
+                            <li>关系抽取</li>
+                            <li>知识融合</li>
+                            <li>推理机制</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-box">
+                        <div class="arch-title">Query Processor</div>
+                        <ul class="arch-items">
+                            <li>查询解析</li>
+                            <li>语义理解</li>
+                            <li>结果排序</li>
+                            <li>缓存管理</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-box">
+                        <div class="arch-title">Graph Builder</div>
+                        <ul class="arch-items">
+                            <li>节点管理</li>
+                            <li>关系管理</li>
+                            <li>模式定义</li>
+                            <li>数据验证</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-box">
+                        <div class="arch-title">API Manager</div>
+                        <ul class="arch-items">
+                            <li>接口管理</li>
+                            <li>协议适配</li>
+                            <li>错误处理</li>
+                            <li>性能监控</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-box">
+                        <div class="arch-title">Neo4j Database</div>
+                        <ul class="arch-items">
+                            <li>Knowledge Graph</li>
+                            <li>Relationship Data</li>
+                            <li>Index Tables</li>
+                            <li>Cypher Query</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-box">
+                        <div class="arch-title">MCP Protocol</div>
+                        <ul class="arch-items">
+                            <li>Request Router</li>
+                            <li>Auth Manager</li>
+                            <li>Rate Limiter</li>
+                            <li>Response Handler</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 安装指南 -->
+    <section id="install" class="install-section">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                安装指南
+            </h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
+                快速部署Neo4j知识图谱服务器
+            </p>
+
+            <div class="install-methods">
+                <div class="install-method">
+                    <div class="method-title">
+                        <div class="method-icon">🐳</div>
+                        Docker Compose 部署
+                    </div>
+                    <div class="code-example">
+                        <div class="code-header">
+                            <span class="code-title">部署命令</span>
+                            <button class="copy-button" onclick="copyCode(this)">复制代码</button>
+                        </div>
+                        <pre><code># 克隆仓库
+git clone https://github.com/gifflet/graphiti-mcp-server.git
+cd graphiti-mcp-server
+
+# 启动服务（包含 Neo4j）
+docker-compose up -d
+
+# 验证安装
+curl http://localhost:8080/health</code></pre>
+                    </div>
+                </div>
+
+                <div class="install-method">
+                    <div class="method-title">
+                        <div class="method-icon">🔧</div>
+                        独立部署
+                    </div>
+                    <div class="code-example">
+                        <div class="code-header">
+                            <span class="code-title">安装命令</span>
+                            <button class="copy-button" onclick="copyCode(this)">复制代码</button>
+                        </div>
+                        <pre><code># 安装 Neo4j
+# 参考官方文档：https://neo4j.com/docs/
+
+# 克隆并构建 Graphiti
+git clone https://github.com/gifflet/graphiti-mcp-server.git
+cd graphiti-mcp-server
+
+# 安装依赖
+npm install
+
+# 配置环境变量
+cp .env.example .env
+
+# 启动服务
+npm start</code></pre>
+                    </div>
+                </div>
+
+                <div class="install-method">
+                    <div class="method-title">
+                        <div class="method-icon">⚙️</div>
+                        Neo4j 配置
+                    </div>
+                    <div class="code-example">
+                        <div class="code-header">
+                            <span class="code-title">环境变量配置</span>
+                            <button class="copy-button" onclick="copyCode(this)">复制代码</button>
+                        </div>
+                        <pre><code># .env 文件
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USER=neo4j
+NEO4J_PASSWORD=password
+NEO4J_DATABASE=neo4j
+
+GRAPHITI_SERVER_PORT=8080
+GRAPHITI_LOG_LEVEL=info
+
+REDIS_URL=redis://localhost:6379
+CACHE_TTL=3600
+
+MCP_SERVER_NAME=graphiti-mcp
+MCP_SERVER_VERSION=1.0.0</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-example" style="margin-top: 3rem;">
+                <div class="code-header">
+                    <span class="code-title">MCP 配置示例 (~/.claude/settings.json)</span>
+                    <button class="copy-button" onclick="copyCode(this)">复制代码</button>
+                </div>
+                <pre><code>{
+  "mcpServers": {
+    "graphiti": {
+      "command": "node",
+      "args": ["/path/to/graphiti-mcp-server/dist/index.js"],
+      "env": {
+        "NEO4J_URI": "bolt://localhost:7687",
+        "NEO4J_USER": "neo4j",
+        "NEO4J_PASSWORD": "password"
+      }
+    }
+  }
+}</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>项目链接</h3>
+                    <ul>
+                        <li><a href="https://github.com/gifflet/graphiti-mcp-server">GitHub仓库</a></li>
+                        <li><a href="https://github.com/gifflet/graphiti-mcp-server/issues">问题反馈</a></li>
+                        <li><a href="https://github.com/gifflet/graphiti-mcp-server/discussions">用户讨论</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>相关资源</h3>
+                    <ul>
+                        <li><a href="https://neo4j.com/docs/">Neo4j官方文档</a></li>
+                        <li><a href="https://modelcontextprotocol.io/">MCP协议规范</a></li>
+                        <li><a href="https://neo4j.com/developer/graph-database/">图数据库教程</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>使用指南</h3>
+                    <ul>
+                        <li><a href="#">快速开始</a></li>
+                        <li><a href="#">Cypher查询</a></li>
+                        <li><a href="#">知识模式设计</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 gifflet. 开源项目，采用Apache 2.0许可证。Graphiti MCP Server让AI知识管理更加智能和高效！</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 复制代码功能
+        function copyCode(button) {
+            const codeBlock = button.parentElement.parentElement.querySelector('code');
+            const text = codeBlock.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                button.textContent = '已复制';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.textContent = '复制代码';
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('复制失败:', err);
+            });
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 动态加载动画
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // 观察所有卡片
+        document.querySelectorAll('.feature-card, .operation-step, .install-method, .arch-box').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+
+        // 知识节点交互
+        document.querySelectorAll('.knowledge-node').forEach(node => {
+            node.addEventListener('mouseenter', function() {
+                // 高亮相关节点
+                this.style.zIndex = '10';
+            });
+
+            node.addEventListener('mouseleave', function() {
+                this.style.zIndex = '1';
+            });
+
+            node.addEventListener('click', function() {
+                // 模拟节点点击效果
+                this.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 300);
+            });
+        });
+
+        // 动态关系线动画
+        function animateRelationships() {
+            const lines = document.querySelectorAll('.relationship-line');
+            lines.forEach((line, index) => {
+                setTimeout(() => {
+                    line.style.opacity = '0';
+                    setTimeout(() => {
+                        line.style.opacity = '1';
+                    }, 100);
+                }, index * 200);
+            });
+        }
+
+        // 每3秒执行一次动画
+        setInterval(animateRelationships, 3000);
+
+        // 知识节点呼吸效果
+        function animateNodes() {
+            const nodes = document.querySelectorAll('.knowledge-node');
+            nodes.forEach((node, index) => {
+                const delay = index * 0.5;
+                node.style.animationDelay = `${delay}s`;
+            });
+        }
+
+        // 初始化节点动画
+        animateNodes();
+
+        // 粒子效果增强
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.style.position = 'absolute';
+            particle.style.width = Math.random() * 6 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.background = 'rgba(0, 188, 120, 0.6)';
+            particle.style.borderRadius = '50%';
+            particle.style.pointerEvents = 'none';
+
+            const startX = Math.random() * window.innerWidth;
+            const startY = Math.random() * window.innerHeight;
+
+            particle.style.left = startX + 'px';
+            particle.style.top = startY + 'px';
+
+            document.querySelector('.particles').appendChild(particle);
+
+            const duration = Math.random() * 3000 + 2000;
+            const endX = startX + (Math.random() - 0.5) * 200;
+            const endY = startY + (Math.random() - 0.5) * 200;
+
+            particle.animate([
+                { transform: `translate(0, 0) scale(1)`, opacity: 1 },
+                { transform: `translate(${endX - startX}px, ${endY - startY}px) scale(0)`, opacity: 0 }
+            ], {
+                duration: duration,
+                easing: 'ease-out'
+            }).onfinish = () => particle.remove();
+        }
+
+        // 定期创建新粒子
+        setInterval(createParticle, 500);
+
+        // 模拟知识图谱数据更新
+        function updateGraphData() {
+            const nodes = document.querySelectorAll('.knowledge-node');
+
+            // 随机改变节点状态
+            nodes.forEach(node => {
+                if (Math.random() < 0.3) {
+                    node.style.boxShadow = `0 0 20px rgba(0, 188, 120, 0.8)`;
+                    setTimeout(() => {
+                        node.style.boxShadow = '';
+                    }, 1000);
+                }
+            });
+        }
+
+        // 每5秒更新一次图谱状态
+        setInterval(updateGraphData, 5000);
+    </script>
+</body>
+</html>

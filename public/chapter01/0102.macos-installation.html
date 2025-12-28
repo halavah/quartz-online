@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code macOS 系统完整安装指南</title>
+    <meta name="description" content="Claude Code在macOS系统上的完整安装指南,包括Shell脚本安装、Homebrew安装、手动下载和npm安装">
+    <meta name="keywords" content="Claude Code,macOS安装,Homebrew,Shell脚本,npm安装,API配置">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0066ff;
+            --secondary-color: #00d4ff;
+            --accent-color: #ff6b00;
+            --dark-bg: #0a0e27;
+            --card-bg: #1a1f3a;
+            --text-color: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --border-color: #2a2f4a;
+            --success-color: #00c853;
+            --gradient-primary: linear-gradient(135deg, #0066ff 0%, #00d4ff 100%);
+            --gradient-hero: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+            --shadow-glow: 0 0 30px rgba(0, 102, 255, 0.3);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--dark-bg);
+            overflow-x: hidden;
+        }
+
+        .hero-section {
+            background: var(--gradient-hero);
+            padding: 4rem 2rem 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: flex;
+            gap: 3rem;
+            align-items: flex-start;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            min-width: 0; /* Important for flex overflow handling */
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+            color: var(--text-color);
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 20px rgba(0, 102, 255, 0.2);
+        }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            color: #58a6ff;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+        }
+
+        .list {
+            margin: 1rem 0 1rem 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .list li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .note {
+            background: rgba(0, 102, 255, 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .note strong {
+            color: var(--secondary-color);
+        }
+
+        .toc-sidebar {
+            position: sticky;
+            top: 6rem;
+            width: 280px;
+            flex-shrink: 0;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .toc-sidebar h3 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .toc-sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc-sidebar li {
+            margin: 0.5rem 0;
+        }
+
+        .toc-sidebar a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: block;
+            padding: 0.25rem 0;
+            font-size: 0.95rem;
+        }
+
+        .toc-sidebar a:hover {
+            color: var(--primary-color);
+            padding-left: 0.5rem;
+        }
+
+        .toc-sidebar a.active {
+            color: var(--primary-color);
+            font-weight: 600;
+            padding-left: 0.5rem;
+            border-left: 2px solid var(--primary-color);
+        }
+
+        /* Scrollbar styling for TOC */
+        .toc-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .toc-sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .toc-sidebar::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .toc-sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+
+        @media (max-width: 1024px) {
+            .toc-sidebar {
+                position: static;
+                width: 100%;
+                max-height: none;
+                order: -1; /* Show TOC before content on mobile */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .main-content {
+                padding: 2rem 1rem;
+            }
+        }
+
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+        }
+
+        .back-to-top:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .back-to-top.show {
+            display: flex;
+        }
+
+        .back-to-top svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .main-content {
+                padding: 2rem 1.5rem;
+                gap: 2rem;
+            }
+
+            .hero-section {
+                padding: 3rem 1.5rem 2rem;
+            }
+
+            .hero-title {
+                font-size: 2.2rem;
+            }
+
+            .toc-sidebar {
+                width: 280px;
+            }
+
+            .prerequisites-grid,
+            .feature-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+                padding: 1.5rem;
+            }
+
+            .hero-section {
+                padding: 2rem 1rem;
+            }
+
+            .hero-title {
+                font-size: 1.8rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .toc-sidebar {
+                width: 100%;
+                margin-bottom: 2rem;
+                position: static;
+                border-radius: 0.75rem;
+            }
+
+            .toc-sidebar ul {
+                columns: 1;
+            }
+
+            .install-methods,
+            .installation-cards,
+            .prerequisites-grid,
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .code-block {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .code-block code {
+                white-space: pre-wrap;
+                word-break: break-all;
+            }
+
+            .config-form {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.6rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            h3 {
+                font-size: 1.3rem;
+            }
+
+            .install-card,
+            .feature-card {
+                padding: 1.5rem;
+            }
+
+            .config-form {
+                padding: 1rem;
+            }
+
+            .feature-list li {
+                padding: 0.75rem;
+            }
+
+            .code-block {
+                padding: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Back to top button -->
+    <button class="back-to-top" id="backToTop">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 15l-6-6-6 6"/>
+        </svg>
+        <span>返回顶部</span>
+    </button>
+
+    <div class="hero-section">
+        <div class="hero-container">
+            <h1 class="hero-title">Claude Code macOS 系统完整安装指南</h1>
+            <p class="hero-subtitle">在 macOS 系统上安装 Claude Code 的完整指南，包括四种安装方式和完整的环境配置</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="content-wrapper">
+        <section id="system-requirements" class="section">
+            <h2 class="section-title">系统要求</h2>
+
+            <h3 class="section-subtitle">最低配置</h3>
+            <ul class="list">
+                <li><strong>操作系统</strong>: macOS 11.0 (Big Sur) 或更高版本</li>
+                <li><strong>处理器</strong>: Intel 芯片或 Apple Silicon (M1/M2/M3)</li>
+                <li><strong>内存</strong>: 至少 4GB RAM（推荐 8GB+）</li>
+                <li><strong>存储空间</strong>: 至少 500MB 可用空间</li>
+                <li><strong>网络</strong>: 需要互联网连接（用于 API 调用和更新）</li>
+            </ul>
+
+            <h3 class="section-subtitle">推荐配置</h3>
+            <ul class="list">
+                <li><strong>操作系统</strong>: macOS 12.0 (Monterey) 或更新版本</li>
+                <li><strong>处理器</strong>: Apple Silicon (M1/M2/M3) - 原生支持</li>
+                <li><strong>内存</strong>: 8GB+ RAM</li>
+            </ul>
+
+            <h3 class="section-subtitle">必需软件</h3>
+            <ul class="list">
+                <li><strong>Terminal</strong>: macOS 内置终端或 iTerm2</li>
+                <li><strong>curl</strong>: 用于下载安装脚本（系统自带）</li>
+                <li><strong>Homebrew</strong>: 可选，用于包管理器安装方式</li>
+                <li><strong>Node.js</strong>: 可选，用于 npm 安装方式</li>
+            </ul>
+        </section>
+
+        <section id="installation" class="section">
+            <h2 class="section-title">安装步骤</h2>
+            <p class="section-description">macOS 系统提供四种安装 Claude Code 的方式，可根据需求选择。</p>
+
+            <h3 class="section-subtitle">方式一: 使用 Shell 脚本一键安装（推荐）</h3>
+            <p class="section-description">这是最简单快捷的安装方式，适合大多数用户。</p>
+
+            <div class="card">
+                <h4>步骤 1: 打开终端</h4>
+                <ul class="list">
+                    <li>按 <code>Command + Space</code> 打开 Spotlight</li>
+                    <li>输入 "Terminal" 或 "终端" 并按回车</li>
+                    <li>或在应用程序 → 实用工具中找到"终端"</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h4>步骤 2: 执行安装命令</h4>
+                <p><strong>安装最新稳定版本</strong>:</p>
+                <div class="code-block">
+                    <code>curl -fsSL https://claude.ai/install.sh | bash</code>
+                </div>
+
+                <p><strong>安装指定版本</strong>:</p>
+                <div class="code-block">
+                    <code>curl -fsSL https://claude.ai/install.sh | bash -s 1.0.58</code>
+                </div>
+
+                <p><strong>安装最新开发版</strong>:</p>
+                <div class="code-block">
+                    <code>curl -fsSL https://claude.ai/install.sh | bash -s latest</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>步骤 3: 等待安装完成</h4>
+                <ul class="list">
+                    <li>脚本会自动检测你的系统架构（Intel x64 或 Apple Silicon ARM64）</li>
+                    <li>下载对应的二进制文件</li>
+                    <li>安装到 <code>~/.local/bin/</code> 目录</li>
+                    <li>自动配置执行权限</li>
+                </ul>
+                <div class="note">
+                    <strong>安装过程示例输出</strong>:
+                    <div class="code-block">
+                        <code>Detecting platform...<br>Platform: darwin-arm64<br>Downloading Claude Code v1.0.58...<br>Installing to /Users/username/.local/bin/<br>Claude Code installed successfully!</code>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="section-subtitle">方式二: 使用 Homebrew 安装</h3>
+            <p class="section-description">如果你习惯使用 Homebrew 管理软件包，这是最优雅的方式。</p>
+
+            <div class="card">
+                <h4>步骤 1: 安装 Homebrew（如果尚未安装）</h4>
+                <div class="code-block">
+                    <code>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>步骤 2: 使用 Homebrew 安装 Claude Code</h4>
+                <div class="code-block">
+                    <code>brew install claude-code</code>
+                </div>
+                <p class="section-description">Homebrew 会自动：</p>
+                <ul class="list">
+                    <li>下载适合你系统的版本</li>
+                    <li>安装到 <code>/opt/homebrew/bin/</code>（Apple Silicon）或 <code>/usr/local/bin/</code>（Intel）</li>
+                    <li>配置 PATH 环境变量</li>
+                </ul>
+            </div>
+
+            <h3 class="section-subtitle">方式三: 手动下载安装</h3>
+            <p class="section-description">适合需要更多控制或离线安装的场景。</p>
+
+            <div class="card">
+                <h4>步骤 1: 确定你的芯片架构</h4>
+                <div class="code-block">
+                    <code>uname -m</code>
+                </div>
+                <ul class="list">
+                    <li><strong>arm64</strong>: Apple Silicon (M1/M2/M3)</li>
+                    <li><strong>x86_64</strong>: Intel 芯片</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h4>步骤 2: 下载对应版本</h4>
+                <p>访问 GitHub Releases 页面或使用 curl 下载：</p>
+                <p><strong>Apple Silicon (M1/M2/M3)</strong>:</p>
+                <div class="code-block">
+                    <code>curl -L https://github.com/anthropics/claude-code/releases/latest/download/claude-darwin-arm64 -o claude</code>
+                </div>
+                <p><strong>Intel 芯片</strong>:</p>
+                <div class="code-block">
+                    <code>curl -L https://github.com/anthropics/claude-code/releases/latest/download/claude-darwin-x64 -o claude</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>步骤 3: 安装到本地目录</h4>
+                <div class="code-block">
+                    <code># 创建安装目录<br>mkdir -p ~/.local/bin<br><br># 移动文件<br>mv claude ~/.local/bin/<br><br># 添加执行权限<br>chmod +x ~/.local/bin/claude</code>
+                </div>
+            </div>
+
+            <h3 class="section-subtitle">方式四: 使用 Node.js/npm 安装</h3>
+            <p class="section-description">适合开发者或需要使用 npm 包管理器的场景。</p>
+
+            <div class="card">
+                <h4>步骤 1: 安装 Node.js 环境</h4>
+                <p><strong>方法一: 使用 Homebrew（推荐）</strong></p>
+                <div class="code-block">
+                    <code>brew install node</code>
+                </div>
+
+                <p><strong>方法二: 从官网下载</strong></p>
+                <ol class="list">
+                    <li>访问 <code>https://nodejs.org/</code></li>
+                    <li>下载 macOS 安装包（.pkg 文件）</li>
+                    <li>双击安装包按照向导完成安装</li>
+                </ol>
+
+                <p><strong>验证安装</strong>:</p>
+                <div class="code-block">
+                    <code>node --version<br>npm --version</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>步骤 2: 安装 Claude Code</h4>
+                <div class="code-block">
+                    <code>npm install -g @anthropic-ai/claude-code</code>
+                </div>
+                <div class="note">
+                    <strong>提示</strong>: 如果遇到权限问题，可能需要使用 <code>sudo</code>:
+                    <div class="code-block">
+                        <code>sudo npm install -g @anthropic-ai/claude-code</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>步骤 3: 验证安装</h4>
+                <div class="code-block">
+                    <code>claude --version</code>
+                </div>
+                <p class="section-description">如果显示版本号，说明安装成功。</p>
+            </div>
+        </section>
+
+        <section id="environment" class="section">
+            <h2 class="section-title">环境配置</h2>
+            <p class="section-description">安装完成后，需要配置 PATH 环境变量和 Shell 配置。</p>
+
+            <h3 class="section-subtitle">配置 PATH 环境变量</h3>
+
+            <div class="card">
+                <h4>自动配置（推荐）</h4>
+                <p class="section-description">大多数情况下，安装脚本已自动配置。验证一下：</p>
+                <div class="code-block">
+                    <code>echo $PATH | grep ".local/bin"</code>
+                </div>
+                <p class="section-description">如果有输出，说明已配置成功。</p>
+            </div>
+
+            <div class="card">
+                <h4>手动配置 - Bash 用户</h4>
+                <p class="section-description">编辑 <code>~/.bash_profile</code> 或 <code>~/.bashrc</code>：</p>
+                <div class="code-block">
+                    <code>nano ~/.bash_profile</code>
+                </div>
+                <p>在文件末尾添加：</p>
+                <div class="code-block">
+                    <code># 添加 Claude Code 到 PATH<br>export PATH="$HOME/.local/bin:$PATH"</code>
+                </div>
+                <p>保存并使配置生效：</p>
+                <div class="code-block">
+                    <code>source ~/.bash_profile</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>手动配置 - Zsh 用户（macOS 默认）</h4>
+                <p class="section-description">编辑 <code>~/.zshrc</code>：</p>
+                <div class="code-block">
+                    <code>nano ~/.zshrc</code>
+                </div>
+                <p>在文件末尾添加：</p>
+                <div class="code-block">
+                    <code># 添加 Claude Code 到 PATH<br>export PATH="$HOME/.local/bin:$PATH"</code>
+                </div>
+                <p>保存并使配置生���：</p>
+                <div class="code-block">
+                    <code>source ~/.zshrc</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>验证配置</h4>
+                <div class="code-block">
+                    <code># 检查 PATH<br>echo $PATH<br><br># 检查 claude 命令位置<br>which claude</code>
+                </div>
+                <p><strong>预期输出</strong>:</p>
+                <div class="code-block">
+                    <code>/Users/username/.local/bin/claude</code>
+                </div>
+            </div>
+        </section>
+
+        <section id="api-config" class="section">
+            <h2 class="section-title">API 配置</h2>
+            <p class="section-description">Claude Code 需要 Anthropic API Key 才能正常工作。</p>
+
+            <h3 class="section-subtitle">获取 API Key</h3>
+
+            <div class="card">
+                <h4>官方 API</h4>
+                <ol class="list">
+                    <li>访问 <code>https://console.anthropic.com/</code></li>
+                    <li>登录或注册账号</li>
+                    <li>进入 "API Keys" 页面</li>
+                    <li>点击 "Create Key" 创建新的 API 密钥</li>
+                    <li>复制生成的密钥（格式: <code>sk-ant-api03-...</code>）</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h4>中转 API（国内推荐）</h4>
+                <p class="section-description">如果你在中国大陆，可以使用中转服务：</p>
+                <ul class="list">
+                    <li>访问中转服务商网站（如 https://api.nekoapi.com/）</li>
+                    <li>注册账号并充值</li>
+                    <li>获取中转 API Key 和 Base URL</li>
+                </ul>
+            </div>
+
+            <h3 class="section-subtitle">配置 API 环境变量</h3>
+
+            <div class="card">
+                <h4>Bash 用户配置</h4>
+                <p>编辑 <code>~/.bash_profile</code>：</p>
+                <div class="code-block">
+                    <code>nano ~/.bash_profile</code>
+                </div>
+                <p>添加以下内容：</p>
+                <div class="code-block">
+                    <code># Claude Code API 配置<br>export ANTHROPIC_API_KEY="sk-ant-api03-你的密钥"<br><br># 如果使用中转服务<br>export ANTHROPIC_BASE_URL="https://api.claudecode.net.cn/api/claudecode"<br><br># Auth Token（与 API Key 相同）<br>export ANTHROPIC_AUTH_TOKEN="sk-ant-api03-你的密钥"</code>
+                </div>
+                <p>保存并使配置生效：</p>
+                <div class="code-block">
+                    <code>source ~/.bash_profile</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>Zsh 用户配置（macOS 默认）</h4>
+                <p>编辑 <code>~/.zshrc</code>：</p>
+                <div class="code-block">
+                    <code>nano ~/.zshrc</code>
+                </div>
+                <p>添加以下内容：</p>
+                <div class="code-block">
+                    <code># Claude Code API 配置<br>export ANTHROPIC_API_KEY="sk-ant-api03-你的密钥"<br><br># 如果使用中转服务<br>export ANTHROPIC_BASE_URL="https://api.claudecode.net.cn/api/claudecode"<br><br># Auth Token（与 API Key 相同）<br>export ANTHROPIC_AUTH_TOKEN="sk-ant-api03-你的密钥"</code>
+                </div>
+                <p>保存并使配置生效：</p>
+                <div class="code-block">
+                    <code>source ~/.zshrc</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>验证配置</h4>
+                <div class="code-block">
+                    <code>echo $ANTHROPIC_API_KEY<br>echo $ANTHROPIC_BASE_URL<br>echo $ANTHROPIC_AUTH_TOKEN</code>
+                </div>
+                <p class="section-description">应该显示你配置的值。</p>
+            </div>
+        </section>
+
+        <section id="verification" class="section">
+            <h2 class="section-title">验证安装</h2>
+            <p class="section-description">配置完成后，验证 Claude Code 是否正常工作。</p>
+
+            <div class="card">
+                <h4>步骤 1: 打开新的终端</h4>
+                <p class="section-description"><strong>重要</strong>：必须打开新的终端窗口或重新加载配置，让环境变量生效。</p>
+                <div class="code-block">
+                    <code># Bash<br>source ~/.bash_profile<br><br># Zsh<br>source ~/.zshrc</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>步骤 2: 检查版本</h4>
+                <div class="code-block">
+                    <code>claude --version</code>
+                </div>
+                <p><strong>预期输出</strong>:</p>
+                <div class="code-block">
+                    <code>Claude Code v1.0.58</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>步骤 3: 检查安装位置</h4>
+                <div class="code-block">
+                    <code>which claude</code>
+                </div>
+                <p><strong>预期输出</strong>:</p>
+                <div class="code-block">
+                    <code>/Users/username/.local/bin/claude</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>步骤 4: 系统诊断</h4>
+                <div class="code-block">
+                    <code>claude doctor</code>
+                </div>
+                <p class="section-description">此命令会检查：</p>
+                <ul class="list">
+                    <li>Claude Code 版本</li>
+                    <li>安装类型（原生 vs npm）</li>
+                    <li>API 配置状态</li>
+                    <li>网络连接</li>
+                    <li>系统架构</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h4>步骤 5: 测试运行</h4>
+                <div class="code-block">
+                    <code>claude "你好，Claude！"</code>
+                </div>
+                <p class="section-description">如果一切正常，Claude 会回复你的问候，说明安装和配置都成功了。</p>
+            </div>
+        </section>
+
+        <section id="troubleshooting" class="section">
+            <h2 class="section-title">常见问题</h2>
+
+            <div class="card">
+                <h4>Q1: 提示 "command not found: claude"</h4>
+                <p><strong>原因</strong>：PATH 环境变量未正确配置。</p>
+                <p><strong>解决方法</strong>：</p>
+                <ol class="list">
+                    <li>检查 PATH：<code>echo $PATH | grep ".local/bin"</code></li>
+                    <li>如果没有输出，重新配置 Shell 配置文件</li>
+                    <li>确保重新加载配置：<code>source ~/.zshrc</code> 或 <code>source ~/.bash_profile</code></li>
+                    <li>验证安装位置：<code>ls -la ~/.local/bin/claude</code></li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h4>Q2: macOS 提示 "无法打开，因为无法验证开发者"</h4>
+                <p><strong>原因</strong>：macOS Gatekeeper 安全机制阻止未签名应用。</p>
+                <p><strong>解决方法</strong>：</p>
+                <ol class="list">
+                    <li>右键点击 <code>claude</code> 文件，选择"打开"</li>
+                    <li>或在终端中运行：<code>xattr -d com.apple.quarantine ~/.local/bin/claude</code></li>
+                    <li>或在"系统偏好设置" → "安全性与隐私" → "通用"中点击"仍要打开"</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h4>Q3: Apple Silicon (M1/M2/M3) 性能问题</h4>
+                <p><strong>症状</strong>：运行缓慢或需要 Rosetta 转译。</p>
+                <p><strong>解决方法</strong>：</p>
+                <ol class="list">
+                    <li>确认下载了 ARM64 版本：<code>file ~/.local/bin/claude</code></li>
+                    <li>应该显示 <code>Mach-O 64-bit executable arm64</code></li>
+                    <li>如果是 x86_64，重新下载 ARM64 版本</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h4>Q4: Homebrew 安装路径问题</h4>
+                <p><strong>症状</strong>：Homebrew 安装后找不到命令。</p>
+                <p><strong>解决方法</strong>：</p>
+                <ul class="list">
+                    <li><strong>Apple Silicon</strong>：确保 <code>/opt/homebrew/bin</code> 在 PATH 中</li>
+                    <li><strong>Intel</strong>：确保 <code>/usr/local/bin</code> 在 PATH 中</li>
+                </ul>
+                <div class="code-block">
+                    <code># Apple Silicon<br>echo 'export PATH="/opt/homebrew/bin:$PATH"' >> ~/.zshrc<br><br># Intel<br>echo 'export PATH="/usr/local/bin:$PATH"' >> ~/.zshrc</code>
+                </div>
+            </div>
+        </section>
+
+        <section id="advanced" class="section">
+            <h2 class="section-title">进阶配置</h2>
+
+            <div class="card">
+                <h4>Shell 别名配置</h4>
+                <p>编辑 <code>~/.zshrc</code> 或 <code>~/.bash_profile</code> 添加别名：</p>
+                <div class="code-block">
+                    <code># Claude Code 别名<br>alias cc='claude'<br>alias ccd='claude doctor'<br>alias ccu='claude update'<br><br># 快速提问函数<br>ask() {<br>  claude "$@"<br>}</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>自动补全</h4>
+                <p><strong>Zsh 自动补全</strong>:</p>
+                <div class="code-block">
+                    <code># 生成补全脚本<br>claude --zsh-completion > ~/.claude-completion.zsh<br><br># 加载补全<br>echo 'source ~/.claude-completion.zsh' >> ~/.zshrc<br>source ~/.zshrc</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>更新 Claude Code</h4>
+                <p><strong>原生安装更新</strong>:</p>
+                <div class="code-block">
+                    <code>claude update</code>
+                </div>
+                <p><strong>Homebrew 更新</strong>:</p>
+                <div class="code-block">
+                    <code>brew upgrade claude-code</code>
+                </div>
+                <p><strong>npm 更新</strong>:</p>
+                <div class="code-block">
+                    <code>npm update -g @anthropic-ai/claude-code</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>卸载 Claude Code</h4>
+                <p><strong>原生/手动安装卸载</strong>:</p>
+                <div class="code-block">
+                    <code># 删除二进制文件<br>rm ~/.local/bin/claude<br><br># 删除配置文件（可选）<br>rm -rf ~/.claude<br><br># 删除缓存（可选）<br>rm -rf ~/.cache/claude</code>
+                </div>
+                <p><strong>Homebrew 卸载</strong>:</p>
+                <div class="code-block">
+                    <code>brew uninstall claude-code</code>
+                </div>
+                <p><strong>npm 卸载</strong>:</p>
+                <div class="code-block">
+                    <code>npm uninstall -g @anthropic-ai/claude-code</code>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">总结</h2>
+            <p class="section-description">完成上述步骤后，你已经在 macOS 系统上成功安装并配置了 Claude Code。</p>
+
+            <div class="card">
+                <h4>快速命令参考</h4>
+                <div class="code-block">
+                    <code>claude                    # 启动交互式会话<br>claude "帮我写一个脚本"   # 直接提问<br>claude --version          # 查看版本<br>claude doctor             # 系统诊断<br>claude update             # 更新 Claude Code<br>claude --help             # 查看帮助<br>which claude              # 查看安装位置</code>
+                </div>
+            </div>
+
+            <div class="note">
+                <strong>macOS 特有优势</strong>:
+                <ul class="list">
+                    <li><strong>原生 Unix 环境</strong>：完美的命令行体验</li>
+                    <li><strong>Apple Silicon 优化</strong>：原生支持 M1/M2/M3 芯片</li>
+                    <li><strong>Homebrew 生态</strong>：优雅的包管理</li>
+                    <li><strong>Terminal 原生支持</strong>：无需额外配置</li>
+                </ul>
+            </div>
+
+            <div class="note">
+                <strong>下一步建议</strong>:
+                <ul class="list">
+                    <li>阅读官方文档了解更多功能</li>
+                    <li>在实际项目中使用 Claude Code</li>
+                    <li>配置 Shell 别名提高效率</li>
+                    <li>探索与 macOS 开发工具的集成</li>
+                </ul>
+            </div>
+        </section>
+        </div>
+        <aside class="toc-sidebar">
+            <h3>📋 目录</h3>
+            <ul>
+                <li><a href="#system-requirements">系统要求</a></li>
+                <li><a href="#installation">安装步骤</a></li>
+                <li><a href="#environment">环境配置</a></li>
+                <li><a href="#api-config">API 配置</a></li>
+                <li><a href="#verification">验证安装</a></li>
+                <li><a href="#troubleshooting">常见问题</a></li>
+                <li><a href="#advanced">进阶配置</a></li>
+            </ul>
+        </aside>
+    </div>
+
+    <footer style="border-top: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); margin-top: 5rem;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 2rem; text-align: center;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                <!-- 版权信息 -->
+                <div style="font-size: 0.875rem; color: var(--text-secondary);" id="copyright-text"></div>
+                <!-- 备案号 -->
+                <div style="font-size: 0.875rem; color: #6b7280;" id="beian-number"></div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // Load config from articles.json
+    fetch('/data/articles.json')
+        .then(response => response.json())
+        .then(data => {
+            const { beianNumber, copyrightText } = data.config;
+
+            document.getElementById('copyright-text').textContent = copyrightText || '© 2025 Halavah\'s Tech. All rights reserved.';
+            if (beianNumber) {
+                document.getElementById('beian-number').textContent = beianNumber;
+            }
+        })
+        .catch(error => console.error('Failed to load config:', error));
+    </script>
+
+    <script>
+    // Smooth scroll and active link tracking
+    document.querySelectorAll('.toc-sidebar a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    // Highlight active section
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                document.querySelectorAll('.toc-sidebar a').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${entry.target.id}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+    }, { rootMargin: '-100px 0px -80% 0px' });
+
+    document.querySelectorAll('section[id]').forEach(section => {
+        observer.observe(section);
+    });
+
+    // Back to top button functionality
+    const backToTop = document.getElementById('backToTop');
+
+    // Show/hide button based on scroll position
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            backToTop.classList.add('show');
+        } else {
+            backToTop.classList.remove('show');
+        }
+    });
+
+    // Smooth scroll to top when button is clicked
+    backToTop.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+    </script>
+</body>
+</html>

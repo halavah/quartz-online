@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crush - 终端AI编程代理工具 | Charmbracelet开发的多AI路由工具</title>
+    <meta name="description" content="Crush 是Charm公司开发的终端AI编程代理，支持多AI提供商路由、自定义API端点、OpenRouter集成，提供强大的代码生成和编程辅助功能">
+    <meta name="keywords" content="Crush,Charmbracelet,AI编程,终端工具,API路由,代码生成,OpenRouter,多AI提供商">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}:root{--primary-color:#7b2cbf;--primary-dark:#6a1b9a;--secondary-color:#c77dff;--accent-color:#f72585;--success-color:#10b981;--background-color:#0f0f1a;--surface-color:#1a1a2e;--surface-light:#252542;--text-color:#e2e8f0;--text-muted:#94a3b8;--border-color:#334155;--gradient-primary:linear-gradient(135deg,#7b2cbf 0%,#c77dff 100%);--gradient-hero:linear-gradient(135deg,#1a1a2e 0%,#0f0f1a 50%,#1e1b4b 100%);--gradient-accent:linear-gradient(135deg,#f72585 0%,#ff006e 100%);--glow-primary:0 0 40px rgba(123,44,191,0.3);--glow-secondary:0 0 40px rgba(199,125,255,0.2);--glow-accent:0 0 40px rgba(247,37,133,0.3)}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;line-height:1.7;color:var(--text-color);background:var(--background-color);overflow-x:hidden}.container{width:100%;max-width:1200px;margin:0 auto;padding:0 1.5rem}.hero-section{position:relative;min-height:100vh;display:flex;align-items:center;background:var(--gradient-hero);overflow:hidden}.hero-section::before{content:"";position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 20% 80%,rgba(123,44,191,0.15) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(199,125,255,0.1) 0%,transparent 50%),radial-gradient(circle at 50% 50%,rgba(247,37,133,0.05) 0%,transparent 50%);pointer-events:none}.particles{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;pointer-events:none}.particle{position:absolute;width:4px;height:4px;background:var(--primary-color);border-radius:50%;opacity:0.3;animation:float 15s infinite ease-in-out}.particle:nth-child(2){left:20%;animation-delay:-2s;background:var(--secondary-color)}.particle:nth-child(3){left:40%;animation-delay:-4s}.particle:nth-child(4){left:60%;animation-delay:-6s;background:var(--accent-color)}.particle:nth-child(5){left:80%;animation-delay:-8s;background:var(--secondary-color)}.particle:nth-child(6){left:10%;animation-delay:-10s}.particle:nth-child(7){left:70%;animation-delay:-12s;background:var(--accent-color)}.particle:nth-child(8){left:90%;animation-delay:-14s}@keyframes float{0%,100%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:0.3}90%{opacity:0.3}100%{transform:translateY(-100vh) scale(1);opacity:0}}.hero-container{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;padding:2rem 0}.hero-content{animation:fadeInUp 0.8s ease-out}@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}.hero-badge{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(123,44,191,0.1);border:1px solid rgba(123,44,191,0.3);padding:0.5rem 1rem;border-radius:50px;font-size:0.875rem;color:var(--primary-color);margin-bottom:1.5rem}.hero-badge::before{content:"";width:8px;height:8px;background:var(--primary-color);border-radius:50%;animation:pulse 2s infinite}@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.2)}}.hero-title{font-size:3.5rem;font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.hero-subtitle{font-size:1.25rem;color:var(--text-muted);margin-bottom:2rem;max-width:500px}.hero-stats{display:flex;gap:2rem;margin-bottom:2rem}.stat-item{text-align:center}.stat-number{display:block;font-size:1.5rem;font-weight:700;color:var(--text-color)}.stat-label{font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em}.hero-actions{display:flex;gap:1rem;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.875rem 1.75rem;border:none;border-radius:12px;font-weight:600;font-size:1rem;text-decoration:none;cursor:pointer;transition:all 0.3s ease}.btn-primary{background:var(--gradient-primary);color:white;box-shadow:var(--glow-primary)}.btn-primary:hover{transform:translateY(-3px);box-shadow:0 10px 40px rgba(123,44,191,0.4)}.btn-secondary{background:var(--surface-light);color:var(--text-color);border:1px solid var(--border-color)}.btn-secondary:hover{background:var(--surface-color);border-color:var(--primary-color);transform:translateY(-3px)}.hero-visual{position:relative;display:flex;justify-content:center;align-items:center;animation:fadeInUp 0.8s ease-out 0.2s both}.terminal-diagram{position:relative;width:100%;max-width:450px;aspect-ratio:1}.terminal-window{position:absolute;width:100%;height:100%;background:var(--surface-light);border-radius:15px;border:1px solid var(--border-color);overflow:hidden}.terminal-header{height:30px;background:var(--surface-color);border-bottom:1px solid var(--border-color);display:flex;align-items:center;padding:0 1rem}.terminal-controls{display:flex;gap:8px}.terminal-dot{width:12px;height:12px;border-radius:50%;background:var(--text-muted)}.terminal-dot.red{background:var(--accent-color)}.terminal-dot.yellow{background:var(--secondary-color)}.terminal-dot.green{background:var(--success-color)}.terminal-title{flex:1;text-align:center;font-size:0.75rem;color:var(--text-muted)}.terminal-content{padding:1.5rem;font-family:"Fira Code","Monaco","Consolas",monospace;font-size:0.75rem;line-height:1.5;color:var(--text-muted);height:calc(100% - 30px);overflow-y:auto}.terminal-line{display:flex;gap:0.5rem;margin-bottom:0.25rem}.terminal-prompt{color:var(--primary-color)}.terminal-command{color:var(--text-color)}.terminal-output{color:var(--secondary-color)}.terminal-cursor{width:8px;height:1.5px;background:var(--text-color);animation:blink 1s infinite}@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}.main-content{position:relative;z-index:1}section{padding:5rem 0}.section-header{text-align:center;margin-bottom:4rem}.section-badge{display:inline-block;background:rgba(123,44,191,0.1);border:1px solid rgba(123,44,191,0.3);padding:0.375rem 1rem;border-radius:50px;font-size:0.75rem;color:var(--primary-color);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem}.section-title{font-size:2.5rem;font-weight:700;margin-bottom:1rem;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.section-subtitle{font-size:1.125rem;color:var(--text-muted);max-width:600px;margin:0 auto}.overview-section{background:linear-gradient(180deg,var(--background-color) 0%,var(--surface-color) 100%)}.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}.overview-content h3{font-size:1.75rem;margin-bottom:1rem;color:var(--text-color)}.overview-content p{color:var(--text-muted);margin-bottom:1.5rem}.overview-list{list-style:none}.overview-list li{display:flex;align-items:flex-start;gap:0.75rem;margin-bottom:1rem;color:var(--text-muted)}.overview-list li::before{content:"✓";color:var(--secondary-color);font-weight:bold}.architecture-diagram{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.arch-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;align-items:center}.arch-node{padding:1rem;background:var(--surface-color);border:2px solid var(--border-color);border-radius:10px;text-align:center;font-weight:600;color:var(--text-color);transition:all 0.3s ease;min-height:80px;display:flex;align-items:center;justify-content:center}.arch-node:hover{border-color:var(--primary-color);transform:scale(1.05)}.arch-arrow{text-align:center;font-size:1.5rem;color:var(--primary-color)}.features-section{background:var(--surface-color)}.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}.feature-card{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color);position:relative;overflow:hidden}.feature-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--gradient-primary);transform:scaleX(0);transition:transform 0.3s ease}.feature-card:hover{transform:translateY(-5px);border-color:var(--primary-color);box-shadow:var(--glow-primary)}.feature-card:hover::before{transform:scaleX(1)}.feature-icon{width:60px;height:60px;background:rgba(123,44,191,0.1);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.75rem;margin-bottom:1.5rem}.feature-title{font-size:1.25rem;font-weight:600;margin-bottom:0.75rem;color:var(--text-color)}.feature-description{color:var(--text-muted);font-size:0.95rem}.installation-section{background:var(--background-color)}.install-tabs{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.tab-buttons{display:flex;gap:0.5rem;margin-bottom:2rem;background:var(--surface-color);padding:0.5rem;border-radius:12px}.tab-btn{flex:1;padding:0.875rem 1.5rem;border:none;background:transparent;color:var(--text-muted);font-weight:600;border-radius:8px;cursor:pointer;transition:all 0.3s ease}.tab-btn.active{background:var(--gradient-primary);color:white}.tab-btn:hover:not(.active){color:var(--text-color);background:rgba(123,44,191,0.1)}.tab-content{display:none}.tab-content.active{display:block;animation:fadeIn 0.3s ease}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.install-step{margin-bottom:1.5rem}.install-step:last-child{margin-bottom:0}.install-step h4{color:var(--text-color);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem}.step-number{width:28px;height:28px;background:var(--gradient-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-weight:700}.code-block{position:relative;background:#0d1117;border-radius:12px;overflow:hidden;border:1px solid var(--border-color)}.code-header{display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;background:#161b22;border-bottom:1px solid var(--border-color)}.code-lang{font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em}.copy-btn{background:var(--primary-color);color:white;border:none;padding:0.375rem 0.75rem;border-radius:6px;font-size:0.75rem;cursor:pointer;transition:all 0.2s ease}.copy-btn:hover{background:var(--primary-dark)}.code-content{padding:1rem;overflow-x:auto}.code-content pre{margin:0;font-family:"Fira Code","Monaco","Consolas",monospace;font-size:0.875rem;line-height:1.6}.code-content code{color:#e6edf3}.usage-section{background:linear-gradient(180deg,var(--surface-color) 0%,var(--background-color) 100%)}.usage-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.usage-features{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.usage-features h3{font-size:1.5rem;margin-bottom:1.5rem;color:var(--text-color)}.usage-item{display:flex;align-items:flex-start;gap:1rem;padding:1rem;background:var(--surface-color);border-radius:12px;margin-bottom:0.75rem;border:1px solid var(--border-color);transition:all 0.3s ease}.usage-item:hover{border-color:var(--primary-color);transform:translateX(5px)}.usage-item:last-child{margin-bottom:0}.usage-icon{width:36px;height:36px;background:rgba(199,125,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.usage-item-title{font-weight:600;color:var(--text-color);margin-bottom:0.25rem;font-size:0.95rem}.usage-item-desc{font-size:0.85rem;color:var(--text-muted)}.usage-examples{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.usage-examples h3{font-size:1.5rem;margin-bottom:1.5rem;color:var(--text-color)}.config-example{background:var(--surface-color);border-radius:10px;padding:1rem;margin-bottom:1rem;font-family:"Fira Code",monospace;font-size:0.875rem;color:var(--text-color)}.routing-section{background:var(--surface-color)}.routing-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem}.routing-features{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.routing-features h3{font-size:1.5rem;margin-bottom:1.5rem;color:var(--text-color)}.routing-diagram{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.router-flow{display:flex;flex-direction:column;gap:1rem}.router-step{display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--surface-color);border-radius:12px;border:1px solid var(--border-color);transition:all 0.3s ease}.router-step:hover{border-color:var(--primary-color);transform:translateX(5px)}.router-icon{width:40px;height:40px;background:var(--gradient-primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;color:white}.router-content{flex:1}.router-title{font-weight:600;color:var(--text-color);margin-bottom:0.25rem}.router-desc{font-size:0.875rem;color:var(--text-muted)}.troubleshooting-section{background:var(--background-color)}.troubleshooting-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem}.trouble-card{background:var(--surface-light);border-radius:16px;padding:1.5rem;border:1px solid var(--border-color)}.trouble-title{font-size:1.1rem;font-weight:600;color:var(--text-color);margin-bottom:1rem}.trouble-content{color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem}.trouble-solution{background:var(--surface-color);border-radius:8px;padding:0.75rem;border-left:3px solid var(--accent-color)}.changelog-section{background:linear-gradient(180deg,var(--background-color) 0%,var(--surface-color) 100%)}.changelog-timeline{max-width:800px;margin:0 auto}.changelog-item{display:flex;gap:1rem;padding-bottom:2rem;border-bottom:1px solid var(--border-color);margin-bottom:2rem}.changelog-item:last-child{border-bottom:none}.changelog-version{flex-shrink:0;width:120px;padding:0.5rem 1rem;background:var(--gradient-primary);color:white;border-radius:20px;font-weight:600;text-align:center}.changelog-content{flex:1}.changelog-title{font-size:1.1rem;font-weight:600;color:var(--text-color);margin-bottom:0.5rem}.changelog-features{list-style:none}.changelog-features li{display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.25rem;color:var(--text-muted);font-size:0.9rem}.footer{background:var(--surface-color);padding:3rem 0;border-top:1px solid var(--border-color)}.footer-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}.footer-info{color:var(--text-muted);font-size:0.9rem}.footer-info a{color:var(--primary-color);text-decoration:none}.footer-info a:hover{text-decoration:underline}.footer-stats{color:var(--text-muted);font-size:0.875rem}.footer-links a:hover{color:var(--primary-color)}@media (max-width:1024px){.hero-container{grid-template-columns:1fr;text-align:center}.hero-subtitle{margin:0 auto 2rem}.hero-stats{justify-content:center}.hero-actions{justify-content:center}.hero-visual{order:-1}.terminal-diagram{max-width:300px}.features-grid{grid-template-columns:repeat(2,1fr)}.overview-grid,.usage-grid,.routing-grid{grid-template-columns:1fr}.troubleshooting-grid{grid-template-columns:1fr}}@media (max-width:768px){.hero-title{font-size:2.5rem}.section-title{font-size:2rem}.features-grid{grid-template-columns:1fr}.tab-buttons{flex-direction:column}.arch-flow{grid-template-columns:1fr}}@media (max-width:480px){.hero-title{font-size:2rem}.hero-stats{flex-wrap:wrap;gap:1rem}.btn{width:100%;justify-content:center}section{padding:3rem 0}}
+    </style>
+</head>
+<body>
+    <header class="hero-section">
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+        <div class="container">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="hero-badge">终端AI编程代理</div>
+                    <h1 class="hero-title">Crush</h1>
+                    <p class="hero-subtitle">Charm公司开发的终端AI编程代理，集成工具、代码和工作流，支持多AI提供商路由、自定义API端点，为开发者提供强大的编程辅助体验</p>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">v2.1</span>
+                            <span class="stat-label">版本</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">Go</span>
+                            <span class="stat-label">语言</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">MIT</span>
+                            <span class="stat-label">许可证</span>
+                        </div>
+                    </div>
+                    <div class="hero-actions">
+                        <a href="https://github.com/charmbracelet/crush" target="_blank" class="btn btn-primary">
+                            <span>查看源码</span>
+                        </a>
+                        <a href="#installation" class="btn btn-secondary">
+                            <span>快速开始</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="terminal-diagram">
+                        <div class="terminal-window">
+                            <div class="terminal-header">
+                                <div class="terminal-controls">
+                                    <div class="terminal-dot red"></div>
+                                    <div class="terminal-dot yellow"></div>
+                                    <div class="terminal-dot green"></div>
+                                </div>
+                                <div class="terminal-title">crush</div>
+                            </div>
+                            <div class="terminal-content">
+                                <div class="terminal-line">
+                                    <span class="terminal-prompt">$</span>
+                                    <span class="terminal-command">crush --provider "openrouter:anthropic/claude-3-opus:nitro" "快速生成排序算法"</span>
+                                </div>
+                                <div class="terminal-line">
+                                    <span class="terminal-prompt">></span>
+                                    <span class="terminal-output">分析任务类型: 代码生成</span>
+                                </div>
+                                <div class="terminal-line">
+                                    <span class="terminal-prompt">></span>
+                                    <span class="terminal-output">选择最优提供商: OpenRouter Anthropic Claude 3 Opus (nitro)</span>
+                                </div>
+                                <div class="terminal-line">
+                                    <span class="terminal-prompt">></span>
+                                    <span class="terminal-output">正在生成代码...</span>
+                                </div>
+                                <div class="terminal-line">
+                                    <span class="terminal-prompt">></span>
+                                    <span class="terminal-output">✓ 代码生成完成</span>
+                                    <span class="terminal-cursor"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="overview-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">项目概述</span>
+                    <h2 class="section-title">什么是 Crush？</h2>
+                    <p class="section-subtitle">Charm公司开发的终端AI编程代理，多AI提供商智能路由系统</p>
+                </div>
+                <div class="overview-grid">
+                    <div class="overview-content">
+                        <h3>智能编程代理</h3>
+                        <p>Crush 是 Charm 公司开发的一款终端 AI 编程代理工具，旨在为开发者提供一个强大、灵活的 AI 编程助手。它集成了多个 AI 提供商，支持智能路由、自定义 API 端点，并通过优雅的终端界面提供无缝的编程体验。</p>
+                        <ul class="overview-list">
+                            <li>统一接口访问多个AI编程助手</li>
+                            <li>智能路由自动选择最适合的模型</li>
+                            <li>完美融入终端工作流</li>
+                            <li>高性能和响应速度优化</li>
+                            <li>支持自定义插件和扩展</li>
+                            <li>Charm设计哲学：简洁优雅、功能强大</li>
+                        </ul>
+                    </div>
+                    <div class="architecture-diagram">
+                        <h3 style="text-align:center;color:var(--text-color);margin-bottom:1.5rem;">技术架构</h3>
+                        <div class="arch-flow">
+                            <div class="arch-node">Terminal<br>Interface</div>
+                            <div class="arch-arrow">↓</div>
+                            <div class="arch-node">Core Engine<br>(Go)</div>
+                            <div class="arch-arrow">↓</div>
+                            <div class="arch-node">Router Module</div>
+                        </div>
+                        <div class="arch-flow" style="margin-top:1rem;">
+                            <div style="grid-column:2;text-align:center;">
+                                <div style="font-size:0.75rem;color:var(--text-muted);">↓</div>
+                                <div style="font-size:0.75rem;color:var(--text-muted);">Provider Manager • Context Manager • Plugin System</div>
+                            </div>
+                        </div>
+                        <div class="arch-flow" style="margin-top:1rem;">
+                            <div style="grid-column:2;">
+                                <div class="arch-node">AI Providers</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">核心功能</span>
+                    <h2 class="section-title">功能特性</h2>
+                    <p class="section-subtitle">全面的AI编程辅助功能，提升开发效率</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <h3 class="feature-title">多AI提供商支持</h3>
+                        <p class="feature-description">支持OpenAI、Anthropic、OpenRouter等主流AI提供商，以及自定义API端点和本地模型</p>
+                        <ul class="feature-list">
+                            <li>OpenAI GPT-4、GPT-3.5等模型</li>
+                            <li>Anthropic Claude系列模型</li>
+                            <li>OpenRouter平台所有模型</li>
+                            <li>自定义兼容OpenAI API服务</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🛣️</div>
+                        <h3 class="feature-title">智能API路由</h3>
+                        <p class="feature-description">自动选择最适合的AI提供商和模型，支持成本优化和性能优化策略</p>
+                        <ul class="feature-list">
+                            <li>根据任务类型自动选择模型</li>
+                            <li>成本优化：路由到最便宜提供商</li>
+                            <li>性能优化：路由到最快提供商</li>
+                            <li>智能负载均衡和故障转移</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💻</div>
+                        <h3 class="feature-title">终端用户体验</h3>
+                        <p class="feature-description">美观的终端用户界面，支持TUI和CLI模式，自然语言交互体验</p>
+                        <ul class="feature-list">
+                            <li>Bubble Tea TUI框架</li>
+                            <li>CLI纯命令行模式</li>
+                            <li>语法高亮显示</li>
+                            <li>丰富的快捷键支持</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔧</div>
+                        <h3 class="feature-title">开发者工具集成</h3>
+                        <p class="feature-description">深度集成Git、文件操作、代码分析等开发工具</p>
+                        <ul class="feature-list">
+                            <li>Git工作流深度集成</li>
+                            <li>直接的文件读写和编辑</li>
+                            <li>智能代码理解和分析</li>
+                            <li>自动生成单元测试和文档</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3 class="feature-title">高级功能</h3>
+                        <p class="feature-description">多文件处理、项目管理、代码重构等高级编程功能</p>
+                        <ul class="feature-list">
+                            <li>同时处理多个文件</li>
+                            <li>项目级别上下文理解</li>
+                            <li>智能代码重构建议</li>
+                            <li>性能优化和安全性检查</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <h3 class="feature-title">可定制性</h3>
+                        <p class="feature-description">支持主题、配置、插件和脚本的自定义</p>
+                        <ul class="feature-list">
+                            <li>多种终端主题支持</li>
+                            <li>灵活的配置选项</li>
+                            <li>可扩展的插件系统</li>
+                            <li>开放的API接口</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="installation-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">安装指南</span>
+                    <h2 class="section-title">快速开始</h2>
+                    <p class="section-subtitle">多种安装方式，支持主流操作系统</p>
+                </div>
+                <div class="install-tabs">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" onclick="switchTab(event, 'binary-install')">二进制安装</button>
+                        <button class="tab-btn" onclick="switchTab(event, 'homebrew')">Homebrew</button>
+                        <button class="tab-btn" onclick="switchTab(event, 'source-build')">源码编译</button>
+                    </div>
+                    <div id="binary-install" class="tab-content active">
+                        <div class="install-step">
+                            <h4><span class="step-number">1</span> Linux/macOS 安装</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># 下载最新版本
+curl -L https://github.com/charmbracelet/crush/releases/latest/download/crush-linux-amd64.tar.gz | tar xz
+
+# 移动到系统路径
+sudo mv crush /usr/local/bin/
+
+# 验证安装
+crush --version</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="install-step">
+                            <h4><span class="step-number">2</span> Windows WSL 安装</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># 在WSL环境中
+wget https://github.com/charmbracelet/crush/releases/latest/download/crush-linux-amd64.tar.gz
+tar -xzf crush-linux-amd64.tar.gz
+sudo mv crush /usr/local/bin/
+crush --version</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="homebrew" class="tab-content">
+                        <div class="install-step">
+                            <h4><span class="step-number">1</span> macOS 安装</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># 安装
+brew install charmbracelet/tap/crush
+
+# 升级
+brew upgrade crush
+
+# 验证安装
+crush --version</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="source-build" class="tab-content">
+                        <div class="install-step">
+                            <h4><span class="step-number">1</span> 前置要求</h4>
+                            <div class="config-example">
+                                <div>- Go 1.21 或更高版本</div>
+                                <div>- Git</div>
+                            </div>
+                        </div>
+                        <div class="install-step">
+                            <h4><span class="step-number">2</span> 编译安装</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># 克隆仓库
+git clone https://github.com/charmbracelet/crush.git
+cd crush
+
+# 编译
+go build -o crush ./cmd/crush
+
+# 安装到系统路径
+sudo mv crush /usr/local/bin/
+
+# 验证安装
+crush --version</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="usage-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">使用方法</span>
+                    <h2 class="section-title">如何使用</h2>
+                    <p class="section-subtitle">交互式和命令行模式的使用方法</p>
+                </div>
+                <div class="usage-grid">
+                    <div class="usage-features">
+                        <h3>交互式模式</h3>
+                        <div class="usage-item">
+                            <div class="usage-icon">🚀</div>
+                            <div>
+                                <div class="usage-item-title">启动交互式会话</div>
+                                <div class="usage-item-desc">crush 命令启动TUI界面</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">⚙️</div>
+                            <div>
+                                <div class="usage-item-title">指定提供商和模型</div>
+                                <div class="usage-item-desc">启动时指定特定的AI提供商</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">📁</div>
+                            <div>
+                                <div class="usage-item-title">加载项目上下文</div>
+                                <div class="usage-item-desc">自动理解项目结构和文件</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">🔧</div>
+                            <div>
+                                <div class="usage-item-title">Git集成</div>
+                                <div class="usage-item-desc">分析Git差异，生成提交信息</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">🔌</div>
+                            <div>
+                                <div class="usage-item-title">插件系统</div>
+                                <div class="usage-item-desc">查看、安装和管理插件</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">📊</div>
+                            <div>
+                                <div class="usage-item-title">性能监控</div>
+                                <div class="usage-item-desc">查看统计信息和资源使用</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="usage-examples">
+                        <h3>命令行示例</h3>
+                        <div class="config-example">
+                            <strong>基础查询：</strong><br>
+                            # 简单查询<br>
+                            crush "解释这段代码的功能"<br><br>
+                            # 代码分析<br>
+                            crush --file main.go "分析这段代码的性能"<br><br>
+                            # 代码生成<br>
+                            crush "生成一个快速排序算法" --language go<br><br>
+                            # 文件操作<br>
+                            crush "重构这个函数" --file utils.py
+                        </div>
+                        <div class="config-example">
+                            <strong>项目级别操作：</strong><br>
+                            # 分析整个项目<br>
+                            crush --project ./my-project "分析这个项目的架构"<br><br>
+                            # 生成项目文档<br>
+                            crush --project ./my-project "生成API文档"<br><br>
+                            # 代码审查<br>
+                            crush --project ./my-project "进行代码审查"<br><br>
+                            # 优化建议<br>
+                            crush --project ./my-project "提供性能优化建议"
+                        </div>
+                        <div class="config-example">
+                            <strong>Git集成：</strong><br>
+                            # 分析Git差异<br>
+                            crush --git-diff "解释这些变更的影响"<br><br>
+                            # 生成提交信息<br>
+                            crush --git-diff "生成合适的提交信息"<br><br>
+                            # 代码审查<br>
+                            crush --git-pr "审查这个Pull Request"<br><br>
+                            # 分支合并建议<br>
+                            crush --git-diff main..feature "评估合并风险"
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="routing-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">API路由功能</span>
+                    <h2 class="section-title">智能路由</h2>
+                    <p class="section-subtitle">OpenRouter集成和自定义API端点支持</p>
+                </div>
+                <div class="routing-grid">
+                    <div class="routing-features">
+                        <h3>OpenRouter 特殊路由</h3>
+                        <div class="router-step">
+                            <div class="router-icon">⚡</div>
+                            <div class="router-content">
+                                <div class="router-title">Nitro 路由</div>
+                                <div class="router-desc">路由到最快的提供商，优先响应速度</div>
+                            </div>
+                        </div>
+                        <div class="router-step">
+                            <div class="router-icon">💰</div>
+                            <div class="router-content">
+                                <div class="router-title">Floor 路由</div>
+                                <div class="router-desc">路由到最便宜的提供商，优先成本</div>
+                            </div>
+                        </div>
+                        <div class="router-step">
+                            <div class="router-icon">🎯</div>
+                            <div class="router-content">
+                                <div class="router-title">特定提供商</div>
+                                <div class="router-desc">指定特定的提供商和模型组合</div>
+                            </div>
+                        </div>
+                        <div class="router-step">
+                            <div class="router-icon">🔄</div>
+                            <div class="router-content">
+                                <div class="router-title">负载均衡</div>
+                                <div class="router-desc">在多个提供商间智能分配请求</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="routing-diagram">
+                        <div class="router-flow">
+                            <div class="router-step">
+                                <div class="router-icon">🎛️</div>
+                                <div class="router-content">
+                                    <div class="router-title">路由策略配置</div>
+                                    <div class="router-desc">针对不同任务类型配置路由策略</div>
+                                </div>
+                            </div>
+                            <div class="router-step">
+                                <div class="router-icon">💾</div>
+                                <div class="router-content">
+                                    <div class="router-title">成本优化</div>
+                                    <div class="router-desc">设置每小时成本限制和偏好</div>
+                                </div>
+                            </div>
+                            <div class="router-step">
+                                <div class="router-icon">⚡</div>
+                                <div class="router-content">
+                                    <div class="router-title">性能优化</div>
+                                    <div class="router-desc">设置响应时间限制和缓存策略</div>
+                                </div>
+                            </div>
+                            <div class="router-step">
+                                <div class="router-icon">🔧</div>
+                                <div class="router-content">
+                                    <div class="router-title">自定义提供商</div>
+                                    <div class="router-desc">支持自定义API端点和代理</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="troubleshooting-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">故障排除</span>
+                    <h2 class="section-title">常见问题</h2>
+                    <p class="section-subtitle">解决使用过程中可能遇到的问题</p>
+                </div>
+                <div class="troubleshooting-grid">
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">API连接失败</h3>
+                        <p class="trouble-content">检查网络连接、API密钥、配置文件和日志</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong> 使用 curl 测试连接，验证API密钥，检查配置文件语法，启用调试日志查看详细错误信息
+                        </div>
+                    </div>
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">路由不工作</h3>
+                        <p class="trouble-content">检查路由配置、提供商状态和路由缓存</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong> 使用 crush router status 检查路由状态，测试路由策略，查看提供商状态，重置路由缓存
+                        </div>
+                    </div>
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">插件问题</h3>
+                        <p class="trouble-content">插件加载失败、冲突或功能异常</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong> 列出已安装插件，检查插件状态，重载插件，卸载有问题的插件
+                        </div>
+                    </div>
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">性能问题</h3>
+                        <p class="trouble-content">响应慢、资源占用高或卡顿</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong> 查看性能统计，清理缓存，检查系统资源，使用优化配置
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="changelog-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">更新日志</span>
+                    <h2 class="section-title">版本历史</h2>
+                    <p class="section-subtitle">持续更新优化，不断提升用户体验</p>
+                </div>
+                <div class="changelog-timeline">
+                    <div class="changelog-item">
+                        <div class="changelog-version">v2.1.0</div>
+                        <div class="changelog-content">
+                            <div class="changelog-title">最新版本</div>
+                            <ul class="changelog-features">
+                                <li>🎉 新增 OpenRouter 路由支持</li>
+                                <li>✨ 支持 `:nitro` 和 `:floor` 路由后缀</li>
+                                <li>🔧 改进自定义提供商配置</li>
+                                <li>🐛 修复 Gemini 自定义提供商问题</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="changelog-item">
+                        <div class="changelog-version">v2.0.0</div>
+                        <div class="changelog-content">
+                            <div class="changelog-title">架构升级</div>
+                            <ul class="changelog-features">
+                                <li>🚀 全新的路由引擎</li>
+                                <li>✨ 多提供商负载均衡</li>
+                                <li>🎨 重构用户界面</li>
+                                <li>📊 性能监控面板</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="changelog-item">
+                        <div class="changelog-version">v1.5.0</div>
+                        <div class="changelog-content">
+                            <div class="changelog-title">功能增强</div>
+                            <ul class="changelog-features">
+                                <li>💾 插件系统支持</li>
+                                <li>🔍 项目上下文理解</li>
+                                <li>📱 改进终端界面</li>
+                                <li>🔧 配置管理优化</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="changelog-item">
+                        <div class="changelog-version">v1.0.0</div>
+                        <div class="changelog-content">
+                            <div class="changelog-title">首次发布</div>
+                            <ul class="changelog-features">
+                                <li>🎉 首个公开发布</li>
+                                <li>⚡ 基础 AI 编程功能</li>
+                                <li>🔧 多提供商支持</li>
+                                <li>📚 完整文档</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p>&copy; 2025 Crush. 开源项目，采用 <a href="https://github.com/charmbracelet/crush/blob/main/LICENSE" target="_blank">MIT 许可证</a></p>
+                </div>
+                <div class="footer-stats">
+                    <p>Charmbracelet 开发 | Bubble Tea TUI框架 | 多AI提供商智能路由 | Go语言构建</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function switchTab(event, tabId) {
+            const buttons = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
+
+            buttons.forEach(btn => btn.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const code = codeBlock.querySelector('code').textContent;
+
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = '已复制';
+                setTimeout(() => {
+                    button.textContent = '复制';
+                }, 2000);
+            });
+        }
+
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Add parallax effect to particles
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const particles = document.querySelector('.particles');
+            particles.style.transform = `translateY(${scrolled * 0.5}px)`;
+        });
+
+        // Animate terminal cursor
+        const cursor = document.querySelector('.terminal-cursor');
+        if (cursor) {
+            setInterval(() => {
+                cursor.style.animation = 'none';
+                setTimeout(() => {
+                    cursor.style.animation = 'blink 1s infinite';
+                }, 10);
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

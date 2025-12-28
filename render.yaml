@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: quartz-online
+    runtime: node
+    region: singapore
+    plan: free
+    branch: master
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_TELEMETRY_DISABLED
+        value: 1
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false
+    # Render 会自动检测 .nvmrc 文件并使用 Node 20.10.0

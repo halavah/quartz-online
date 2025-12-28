@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open CoreUI - Rust重写的轻量级Open WebUI | 高性能AI交互界面</title>
+    <meta name="description" content="Open CoreUI 是使用Rust重写的轻量级Open WebUI服务端和桌面客户端，显著减少内存和资源占用，无需Docker和依赖服务">
+    <meta name="keywords" content="Open CoreUI,Rust,WebUI,Tauri,轻量级,桌面应用,Open WebUI,性能优化,xxnuo">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}:root{--primary-color:#ce422b;--primary-dark:#b83725;--secondary-color:#f97316;--accent-color:#eab308;--success-color:#10b981;--background-color:#0f0f1a;--surface-color:#1a1a2e;--surface-light:#252542;--text-color:#e2e8f0;--text-muted:#94a3b8;--border-color:#334155;--gradient-primary:linear-gradient(135deg,#ce422b 0%,#f97316 100%);--gradient-hero:linear-gradient(135deg,#1a1a2e 0%,#0f0f1a 50%,#1e1b4b 100%);--gradient-accent:linear-gradient(135deg,#eab308 0%,#f59e0b 100%);--glow-primary:0 0 40px rgba(206,66,43,0.3);--glow-secondary:0 0 40px rgba(249,115,22,0.2);--glow-accent:0 0 40px rgba(234,179,8,0.3)}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;line-height:1.7;color:var(--text-color);background:var(--background-color);overflow-x:hidden}.container{width:100%;max-width:1200px;margin:0 auto;padding:0 1.5rem}.hero-section{position:relative;min-height:100vh;display:flex;align-items:center;background:var(--gradient-hero);overflow:hidden}.hero-section::before{content:"";position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 20% 80%,rgba(206,66,43,0.15) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(249,115,22,0.1) 0%,transparent 50%),radial-gradient(circle at 50% 50%,rgba(234,179,8,0.05) 0%,transparent 50%);pointer-events:none}.particles{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;pointer-events:none}.particle{position:absolute;width:4px;height:4px;background:var(--primary-color);border-radius:50%;opacity:0.3;animation:float 15s infinite ease-in-out}.particle:nth-child(2){left:20%;animation-delay:-2s;background:var(--secondary-color)}.particle:nth-child(3){left:40%;animation-delay:-4s}.particle:nth-child(4){left:60%;animation-delay:-6s;background:var(--accent-color)}.particle:nth-child(5){left:80%;animation-delay:-8s;background:var(--secondary-color)}.particle:nth-child(6){left:10%;animation-delay:-10s}.particle:nth-child(7){left:70%;animation-delay:-12s;background:var(--accent-color)}.particle:nth-child(8){left:90%;animation-delay:-14s}@keyframes float{0%,100%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:0.3}90%{opacity:0.3}100%{transform:translateY(-100vh) scale(1);opacity:0}}.hero-container{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;padding:2rem 0}.hero-content{animation:fadeInUp 0.8s ease-out}@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}.hero-badge{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(206,66,43,0.1);border:1px solid rgba(206,66,43,0.3);padding:0.5rem 1rem;border-radius:50px;font-size:0.875rem;color:var(--primary-color);margin-bottom:1.5rem}.hero-badge::before{content:"";width:8px;height:8px;background:var(--primary-color);border-radius:50%;animation:pulse 2s infinite}@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.2)}}.hero-title{font-size:3.5rem;font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.hero-subtitle{font-size:1.25rem;color:var(--text-muted);margin-bottom:2rem;max-width:500px}.hero-stats{display:flex;gap:2rem;margin-bottom:2rem}.stat-item{text-align:center}.stat-number{display:block;font-size:1.5rem;font-weight:700;color:var(--text-color)}.stat-label{font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em}.hero-actions{display:flex;gap:1rem;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.875rem 1.75rem;border:none;border-radius:12px;font-weight:600;font-size:1rem;text-decoration:none;cursor:pointer;transition:all 0.3s ease}.btn-primary{background:var(--gradient-primary);color:white;box-shadow:var(--glow-primary)}.btn-primary:hover{transform:translateY(-3px);box-shadow:0 10px 40px rgba(206,66,43,0.4)}.btn-secondary{background:var(--surface-light);color:var(--text-color);border:1px solid var(--border-color)}.btn-secondary:hover{background:var(--surface-color);border-color:var(--primary-color);transform:translateY(-3px)}.hero-visual{position:relative;display:flex;justify-content:center;align-items:center;animation:fadeInUp 0.8s ease-out 0.2s both}.performance-diagram{position:relative;width:100%;max-width:450px;aspect-ratio:1}.perf-comparison{position:absolute;width:100%;height:100%;border-radius:20px;background:var(--surface-light);border:1px solid var(--border-color);overflow:hidden}.perf-bar{position:absolute;bottom:0;border-radius:10px 10px 0 0;transition:all 0.5s ease}.perf-bar.webui{left:20%;width:25%;background:linear-gradient(180deg,rgba(148,163,184,0.3),rgba(148,163,184,0.6));animation:growWebUI 2s ease-out}.perf-bar.coreui{left:55%;width:25%;background:var(--gradient-primary);animation:growCoreUI 2s ease-out 0.5s both}@keyframes growWebUI{from{height:0}to{height:80%}}@keyframes growCoreUI{from{height:0}to{height:15%}}.perf-label{position:absolute;bottom:-30px;font-size:0.875rem;color:var(--text-muted);font-weight:600}.perf-label.webui{left:22.5%}.perf-label.coreui{left:60%}.perf-value{position:absolute;top:10px;font-size:1.1rem;font-weight:700;color:white}.perf-value.webui{left:27.5%}.perf-value.coreui{left:65%}.main-content{position:relative;z-index:1}section{padding:5rem 0}.section-header{text-align:center;margin-bottom:4rem}.section-badge{display:inline-block;background:rgba(206,66,43,0.1);border:1px solid rgba(206,66,43,0.3);padding:0.375rem 1rem;border-radius:50px;font-size:0.75rem;color:var(--primary-color);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem}.section-title{font-size:2.5rem;font-weight:700;margin-bottom:1rem;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.section-subtitle{font-size:1.125rem;color:var(--text-muted);max-width:600px;margin:0 auto}.overview-section{background:linear-gradient(180deg,var(--background-color) 0%,var(--surface-color) 100%)}.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}.overview-content h3{font-size:1.75rem;margin-bottom:1rem;color:var(--text-color)}.overview-content p{color:var(--text-muted);margin-bottom:1.5rem}.overview-list{list-style:none}.overview-list li{display:flex;align-items:flex-start;gap:0.75rem;margin-bottom:1rem;color:var(--text-muted)}.overview-list li::before{content:"✓";color:var(--secondary-color);font-weight:bold}.tech-comparison{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.comparison-table{width:100%;border-collapse:collapse}.comparison-table th,.comparison-table td{padding:1rem;text-align:left;border-bottom:1px solid var(--border-color)}.comparison-table th{color:var(--text-color);font-weight:600;font-size:0.875rem;text-transform:uppercase;letter-spacing:0.05em;background:var(--surface-color)}.comparison-table td{color:var(--text-muted);font-size:0.9rem}.comparison-table tr:last-child td{border-bottom:none}.comparison-table tr:hover td{background:rgba(206,66,43,0.05)}.advantages-section{background:var(--surface-color)}.advantages-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}.advantage-card{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color);position:relative;overflow:hidden}.advantage-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--gradient-primary);transform:scaleX(0);transition:transform 0.3s ease}.advantage-card:hover{transform:translateY(-5px);border-color:var(--primary-color);box-shadow:var(--glow-primary)}.advantage-card:hover::before{transform:scaleX(1)}.advantage-icon{width:60px;height:60px;background:rgba(206,66,43,0.1);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.75rem;margin-bottom:1.5rem}.advantage-title{font-size:1.25rem;font-weight:600;margin-bottom:0.75rem;color:var(--text-color)}.advantage-description{color:var(--text-muted);font-size:0.95rem}.advantage-metrics{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border-color)}.metric-item{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem}.metric-label{font-size:0.875rem;color:var(--text-muted)}.metric-value{font-weight:600;color:var(--success-color)}.architecture-section{background:var(--background-color)}.arch-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem}.tech-stack{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.tech-title{font-size:1.25rem;font-weight:600;color:var(--text-color);margin-bottom:1.5rem}.tech-items{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}.tech-item{display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:var(--surface-color);border-radius:10px;border:1px solid var(--border-color)}.tech-icon{width:32px;height:32px;background:var(--gradient-primary);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.875rem}.tech-name{font-size:0.875rem;color:var(--text-color)}.arch-diagram{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.arch-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;align-items:center}.arch-node{padding:1rem;background:var(--surface-color);border:2px solid var(--border-color);border-radius:10px;text-align:center;font-weight:600;color:var(--text-color);transition:all 0.3s ease}.arch-node:hover{border-color:var(--primary-color);transform:scale(1.05)}.arch-arrow{text-align:center;font-size:1.5rem;color:var(--primary-color)}.installation-section{background:linear-gradient(180deg,var(--surface-color) 0%,var(--background-color) 100%)}.install-tabs{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.tab-buttons{display:flex;gap:0.5rem;margin-bottom:2rem;background:var(--surface-color);padding:0.5rem;border-radius:12px}.tab-btn{flex:1;padding:0.875rem 1.5rem;border:none;background:transparent;color:var(--text-muted);font-weight:600;border-radius:8px;cursor:pointer;transition:all 0.3s ease}.tab-btn.active{background:var(--gradient-primary);color:white}.tab-btn:hover:not(.active){color:var(--text-color);background:rgba(206,66,43,0.1)}.tab-content{display:none}.tab-content.active{display:block;animation:fadeIn 0.3s ease}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.install-step{margin-bottom:1.5rem}.install-step:last-child{margin-bottom:0}.install-step h4{color:var(--text-color);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem}.step-number{width:28px;height:28px;background:var(--gradient-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-weight:700}.code-block{position:relative;background:#0d1117;border-radius:12px;overflow:hidden;border:1px solid var(--border-color)}.code-header{display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;background:#161b22;border-bottom:1px solid var(--border-color)}.code-lang{font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em}.copy-btn{background:var(--primary-color);color:white;border:none;padding:0.375rem 0.75rem;border-radius:6px;font-size:0.75rem;cursor:pointer;transition:all 0.2s ease}.copy-btn:hover{background:var(--primary-dark)}.code-content{padding:1rem;overflow-x:auto}.code-content pre{margin:0;font-family:"Fira Code","Monaco","Consolas",monospace;font-size:0.875rem;line-height:1.6}.code-content code{color:#e6edf3}.usage-section{background:var(--surface-color)}.usage-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.usage-features{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.usage-features h3{font-size:1.5rem;margin-bottom:1.5rem;color:var(--text-color)}.usage-item{display:flex;align-items:flex-start;gap:1rem;padding:1rem;background:var(--surface-color);border-radius:12px;margin-bottom:0.75rem;border:1px solid var(--border-color);transition:all 0.3s ease}.usage-item:hover{border-color:var(--primary-color);transform:translateX(5px)}.usage-item:last-child{margin-bottom:0}.usage-icon{width:36px;height:36px;background:rgba(249,115,22,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.usage-item-title{font-weight:600;color:var(--text-color);margin-bottom:0.25rem;font-size:0.95rem}.usage-item-desc{font-size:0.85rem;color:var(--text-muted)}.usage-examples{background:var(--surface-light);border-radius:20px;padding:2rem;border:1px solid var(--border-color)}.usage-examples h3{font-size:1.5rem;margin-bottom:1.5rem;color:var(--text-color)}.config-example{background:var(--surface-color);border-radius:10px;padding:1rem;margin-bottom:1rem;font-family:"Fira Code",monospace;font-size:0.875rem;color:var(--text-color)}.specs-section{background:var(--background-color)}.specs-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem}.specs-card{background:var(--surface-light);border-radius:16px;padding:1.5rem;border:1px solid var(--border-color)}.specs-title{font-size:1.1rem;font-weight:600;color:var(--text-color);margin-bottom:1rem}.specs-content{color:var(--text-muted);font-size:0.9rem}.specs-table{width:100%;border-collapse:collapse;margin-top:1rem}.specs-table th,.specs-table td{padding:0.75rem;text-align:left;border-bottom:1px solid var(--border-color)}.specs-table th{color:var(--text-color);font-weight:600;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em}.specs-table td{color:var(--text-muted);font-size:0.875rem}.specs-table tr:last-child td{border-bottom:none}.troubleshooting-section{background:var(--surface-color)}.troubleshooting-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem}.trouble-card{background:var(--surface-light);border-radius:16px;padding:1.5rem;border:1px solid var(--border-color)}.trouble-title{font-size:1.1rem;font-weight:600;color:var(--text-color);margin-bottom:1rem}.trouble-content{color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem}.trouble-solution{background:var(--surface-color);border-radius:8px;padding:0.75rem;border-left:3px solid var(--accent-color)}.changelog-section{background:var(--background-color)}.changelog-timeline{max-width:800px;margin:0 auto}.changelog-item{display:flex;gap:1rem;padding-bottom:2rem;border-bottom:1px solid var(--border-color);margin-bottom:2rem}.changelog-item:last-child{border-bottom:none}.changelog-version{flex-shrink:0;width:120px;padding:0.5rem 1rem;background:var(--gradient-primary);color:white;border-radius:20px;font-weight:600;text-align:center}.changelog-content{flex:1}.changelog-title{font-size:1.1rem;font-weight:600;color:var(--text-color);margin-bottom:0.5rem}.changelog-features{list-style:none}.changelog-features li{display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.25rem;color:var(--text-muted);font-size:0.9rem}.footer{background:var(--surface-color);padding:3rem 0;border-top:1px solid var(--border-color)}.footer-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}.footer-info{color:var(--text-muted);font-size:0.9rem}.footer-info a{color:var(--primary-color);text-decoration:none}.footer-info a:hover{text-decoration:underline}.footer-stats{color:var(--text-muted);font-size:0.875rem}.footer-links a:hover{color:var(--primary-color)}@media (max-width:1024px){.hero-container{grid-template-columns:1fr;text-align:center}.hero-subtitle{margin:0 auto 2rem}.hero-stats{justify-content:center}.hero-actions{justify-content:center}.hero-visual{order:-1}.performance-diagram{max-width:300px}.advantages-grid{grid-template-columns:repeat(2,1fr)}.overview-grid,.arch-grid,.usage-grid,.specs-grid{grid-template-columns:1fr}.troubleshooting-grid{grid-template-columns:1fr}}@media (max-width:768px){.hero-title{font-size:2.5rem}.section-title{font-size:2rem}.advantages-grid{grid-template-columns:1fr}.tab-buttons{flex-direction:column}.arch-flow{grid-template-columns:1fr}.tech-items{grid-template-columns:1fr}}@media (max-width:480px){.hero-title{font-size:2rem}.hero-stats{flex-wrap:wrap;gap:1rem}.btn{width:100%;justify-content:center}section{padding:3rem 0}}
+    </style>
+</head>
+<body>
+    <header class="hero-section">
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+        <div class="container">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="hero-badge">Rust 重写项目</div>
+                    <h1 class="hero-title">Open CoreUI</h1>
+                    <p class="hero-subtitle">使用 Rust 重写的轻量级 Open WebUI，显著减少内存和资源占用，无需 Docker 和依赖服务，提供更高效的 AI 交互界面</p>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">v1.2</span>
+                            <span class="stat-label">版本</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">Rust</span>
+                            <span class="stat-label">语言</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">90%</span>
+                            <span class="stat-label">资源优化</span>
+                        </div>
+                    </div>
+                    <div class="hero-actions">
+                        <a href="https://github.com/xxnuo/open-coreui" target="_blank" class="btn btn-primary">
+                            <span>查看源码</span>
+                        </a>
+                        <a href="#installation" class="btn btn-secondary">
+                            <span>快速开始</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="performance-diagram">
+                        <div class="perf-comparison">
+                            <div class="perf-bar webui">
+                                <div class="perf-value">2GB</div>
+                            </div>
+                            <div class="perf-label webui">原版 Open WebUI</div>
+                            <div class="perf-bar coreui">
+                                <div class="perf-value">200MB</div>
+                            </div>
+                            <div class="perf-label coreui">Open CoreUI</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="overview-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">项目概述</span>
+                    <h2 class="section-title">什么是 Open CoreUI？</h2>
+                    <p class="section-subtitle">基于 Rust 语言的轻量级 AI 交互界面，性能优化，部署简化</p>
+                </div>
+                <div class="overview-grid">
+                    <div class="overview-content">
+                        <h3>极致性能重构</h3>
+                        <p>Open CoreUI 是一个基于 Rust 语言重写的 Open WebUI 项目，旨在提供一个更加轻量级、高性能的 AI 交互界面。相比原版，在保持功能完整性的同时，大幅减少了系统资源占用，并简化了部署流程。</p>
+                        <ul class="overview-list">
+                            <li>Rust 语言带来的零成本抽象和内存安全</li>
+                            <li>显著减少内存和 CPU 占用（减少 80-90%）</li>
+                            <li>无需 Docker 和复杂的依赖服务</li>
+                            <li>服务端和桌面客户端双重支持</li>
+                            <li>完全开源，社区驱动发展</li>
+                            <li>解决原版高资源消耗问题</li>
+                        </ul>
+                    </div>
+                    <div class="tech-comparison">
+                        <table class="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>项目</th>
+                                    <th>原版 Open WebUI</th>
+                                    <th>Open CoreUI</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>后端语言</td>
+                                    <td>Python + FastAPI</td>
+                                    <td>Rust + Actix-web</td>
+                                </tr>
+                                <tr>
+                                    <td>数据库</td>
+                                    <td>PostgreSQL/SQLite</td>
+                                    <td>SQLite (嵌入式)</td>
+                                </tr>
+                                <tr>
+                                    <td>缓存</td>
+                                    <td>Redis</td>
+                                    <td>内存缓存 (内置)</td>
+                                </tr>
+                                <tr>
+                                    <td>部署方式</td>
+                                    <td>Docker</td>
+                                    <td>直接运行</td>
+                                </tr>
+                                <tr>
+                                    <td>桌面客户端</td>
+                                    <td>不支持</td>
+                                    <td>Tauri 支持</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="advantages-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">核心优势</span>
+                    <h2 class="section-title">为什么选择 Open CoreUI？</h2>
+                    <p class="section-subtitle">全方位的性能优化和功能增强</p>
+                </div>
+                <div class="advantages-grid">
+                    <div class="advantage-card">
+                        <div class="advantage-icon">🚀</div>
+                        <h3 class="advantage-title">性能优势</h3>
+                        <p class="advantage-description">Rust 语言带来的极致性能，内存占用减少 80-90%，启动速度提升 70-80%</p>
+                        <div class="advantage-metrics">
+                            <div class="metric-item">
+                                <span class="metric-label">内存优化</span>
+                                <span class="metric-value">90% ↓</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">启动速度</span>
+                                <span class="metric-value">80% ↑</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">响应速度</span>
+                                <span class="metric-value">70% ↑</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="advantage-card">
+                        <div class="advantage-icon">🛠️</div>
+                        <h3 class="advantage-title">部署优势</h3>
+                        <p class="advantage-description">简化部署流程，无需 Docker 和复杂依赖，直接运行二进制文件</p>
+                        <div class="advantage-metrics">
+                            <div class="metric-item">
+                                <span class="metric-label">部署复杂度</span>
+                                <span class="metric-value">95% ↓</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">启动时间</span>
+                                <span class="metric-value">3s → 0.5s</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">依赖服务</span>
+                                <span class="metric-value">0 个</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="advantage-card">
+                        <div class="advantage-icon">🎯</div>
+                        <h3 class="advantage-title">功能优势</h3>
+                        <p class="advantage-description">完整保持原版功能，新增桌面客户端、插件系统和主题定制</p>
+                        <div class="advantage-metrics">
+                            <div class="metric-item">
+                                <span class="metric-label">功能完整性</span>
+                                <span class="metric-value">100%</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">新功能</span>
+                                <span class="metric-value">10+ 项</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">插件系统</span>
+                                <span class="metric-value">✓ 支持</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="architecture-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">技术架构</span>
+                    <h2 class="section-title">系统设计</h2>
+                    <p class="section-subtitle">现代化的技术栈和架构设计</p>
+                </div>
+                <div class="arch-grid">
+                    <div class="tech-stack">
+                        <h3 class="tech-title">技术栈对比</h3>
+                        <div class="tech-items">
+                            <div class="tech-item">
+                                <div class="tech-icon">🦀</div>
+                                <span class="tech-name">Rust</span>
+                            </div>
+                            <div class="tech-item">
+                                <div class="tech-icon">⚛️</div>
+                                <span class="tech-name">React</span>
+                            </div>
+                            <div class="tech-item">
+                                <div class="tech-icon">🎨</div>
+                                <span class="tech-name">Tailwind</span>
+                            </div>
+                            <div class="tech-item">
+                                <div class="tech-icon">🌐</div>
+                                <span class="tech-name">Actix-web</span>
+                            </div>
+                            <div class="tech-item">
+                                <div class="tech-icon">💾</div>
+                                <span class="tech-name">SQLite</span>
+                            </div>
+                            <div class="tech-item">
+                                <div class="tech-icon">🦜</div>
+                                <span class="tech-name">Tauri</span>
+                            </div>
+                            <div class="tech-item">
+                                <div class="tech-icon">⚡</div>
+                                <span class="tech-name">TypeScript</span>
+                            </div>
+                            <div class="tech-item">
+                                <div class="tech-icon">🔧</div>
+                                <span class="tech-name">Hot Reload</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="arch-diagram">
+                        <h3 class="tech-title">数据流设计</h3>
+                        <div class="arch-flow">
+                            <div class="arch-node">用户请求</div>
+                            <div class="arch-arrow">→</div>
+                            <div class="arch-node">Tauri Frontend</div>
+                            <div class="arch-arrow">→</div>
+                            <div class="arch-node">Rust Backend</div>
+                        </div>
+                        <div class="arch-arrow" style="grid-column: 4;">↓</div>
+                        <div class="arch-flow" style="grid-template-columns: 1fr;">
+                            <div class="arch-node">SQLite Database</div>
+                        </div>
+                        <div class="arch-arrow" style="grid-column: 1;transform: rotate(180deg);">↓</div>
+                        <div class="arch-flow" style="grid-template-columns: 1fr;">
+                            <div class="arch-node">响应 ← 数据 ← 存储</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="installation-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">安装指南</span>
+                    <h2 class="section-title">快速开始</h2>
+                    <p class="section-subtitle">多种安装方式，选择最适合您的方案</p>
+                </div>
+                <div class="install-tabs">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" onclick="switchTab(event, 'binary-install')">二进制安装</button>
+                        <button class="tab-btn" onclick="switchTab(event, 'package-manager')">包管理器</button>
+                        <button class="tab-btn" onclick="switchTab(event, 'source-build')">源码编译</button>
+                    </div>
+                    <div id="binary-install" class="tab-content active">
+                        <div class="install-step">
+                            <h4><span class="step-number">1</span> 下载服务端</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># Linux/macOS
+curl -L https://github.com/xxnuo/open-coreui/releases/latest/download/open-coreui-server-linux-x64.tar.gz | tar xz
+sudo mv open-coreui-server /usr/local/bin/
+
+# Windows
+# 下载 open-coreui-server-windows-x64.zip 并解压</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="install-step">
+                            <h4><span class="step-number">2</span> 下载桌面客户端</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># macOS
+curl -L https://github.com/xxnuo/open-coreui/releases/latest/download/Open.CoreUI.dmg -o Open.CoreUI.dmg
+open Open.CoreUI.dmg
+
+# Linux
+curl -L https://github.com/xxnuo/open-coreui/releases/latest/download/open-coreui-app.AppImage -o open-coreui-app.AppImage
+chmod +x open-coreui-app.AppImage</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="package-manager" class="tab-content">
+                        <div class="install-step">
+                            <h4><span class="step-number">1</span> Homebrew (macOS)</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># 添加 tap
+brew tap xxnuo/open-coreui
+
+# 安装服务端
+brew install open-coreui-server
+
+# 安装桌面客户端
+brew install --cask open-coreui-app</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="install-step">
+                            <h4><span class="step-number">2</span> Cargo (Rust 生态)</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># 安装服务端
+cargo install open-coreui-server
+
+# 安装桌面客户端
+cargo install open-coreui-app</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="source-build" class="tab-content">
+                        <div class="install-step">
+                            <h4><span class="step-number">1</span> 前置要求</h4>
+                            <div class="config-example">
+                                <div>- Rust 1.70.0+</div>
+                                <div>- Node.js 16.0+</div>
+                                <div>- npm/yarn</div>
+                            </div>
+                        </div>
+                        <div class="install-step">
+                            <h4><span class="step-number">2</span> 编译服务端</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># 克隆仓库
+git clone https://github.com/xxnuo/open-coreui.git
+cd open-coreui
+
+# 编译服务端
+cargo build --release
+
+# 运行服务端
+./target/release/open-coreui-server</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="install-step">
+                            <h4><span class="step-number">3</span> 编译桌面客户端</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code># 安装前端依赖
+cd frontend
+npm install
+npm run build
+
+# 编译桌面应用
+cd ../src-tauri
+cargo tauri build</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="usage-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">使用方法</span>
+                    <h2 class="section-title">如何使用</h2>
+                    <p class="section-subtitle">掌握服务端和桌面客户端的使用方法</p>
+                </div>
+                <div class="usage-grid">
+                    <div class="usage-features">
+                        <h3>服务端使用</h3>
+                        <div class="usage-item">
+                            <div class="usage-icon">🚀</div>
+                            <div>
+                                <div class="usage-item-title">基础启动</div>
+                                <div class="usage-item-desc">使用默认配置启动，或指定端口和配置文件</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">⚙️</div>
+                            <div>
+                                <div class="usage-item-title">配置管理</div>
+                                <div class="usage-item-desc">TOML 配置文件，支持网络、数据库、认证等配置</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">🔌</div>
+                            <div>
+                                <div class="usage-item-title">API 集成</div>
+                                <div class="usage-item-desc">支持 OpenAI、Ollama 和自定义 API 端点</div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-icon">🔧</div>
+                            <div>
+                                <div class="usage-item-title">环境变量</div>
+                                <div class="usage-item-desc">通过环境变量进行灵活配置</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="usage-examples">
+                        <h3>配置示例</h3>
+                        <div class="config-example">
+                            <strong>服务端配置文件：</strong><br>
+                            [server]<br>
+                            host = "0.0.0.0"<br>
+                            port = 3000<br>
+                            workers = 4<br>
+                            <br>
+                            [database]<br>
+                            path = "./data/open-coreui.db"<br>
+                            backup_interval = 3600
+                        </div>
+                        <div class="config-example">
+                            <strong>模型配置：</strong><br>
+                            [models.openai]<br>
+                            api_key = "sk-..."<br>
+                            base_url = "https://api.openai.com/v1"<br>
+                            timeout = 30<br>
+                            <br>
+                            [models.openai.defaults]<br>
+                            model = "gpt-3.5-turbo"<br>
+                            temperature = 0.7
+                        </div>
+                        <div class="config-example">
+                            <strong>性能优化：</strong><br>
+                            [cache]<br>
+                            enabled = true<br>
+                            max_size = 1000<br>
+                            ttl = 3600<br>
+                            <br>
+                            [concurrency]<br>
+                            max_concurrent_requests = 100<br>
+                            worker_pool_size = 8
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="specs-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">技术规格</span>
+                    <h2 class="section-title">性能指标</h2>
+                    <p class="section-subtitle">详细的性能对比和技术规格</p>
+                </div>
+                <div class="specs-grid">
+                    <div class="specs-card">
+                        <h3 class="specs-title">内存使用对比</h3>
+                        <p class="specs-content">显著的内存优化，适用于各种硬件环境</p>
+                        <table class="specs-table">
+                            <thead>
+                                <tr>
+                                    <th>组件</th>
+                                    <th>原版</th>
+                                    <th>Open CoreUI</th>
+                                    <th>优化</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>基础内存</td>
+                                    <td>500MB</td>
+                                    <td>50MB</td>
+                                    <td>90% ↓</td>
+                                </tr>
+                                <tr>
+                                    <td>峰值内存</td>
+                                    <td>2GB</td>
+                                    <td>200MB</td>
+                                    <td>90% ↓</td>
+                                </tr>
+                                <tr>
+                                    <td>内存增长</td>
+                                    <td>100MB/小时</td>
+                                    <td>10MB/小时</td>
+                                    <td>90% ↓</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="specs-card">
+                        <h3 class="specs-title">响应时间对比</h3>
+                        <p class="specs-content">显著的响应速度提升，改善用户体验</p>
+                        <table class="specs-table">
+                            <thead>
+                                <tr>
+                                    <th>操作类型</th>
+                                    <th>原版</th>
+                                    <th>Open CoreUI</th>
+                                    <th>提升</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>页面加载</td>
+                                    <td>3-5秒</td>
+                                    <td>0.5-1秒</td>
+                                    <td>80% ↑</td>
+                                </tr>
+                                <tr>
+                                    <td>API响应</td>
+                                    <td>500ms</td>
+                                    <td>150ms</td>
+                                    <td>70% ↑</td>
+                                </tr>
+                                <tr>
+                                    <td>文件上传</td>
+                                    <td>10秒</td>
+                                    <td>2秒</td>
+                                    <td>80% ↑</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="specs-card">
+                        <h3 class="specs-title">吞吐量对比</h3>
+                        <p class="specs-content">更高的并发处理能力和系统吞吐量</p>
+                        <table class="specs-table">
+                            <thead>
+                                <tr>
+                                    <th>指标</th>
+                                    <th>原版</th>
+                                    <th>Open CoreUI</th>
+                                    <th>提升</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>并发用户</td>
+                                    <td>100</td>
+                                    <td>500</td>
+                                    <td>400% ↑</td>
+                                </tr>
+                                <tr>
+                                    <td>请求/秒</td>
+                                    <td>50</td>
+                                    <td>300</td>
+                                    <td>500% ↑</td>
+                                </tr>
+                                <tr>
+                                    <td>文件处理</td>
+                                    <td>10个/分钟</td>
+                                    <td>50个/分钟</td>
+                                    <td>400% ↑</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="specs-card">
+                        <h3 class="specs-title">版本信息</h3>
+                        <div class="specs-content">
+                            <p><strong>当前版本</strong>: v1.2.0</p>
+                            <p><strong>开发语言</strong>: Rust, TypeScript, React</p>
+                            <p><strong>桌面框架</strong>: Tauri</p>
+                            <p><strong>Web框架</strong>: Actix-web</p>
+                            <p><strong>数据库</strong>: SQLite</p>
+                            <p><strong>许可证</strong>: MIT License</p>
+                            <p><strong>安全特性</strong>: 内存安全、类型安全、输入验证、JWT认证、加密存储</p>
+                            <p><strong>兼容性</strong>: OpenAI API、Ollama、自定义API、主流浏览器支持</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="troubleshooting-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">故障排除</span>
+                    <h2 class="section-title">常见问题</h2>
+                    <p class="section-subtitle">解决使用过程中可能遇到的问题</p>
+                </div>
+                <div class="troubleshooting-grid">
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">服务端启动失败</h3>
+                        <p class="trouble-content">检查端口占用、配置文件正确性，或启用详细日志查看问题</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong> 使用命令行工具检查端口占用情况，验证配置文件格式，或使用调试模式启动
+                        </div>
+                    </div>
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">数据库连接问题</h3>
+                        <p class="trouble-content">检查数据库文件权限，或重新初始化数据库</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong> 确保数据库文件有正确的读写权限，使用 --init-db 参数重新初始化
+                        </div>
+                    </div>
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">桌面客户端无法启动</h3>
+                        <p class="trouble-content">可能是系统安全策略阻止应用启动</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong> macOS 上移除隔离属性，Linux 上确保执行权限，Windows 上以管理员身份运行
+                        </div>
+                    </div>
+                    <div class="trouble-card">
+                        <h3 class="trouble-title">API 连接失败</h3>
+                        <p class="trouble-content">检查网络连接、API 密钥正确性，确认防火墙设置</p>
+                        <div class="trouble-solution">
+                            <strong>解决方案：</strong> 验证网络连接状态，检查 API 密钥格式和有效性，查看错误日志获取详细信息
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="changelog-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">更新日志</span>
+                    <h2 class="section-title">版本历史</h2>
+                    <p class="section-subtitle">持续更新优化，不断提升用户体验</p>
+                </div>
+                <div class="changelog-timeline">
+                    <div class="changelog-item">
+                        <div class="changelog-version">v1.2.0</div>
+                        <div class="changelog-content">
+                            <div class="changelog-title">最新版本</div>
+                            <ul class="changelog-features">
+                                <li>🚀 性能提升 30%，内存占用进一步优化</li>
+                                <li>✨ 新增插件系统支持</li>
+                                <li>🔧 改进配置文件热重载</li>
+                                <li>🐛 修复桌面客户端崩溃问题</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="changelog-item">
+                        <div class="changelog-version">v1.1.0</div>
+                        <div class="changelog-content">
+                            <div class="changelog-title">功能增强</div>
+                            <ul class="changelog-features">
+                                <li>🎨 全新用户界面设计</li>
+                                <li>📱 响应式布局优化</li>
+                                <li>🔍 增强的搜索功能</li>
+                                <li>🌙 深色主题支持</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="changelog-item">
+                        <div class="changelog-version">v1.0.0</div>
+                        <div class="changelog-content">
+                            <div class="changelog-title">稳定版本</div>
+                            <ul class="changelog-features">
+                                <li>🎉 首个稳定版本发布</li>
+                                <li>⚡ 基础功能完整实现</li>
+                                <li>🔧 配置系统完善</li>
+                                <li>📚 完整文档编写</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p>&copy; 2025 Open CoreUI. 开源项目，采用 <a href="https://github.com/xxnuo/open-coreui/blob/main/LICENSE" target="_blank">MIT 许可证</a></p>
+                </div>
+                <div class="footer-stats">
+                    <p>内存占用减少 90% | 性能提升 5 倍 | Rust 重写的 AI 交互界面</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function switchTab(event, tabId) {
+            const buttons = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
+
+            buttons.forEach(btn => btn.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const code = codeBlock.querySelector('code').textContent;
+
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = '已复制';
+                setTimeout(() => {
+                    button.textContent = '复制';
+                }, 2000);
+            });
+        }
+
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Add parallax effect to particles
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const particles = document.querySelector('.particles');
+            particles.style.transform = `translateY(${scrolled * 0.5}px)`;
+        });
+    </script>
+</body>
+</html>

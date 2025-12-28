@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code 原生安装完全指南</title>
+    <meta name="description" content="Claude Code 原生安装完全指南,包括 Windows、macOS 和 Linux 系统的原生安装方式,配置方法和最佳实践">
+    <meta name="keywords" content="Claude Code,原生安装,Windows,macOS,Linux,安装指南,配置">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0066ff;
+            --secondary-color: #00d4ff;
+            --accent-color: #ff6b00;
+            --dark-bg: #0a0e27;
+            --card-bg: #1a1f3a;
+            --text-color: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --border-color: #2a2f4a;
+            --success-color: #00c853;
+            --gradient-primary: linear-gradient(135deg, #0066ff 0%, #00d4ff 100%);
+            --gradient-hero: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+            --shadow-glow: 0 0 30px rgba(0, 102, 255, 0.3);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--dark-bg);
+            overflow-x: hidden;
+        }
+
+        .hero-section {
+            background: var(--gradient-hero);
+            padding: 4rem 2rem 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: flex;
+            gap: 3rem;
+            align-items: flex-start;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            min-width: 0; /* Important for flex overflow handling */
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+            color: var(--text-color);
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 20px rgba(0, 102, 255, 0.2);
+        }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            color: #58a6ff;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+        }
+
+        .list {
+            margin: 1rem 0 1rem 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .list li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .note {
+            background: rgba(0, 102, 255, 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .note strong {
+            color: var(--secondary-color);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: rgba(0, 102, 255, 0.1);
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .toc-sidebar {
+            position: sticky;
+            top: 6rem;
+            width: 280px;
+            flex-shrink: 0;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .toc-sidebar h3 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .toc-sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc-sidebar li {
+            margin: 0.5rem 0;
+        }
+
+        .toc-sidebar a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: block;
+            padding: 0.25rem 0;
+            font-size: 0.95rem;
+        }
+
+        .toc-sidebar a:hover {
+            color: var(--primary-color);
+            padding-left: 0.5rem;
+        }
+
+        .toc-sidebar a.active {
+            color: var(--primary-color);
+            font-weight: 600;
+            padding-left: 0.5rem;
+            border-left: 2px solid var(--primary-color);
+        }
+
+        /* Scrollbar styling for TOC */
+        .toc-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .toc-sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .toc-sidebar::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .toc-sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+
+        @media (max-width: 1024px) {
+            .toc-sidebar {
+                position: static;
+                width: 100%;
+                max-height: none;
+                order: -1; /* Show TOC before content on mobile */
+            }
+        }
+
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+        }
+
+        .back-to-top:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .back-to-top.show {
+            display: flex;
+        }
+
+        .back-to-top svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .main-content {
+                padding: 2rem 1rem;
+            }
+
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .main-content {
+                padding: 2rem 1.5rem;
+                gap: 2rem;
+            }
+
+            .hero-section {
+                padding: 3rem 1.5rem 2rem;
+            }
+
+            .hero-title {
+                font-size: 2.2rem;
+            }
+
+            .toc-sidebar {
+                width: 280px;
+            }
+
+            .prerequisites-grid,
+            .feature-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+                padding: 1.5rem;
+            }
+
+            .hero-section {
+                padding: 2rem 1rem;
+            }
+
+            .hero-title {
+                font-size: 1.8rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .toc-sidebar {
+                width: 100%;
+                margin-bottom: 2rem;
+                position: static;
+                border-radius: 0.75rem;
+            }
+
+            .toc-sidebar ul {
+                columns: 1;
+            }
+
+            .install-methods,
+            .installation-cards,
+            .prerequisites-grid,
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .code-block {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .code-block code {
+                white-space: pre-wrap;
+                word-break: break-all;
+            }
+
+            .config-form {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.6rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            h3 {
+                font-size: 1.3rem;
+            }
+
+            .install-card,
+            .feature-card {
+                padding: 1.5rem;
+            }
+
+            .config-form {
+                padding: 1rem;
+            }
+
+            .feature-list li {
+                padding: 0.75rem;
+            }
+
+            .code-block {
+                padding: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Back to top button -->
+    <button class="back-to-top" id="backToTop">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 15l-6-6-6 6"/>
+        </svg>
+        <span>返回顶部</span>
+    </button>
+
+    <div class="hero-section">
+        <div class="hero-container">
+            <h1 class="hero-title">Claude Code 原生安装完全指南</h1>
+            <p class="hero-subtitle">使用 Bun 编译的原生版本，无需 Node.js 依赖，启动速度提升 4 倍的全新安装体验</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="content-wrapper">
+        <section id="overview" class="section">
+            <h2 class="section-title">什么是原生安装？</h2>
+            <p class="section-description">Claude Code 原生安装是使用 Bun 编译器将整个应用打包成单一可执行文件的全新安装方式。它彻底摆脱了对 Node.js 运行时的依赖，提供了更快、更轻量的使用体验。</p>
+
+            <div class="card">
+                <h4>核心优势</h4>
+                <ul class="list">
+                    <li><strong>无需 Node.js</strong>：不再需要安装 Node.js 和 npm，降低了入门门槛，避免了版本兼容问题</li>
+                    <li><strong>单一可执行文件</strong>：使用 Bun 编译成自包含的原生二进制文件，包含完整运行时，无需任何外部依赖</li>
+                    <li><strong>极速启动</strong>：启动时间从 2-3 秒缩短至 0.5-0.7 秒，提升 4 倍</li>
+                    <li><strong>资源优化</strong>：基于 JavaScriptCore 引擎，优先优化启动时间和内存占用，特别适合 CLI 工具</li>
+                    <li><strong>稳定的自动更新</strong>：改进的自动更新机制，后台下载安装，无需手动干预</li>
+                    <li><strong>全平台支持</strong>：支持 macOS、Linux、Windows（WSL/Git Bash），一次编译，到处运行</li>
+                    <li><strong>更安全可靠</strong>：避免 npm 权限问题和安全风险，提供更稳定的运行环境</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h4>技术实现：从 TypeScript 到原生二进制</h4>
+                <p class="section-description">使用 Bun 将 TypeScript 代码编译成单一可执行文件的过程：</p>
+                <ol class="list">
+                    <li><strong>转译 TypeScript</strong>：将 TypeScript 代码转译成 JavaScript</li>
+                    <li><strong>字节码编译</strong>：使用 <code>--bytecode</code> 标志预编译成 JavaScriptCore 字节码</li>
+                    <li><strong>打包依赖</strong>：将所有 npm 包和代码打包进来</li>
+                    <li><strong>嵌入运行时</strong>：将完整的 Bun 运行时（基于 JavaScriptCore）一起打包</li>
+                    <li><strong>生成二进制</strong>：输出平台原生的自包含可执行文件</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <div class="code-block">
+                    <code># 使用 Bun 编译成单一可执行文件
+bun build --compile --bytecode ./src/index.ts --outfile claude
+
+# 生成的文件是完全自包含的
+./claude --version</code>
+                </div>
+            </div>
+        </section>
+
+        <section id="system-requirements" class="section">
+            <h2 class="section-title">系统要求</h2>
+
+            <h3 class="section-subtitle">支持的操作系统</h3>
+            <div class="card">
+                <ul class="list">
+                    <li><strong>Windows</strong>：Windows 10 1903 或更高版本（x64 架构）</li>
+                    <li><strong>macOS</strong>：macOS 11.0 (Big Sur) 或更高版本（Intel 或 Apple Silicon）</li>
+                    <li><strong>Linux</strong>：支持 glibc 2.17+ 的主流发行版（x64 架构）
+                        <ul class="list">
+                            <li>Ubuntu 18.04+ / Debian 10+</li>
+                            <li>CentOS 7+ / RHEL 7+</li>
+                            <li>Fedora 30+</li>
+                            <li>Arch Linux</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <h3 class="section-subtitle">最低硬件要求</h3>
+            <div class="card">
+                <ul class="list">
+                    <li><strong>内存</strong>：至少 2GB RAM（推荐 4GB+）</li>
+                    <li><strong>存储</strong>：100MB 可用磁盘空间</li>
+                    <li><strong>网络</strong>：互联网连接（用于 API 调用和自动更新）</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="installation-methods" class="section">
+            <h2 class="section-title">安装指南</h2>
+            <p class="section-description">选择适合你的操作系统的安装方式</p>
+
+            <h3 class="section-subtitle">方法一：官方安装脚本（推荐）</h3>
+            <p class="section-description">适用于所有平台，自动检测系统并下载对应版本</p>
+
+            <div class="card">
+                <h4>Windows (PowerShell)</h4>
+                <div class="code-block">
+                    <code>irm https://claude.ai/install.ps1 | iex</code>
+                </div>
+                <p class="section-description">⚠️ 注意：Windows 需要先安装 Git Bash</p>
+            </div>
+
+            <div class="card">
+                <h4>macOS / Linux (Bash)</h4>
+                <div class="code-block">
+                    <code>curl -fsSL https://claude.ai/install.sh | sh</code>
+                </div>
+            </div>
+
+            <div class="note">
+                <strong>提示</strong>：安装脚本会自动：
+                <ul class="list">
+                    <li>检测你的操作系统和架构</li>
+                    <li>下载最新版本的原生二进制文件</li>
+                    <li>安装到用户目录（<code>~/.local/bin</code>）</li>
+                    <li>配置 PATH 环境变量</li>
+                </ul>
+            </div>
+
+            <h3 class="section-subtitle">方法二：Windows 详细安装步骤</h3>
+            <div class="card">
+                <h4>步骤 1：安装 Git Bash（前置要求）</h4>
+                <p class="section-description">Claude Code 在 Windows 上需要 Git Bash 才能运行。请先下载安装：</p>
+                <div class="code-block">
+                    <code>下载地址：https://git-scm.com/downloads/win</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>步骤 2：使用 CMD 安装</h4>
+                <div class="code-block">
+                    <code>curl -fsSL https://claude.ai/install.cmd -o install.cmd
+install.cmd</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>步骤 3：配置环境变量 PATH</h4>
+                <p class="section-description">安装完成后，需要手动添加到系统 PATH：</p>
+                <ol class="list">
+                    <li>按 <code>Win + R</code>，输入 <code>sysdm.cpl</code>，回车</li>
+                    <li>点击"高级"标签，然后点击"环境变量"</li>
+                    <li>在"用户变量"中，找到 <code>Path</code>，点击"编辑"</li>
+                    <li>点击"新建"，添加：<code>C:\Users\你的用户名\.local\bin</code></li>
+                    <li>确定保存，重启 CMD 或 Git Bash</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h4>步骤 4：配置 API 环境变量</h4>
+                <p class="section-description">在"环境变量"窗口中，点击"新建"添加以下三个变量：</p>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>变量名</th>
+                                <th>值</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ANTHROPIC_BASE_URL</td>
+                                <td>https://api.claudecode.net.cn/api/claudecode</td>
+                            </tr>
+                            <tr>
+                                <td>ANTHROPIC_API_KEY</td>
+                                <td>sk-ant-api03-你的密钥</td>
+                            </tr>
+                            <tr>
+                                <td>ANTHROPIC_AUTH_TOKEN</td>
+                                <td>sk-ant-api03-你的密钥</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="note">
+                    <strong>或者使用配置文件：</strong>创建文件 <code>%USERPROFILE%\.claude\settings.json</code>，内容如下：
+                    <div class="code-block">
+                        <code>{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.claudecode.net.cn/api/claudecode",
+    "ANTHROPIC_API_KEY": "sk-ant-api03-pbKM2cfaKU******",
+    "ANTHROPIC_AUTH_TOKEN": "sk-ant-api03-pbKM2cfaKU******"
+  }
+}</code>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="section-subtitle">从 Node.js 版本迁移</h3>
+            <p class="section-description">一条命令完成迁移，保留所有配置和设置</p>
+
+            <div class="card">
+                <h4>自动迁移</h4>
+                <p class="section-description">如果你之前通过 npm 安装了 Claude Code，迁移到原生安装非常简单。运行以下命令会自动检测当前安装，并将其迁移到原生二进制版本：</p>
+                <div class="code-block">
+                    <code># 自动迁移命令
+claude --migrate-to-native</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>迁移会保留的内容</h4>
+                <ul class="list">
+                    <li><strong>API Keys</strong>：所有已配置的 API 密钥将被保留</li>
+                    <li><strong>自定义配置</strong>：settings.json 中的所有配置项</li>
+                    <li><strong>Subagents 定义</strong>：自定义的子代理配置</li>
+                    <li><strong>Slash Commands</strong>：自定义的斜杠命令</li>
+                </ul>
+            </div>
+
+            <h3 class="section-subtitle">方法三：手动下载安装</h3>
+            <p class="section-description">适用于需要特定版本或离线安装的场景</p>
+
+            <div class="card">
+                <h4>1. 访问官方下载页面</h4>
+                <p>打开浏览器访问：<code>https://claude.ai/download</code></p>
+            </div>
+
+            <div class="card">
+                <h4>2. 选择对应平台下载</h4>
+                <ul class="list">
+                    <li><strong>Windows</strong>：claude-windows-x64.exe</li>
+                    <li><strong>macOS</strong>：
+                        <ul class="list">
+                            <li>Intel Mac：claude-macos-x64.tar.gz</li>
+                            <li>Apple Silicon：claude-macos-arm64.tar.gz</li>
+                            <li>Universal：claude-macos-universal.tar.gz</li>
+                        </ul>
+                    </li>
+                    <li><strong>Linux</strong>：claude-linux-x64.tar.gz</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h4>3. Windows 安装步骤</h4>
+                <div class="code-block">
+                    <code># 下载完成后
+./claude-windows-x64.exe</code>
+                </div>
+                <p class="section-description">按照安装向导完成安装，默认会添加到 PATH</p>
+            </div>
+
+            <div class="card">
+                <h4>4. macOS 安装步骤</h4>
+                <div class="code-block">
+                    <code># 解压文件
+tar -xzf claude-macos-*.tar.gz
+
+# 移动到系统路径
+sudo mv claude /usr/local/bin/
+
+# 添加执行权限
+chmod +x /usr/local/bin/claude</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>5. Linux 安装步骤</h4>
+                <div class="code-block">
+                    <code># 解压文件
+tar -xzf claude-linux-x64.tar.gz
+
+# 移动到系统路径
+sudo mv claude /usr/local/bin/
+
+# 添加执行权限
+chmod +x /usr/local/bin/claude</code>
+                </div>
+            </div>
+
+            <h3 class="section-subtitle">方法三：包管理器安装</h3>
+
+            <div class="card">
+                <h4>macOS (Homebrew)</h4>
+                <div class="code-block">
+                    <code># 安装
+brew install claude-code
+
+# 更新
+brew upgrade claude-code</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>Windows (Scoop)</h4>
+                <div class="code-block">
+                    <code># 添加 bucket
+scoop bucket add claude
+
+# 安装
+scoop install claude-code</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>Linux (APT)</h4>
+                <div class="code-block">
+                    <code># 添加 GPG 密钥
+curl -fsSL https://claude.ai/gpg.key | sudo apt-key add -
+
+# 添加仓库
+echo "deb https://claude.ai/apt stable main" | sudo tee /etc/apt/sources.list.d/claude.list
+
+# 安装
+sudo apt update
+sudo apt install claude-code</code>
+                </div>
+            </div>
+        </section>
+
+        <section id="configuration" class="section">
+            <h2 class="section-title">配置说明</h2>
+
+            <h3 class="section-subtitle">验证安装</h3>
+            <div class="card">
+                <div class="code-block">
+                    <code># 检查版本
+claude --version
+
+# 查看帮助
+claude --help
+
+# 运行系统诊断
+claude doctor</code>
+                </div>
+            </div>
+
+            <h3 class="section-subtitle">API 配置</h3>
+            <p class="section-description">原生版本与 npm 版本使用相同的 API 配置方式</p>
+
+            <div class="card">
+                <h4>方式一：环境变量（推荐）</h4>
+                <div class="code-block">
+                    <code># Windows (PowerShell)
+$env:ANTHROPIC_API_KEY="sk-ant-api03-你的密钥"
+$env:ANTHROPIC_AUTH_TOKEN="sk-ant-api03-你的密钥"
+
+# macOS / Linux
+export ANTHROPIC_API_KEY="sk-ant-api03-你的密钥"
+export ANTHROPIC_AUTH_TOKEN="sk-ant-api03-你的密钥"</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>方式二：配置文件</h4>
+                <p>创建配置文件 <code>~/.claude/config.json</code>：</p>
+                <div class="code-block">
+                    <code>{
+  "apiKey": "sk-ant-api03-你的密钥",
+  "authToken": "sk-ant-api03-你的密钥",
+  "baseUrl": "https://api.anthropic.com",
+  "model": "claude-3-sonnet-20241022"
+}</code>
+                </div>
+            </div>
+
+            <h3 class="section-subtitle">配置文件详解</h3>
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>配置项</th>
+                            <th>说明</th>
+                            <th>默认值</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>apiKey</td>
+                            <td>Anthropic API 密钥</td>
+                            <td>必填</td>
+                        </tr>
+                        <tr>
+                            <td>authToken</td>
+                            <td>认证令牌</td>
+                            <td>同 apiKey</td>
+                        </tr>
+                        <tr>
+                            <td>baseUrl</td>
+                            <td>API 服务器地址</td>
+                            <td>https://api.anthropic.com</td>
+                        </tr>
+                        <tr>
+                            <td>model</td>
+                            <td>默认模型</td>
+                            <td>claude-3-sonnet-20241022</td>
+                        </tr>
+                        <tr>
+                            <td>maxTokens</td>
+                            <td>最大输出 token 数</td>
+                            <td>4096</td>
+                        </tr>
+                        <tr>
+                            <td>temperature</td>
+                            <td>生成温度（0-1）</td>
+                            <td>0.7</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="usage" class="section">
+            <h2 class="section-title">使用指南</h2>
+
+            <h3 class="section-subtitle">基本命令</h3>
+            <div class="card">
+                <div class="code-block">
+                    <code># 启动交互式会话
+claude
+
+# 直接提问
+claude "写一个 Python Hello World 程序"
+
+# 查看版本
+claude --version
+
+# 系统诊断
+claude doctor
+
+# 更新到最新版本
+claude update
+
+# 查看配置
+claude config show
+
+# 重置配置
+claude config reset</code>
+                </div>
+            </div>
+
+            <h3 class="section-subtitle">高级功能</h3>
+            <div class="card">
+                <h4>项目初始化</h4>
+                <div class="code-block">
+                    <code># 在当前目录初始化 Claude 项目
+claude init
+
+# 指定项目类型
+claude init --type react
+
+# 使用自定义模板
+claude init --template ./my-template</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>文件操作</h4>
+                <div class="code-block">
+                    <code># 查看文件
+claude show src/App.js
+
+# 编辑文件
+claude edit src/App.js "添加错误边界"
+
+# 创建新文件
+claude create utils/api.js "实现 API 调用函数"</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>Git 集成</h4>
+                <div class="code-block">
+                    <code># 生成提交信息
+claude commit
+
+# 代码审查
+claude review
+
+# 生成 PR 描述
+claude pr</code>
+                </div>
+            </div>
+        </section>
+
+        <section id="comparison" class="section">
+            <h2 class="section-title">原生版本 vs npm 版本对比</h2>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>特性</th>
+                            <th>原生版本</th>
+                            <th>npm 版本</th>
+                            <th>说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>安装方式</td>
+                            <td>单文件</td>
+                            <td>npm 包</td>
+                            <td>原生版本更简单</td>
+                        </tr>
+                        <tr>
+                            <td>依赖要求</td>
+                            <td>无</td>
+                            <td>Node.js 18+</td>
+                            <td>原生版本零依赖</td>
+                        </tr>
+                        <tr>
+                            <td>启动时间</td>
+                            <td>0.5-0.7秒</td>
+                            <td>2-3秒</td>
+                            <td>原生版本快 4 倍</td>
+                        </tr>
+                        <tr>
+                            <td>内存占用</td>
+                            <td>30-50MB</td>
+                            <td>80-120MB</td>
+                            <td>原生版本节省 60%</td>
+                        </tr>
+                        <tr>
+                            <td>更新方式</td>
+                            <td>自动更新</td>
+                            <td>npm update</td>
+                            <td>都支持自动更新</td>
+                        </tr>
+                        <tr>
+                            <td>功能完整性</td>
+                            <td>100%</td>
+                            <td>100%</td>
+                            <td>功能完全一致</td>
+                        </tr>
+                        <tr>
+                            <td>适用场景</td>
+                            <td>生产环境</td>
+                            <td>开发环境</td>
+                            <td>根据需求选择</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="note">
+                <strong>建议</strong>：
+                <ul class="list">
+                    <li><strong>开发环境</strong>：可以使用 npm 版本，方便与其他 Node.js 工具集成</li>
+                    <li><strong>生产环境</strong>：推荐原生版本，更轻量、启动更快</li>
+                    <li><strong>CI/CD</strong>：强烈推荐原生版本，减少构建时间和资源占用</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="troubleshooting" class="section">
+            <h2 class="section-title">常见问题</h2>
+
+            <div class="card">
+                <h4>Q1: 原生安装是如何工作的？</h4>
+                <p><strong>回答</strong>：使用 Bun 的 <code>--compile</code> 功能将 TypeScript 代码、所有依赖和 Bun 运行时打包成单一的原生可执行文件。类似于 Go 或 Rust 编译出来的二进制文件。</p>
+            </div>
+
+            <div class="card">
+                <h4>Q2: 为什么启动速度更快？</h4>
+                <p><strong>回答</strong>：Bun 使用 Apple 的 JavaScriptCore 引擎（Safari 的 JS 引擎），优先优化启动时间和内存占用。而 Node.js 使用 V8 引擎，更注重长时间运行的性能。</p>
+            </div>
+
+            <div class="card">
+                <h4>Q3: 需要卸载 Node.js 吗？</h4>
+                <p><strong>回答</strong>：不需要。原生安装的 Claude Code 完全独立运行，不会影响系统中的 Node.js。你可以继续使用 Node.js 进行其他开发工作。</p>
+            </div>
+
+            <div class="card">
+                <h4>Q4: Alpine Linux 支持吗？</h4>
+                <p><strong>回答</strong>：Alpine Linux 使用 musl libc，而原生版本基于 glibc，因此不支持。建议使用 Ubuntu、Debian、CentOS 等主流发行版。</p>
+            </div>
+
+            <div class="card">
+                <h4>Q5: 如何验证安装类型？</h4>
+                <p><strong>回答</strong>：运行 <code>claude doctor</code> 命令可以检查你的安装类型、版本和系统配置。</p>
+            </div>
+
+            <div class="card">
+                <h4>Q6: 可以回退到 npm 版本吗？</h4>
+                <p><strong>回答</strong>：可以，但不推荐。你可以卸载原生版本后重新使用 <code>npm install -g @anthropic-ai/claude-code</code> 安装。</p>
+            </div>
+
+            <div class="card">
+                <h4>Q7: Windows 安装后提示找不到 claude 命令？</h4>
+                <p><strong>解决</strong>：需要将 <code>C:\Users\你的用户名\.local\bin</code> 添加到系统 PATH 环境变量中。可以使用 PowerShell 命令一键配置，或通过"系统属性 → 环境变量"手动添加。</p>
+            </div>
+
+            <div class="card">
+                <h4>Q8: Windows 上需要 Git Bash 吗？</h4>
+                <p><strong>回答</strong>：是的。原生版本在 Windows 上通过 Git Bash 运行，因为提供了更好的 Unix 兼容性。安装 Git for Windows 后会自动包含 Git Bash。</p>
+            </div>
+
+            <div class="card">
+                <h4>Q9: 如何配置中转 API？</h4>
+                <p><strong>回答</strong>：设置三个环境变量：<code>ANTHROPIC_BASE_URL</code>（中转地址）、<code>ANTHROPIC_API_KEY</code> 和 <code>ANTHROPIC_AUTH_TOKEN</code>（API 密钥）。也可以在 <code>~/.claude/settings.json</code> 中配置。</p>
+            </div>
+
+            <div class="card">
+                <h4>Q10: Windows 显示安全警告</h4>
+                <p><strong>问题</strong>：运行 .exe 文件时 Windows Defender 提示安全风险</p>
+                <p><strong>解决</strong>：</p>
+                <ul class="list">
+                    <li>点击"更多信息"</li>
+                    <li>选择"仍要运行"</li>
+                    <li>或将文件添加到 Windows Defender 白名单</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h4>Q11: Linux/macOS 权限被拒绝</h4>
+                <p><strong>问题</strong>：执行 claude 命令时提示 permission denied</p>
+                <p><strong>解决</strong>：</p>
+                <div class="code-block">
+                    <code>chmod +x /usr/local/bin/claude</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>Q12: 自动更新失败</h4>
+                <p><strong>问题</strong>：claude update 命令执行失败</p>
+                <p><strong>解决</strong>：</p>
+                <ul class="list">
+                    <li>手动下载最新版本替换旧文件</li>
+                    <li>检查网络连接和防火墙设置</li>
+                    <li>使用管理员权限运行</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="advanced" class="section">
+            <h2 class="section-title">高级配置</h2>
+
+            <h3 class="section-subtitle">环境变量完整列表</h3>
+            <div class="card">
+                <div class="code-block">
+                    <code># API 配置
+ANTHROPIC_API_KEY=你的API密钥
+ANTHROPIC_AUTH_TOKEN=你的认证令牌
+ANTHROPIC_BASE_URL=https://api.anthropic.com
+
+# 行为配置
+CLAUDE_MODEL=claude-3-sonnet-20241022
+CLAUDE_MAX_TOKENS=4096
+CLAUDE_TEMPERATURE=0.7
+
+# 禁用自动更新
+DISABLE_AUTOUPDATER=1
+
+# 设置配置文件路径
+CLAUDE_CONFIG_PATH=/custom/path/config.json</code>
+                </div>
+            </div>
+
+            <h3 class="section-subtitle">CI/CD 集成</h3>
+            <div class="card">
+                <h4>GitHub Actions 示例</h4>
+                <div class="code-block">
+                    <code>name: Claude Code Example
+on: [push]
+jobs:
+  claude:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Claude Code
+        run: curl -fsSL https://claude.ai/install.sh | sh
+      - name: Run Claude
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: claude "review this PR" --output pr-review.md</code>
+                </div>
+            </div>
+
+            <h3 class="section-subtitle">性能优化建议</h3>
+            <div class="card">
+                <ul class="list">
+                    <li><strong>使用 SSD</strong>：虽然不是必须，但 SSD 可以进一步提升启动速度</li>
+                    <li><strong>配置代理</strong>：如果网络环境受限，配置 HTTP 代理：
+                        <div class="code-block">
+                            <code>export HTTP_PROXY=http://proxy.example.com:8080
+export HTTPS_PROXY=http://proxy.example.com:8080</code>
+                        </div>
+                    </li>
+                    <li><strong>缓存管理</strong>：Claude 会自动缓存常用数据，清理缓存：
+                        <div class="code-block">
+                            <code>claude cache clear</code>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="uninstall" class="section">
+            <h2 class="section-title">卸载指南</h2>
+
+            <h3 class="section-subtitle">Windows</h3>
+            <div class="card">
+                <div class="code-block">
+                    <code># 方法一：使用卸载程序
+# 在"应用和功能"中找到 Claude Code 并卸载
+
+# 方法二：手动删除
+Remove-Item "$env:USERPROFILE\.local\bin\claude.exe" -Force
+Remove-Item "$env:USERPROFILE\.claude" -Recurse -Force</code>
+                </div>
+            </div>
+
+            <h3 class="section-subtitle">macOS</h3>
+            <div class="card">
+                <div class="code-block">
+                    <code># 删除主程序
+sudo rm -f /usr/local/bin/claude
+
+# 删除配置文件
+rm -rf ~/.claude
+
+# 如果使用 Homebrew 安装
+brew uninstall claude-code</code>
+                </div>
+            </div>
+
+            <h3 class="section-subtitle">Linux</h3>
+            <div class="card">
+                <div class="code-block">
+                    <code># 删除主程序
+sudo rm -f /usr/local/bin/claude
+
+# 删除配置文件
+rm -rf ~/.claude
+
+# 如果使用 APT 安装
+sudo apt remove claude-code</code>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">总结</h2>
+            <p class="section-description">Claude Code 原生版本通过 Bun 编译技术实现了零依赖、极速启动的全新体验。它不仅保留了所有原有功能，还大幅提升了性能和便携性。无论是个人开发、企业部署还是 CI/CD 集成，原生版本都是更优的选择。</p>
+
+            <div class="card">
+                <h4>快速开始命令</h4>
+                <div class="code-block">
+                    <code># 一键安装
+curl -fsSL https://claude.ai/install.sh | sh
+
+# 配置 API
+export ANTHROPIC_API_KEY="你的密钥"
+
+# 开始使用
+claude</code>
+                </div>
+            </div>
+
+            <div class="note">
+                <strong>下一步</strong>：
+                <ul class="list">
+                    <li>查看 <a href="https://docs.claude.ai" style="color: var(--secondary-color);">官方文档</a> 了解更多功能</li>
+                    <li>探索 <a href="https://github.com/anthropic/claude-code" style="color: var(--secondary-color);">GitHub 仓库</a> 参与开源贡献</li>
+                    <li>加入社区交流获取最佳实践</li>
+                </ul>
+            </div>
+        </section>
+        </div>
+        <aside class="toc-sidebar">
+            <h3>📋 目录</h3>
+            <ul>
+                <li><a href="#overview">什么是原生安装？</a></li>
+                <li><a href="#system-requirements">系统要求</a></li>
+                <li><a href="#installation-methods">安装指南</a></li>
+                <li><a href="#configuration">配置说明</a></li>
+                <li><a href="#usage">使用指南</a></li>
+                <li><a href="#comparison">版本对比</a></li>
+                <li><a href="#troubleshooting">常见问题</a></li>
+                <li><a href="#advanced">高级配置</a></li>
+                <li><a href="#uninstall">卸载指南</a></li>
+            </ul>
+        </aside>
+    </div>
+
+    <footer style="border-top: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); margin-top: 5rem;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 2rem; text-align: center;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                <!-- 版权信息 -->
+                <div style="font-size: 0.875rem; color: var(--text-secondary);" id="copyright-text"></div>
+                <!-- 备案号 -->
+                <div style="font-size: 0.875rem; color: #6b7280;" id="beian-number"></div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // Load config from articles.json
+    fetch('/data/articles.json')
+        .then(response => response.json())
+        .then(data => {
+            const { beianNumber, copyrightText } = data.config;
+
+            document.getElementById('copyright-text').textContent = copyrightText || '© 2025 Halavah\'s Tech. All rights reserved.';
+            if (beianNumber) {
+                document.getElementById('beian-number').textContent = beianNumber;
+            }
+        })
+        .catch(error => console.error('Failed to load config:', error));
+    </script>
+
+    <script>
+    // Smooth scroll and active link tracking
+    document.querySelectorAll('.toc-sidebar a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    // Highlight active section
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                document.querySelectorAll('.toc-sidebar a').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${entry.target.id}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+    }, { rootMargin: '-100px 0px -80% 0px' });
+
+    document.querySelectorAll('section[id]').forEach(section => {
+        observer.observe(section);
+    });
+
+    // Back to top button functionality
+    const backToTop = document.getElementById('backToTop');
+
+    // Show/hide button based on scroll position
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            backToTop.classList.add('show');
+        } else {
+            backToTop.classList.remove('show');
+        }
+    });
+
+    // Smooth scroll to top when button is clicked
+    backToTop.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+    </script>
+</body>
+</html>

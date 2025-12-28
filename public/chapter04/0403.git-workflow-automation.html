@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Workflow Automation - Git工作流自动化实战</title>
+    <meta name="description" content="基于Claude Code的Git工作流自动化指南，包括文件选择、提交信息生成、分支管理等，提升团队协作效率">
+    <style>
+        :root {
+            --primary-color: #8b5cf6;
+            --secondary-color: #06b6d4;
+            --accent-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --border-color: #475569;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --gradient-git: linear-gradient(135deg, #f05032 0%, #ff6b35 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        /* 背景粒子效果 */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        /* 头部样式 */
+        .hero-header {
+            background: var(--gradient-git);
+            padding: 4rem 2rem 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 3rem;
+        }
+
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 8s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 导航目录 */
+        .toc-container {
+            max-width: 1200px;
+            margin: 0 auto 3rem;
+            padding: 0 2rem;
+        }
+
+        .toc-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .toc-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+            border-color: var(--primary-color);
+        }
+
+        .toc-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .toc-item {
+            padding: 0.8rem 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .toc-item:hover {
+            background: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .toc-item a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc-item:hover a {
+            color: var(--text-primary);
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        /* 区块样式 */
+        .section {
+            margin-bottom: 4rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        .section:nth-child(1) { animation-delay: 0.1s; }
+        .section:nth-child(2) { animation-delay: 0.2s; }
+        .section:nth-child(3) { animation-delay: 0.3s; }
+        .section:nth-child(4) { animation-delay: 0.4s; }
+        .section:nth-child(5) { animation-delay: 0.5s; }
+        .section:nth-child(6) { animation-delay: 0.6s; }
+        .section:nth-child(7) { animation-delay: 0.7s; }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+            padding-left: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* 痛点卡片 */
+        .pain-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .pain-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .pain-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--error-color);
+        }
+
+        .pain-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.2);
+        }
+
+        .pain-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .pain-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .pain-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* 价值卡片 */
+        .value-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .value-card {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .value-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .value-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
+            border-color: var(--accent-color);
+        }
+
+        .value-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .value-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .value-description {
+            color: var(--text-muted);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 流程对比 */
+        .comparison-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .process-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .process-card.featured {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+        }
+
+        .process-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .process-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .process-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .badge-ui {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .badge-ai {
+            background: var(--primary-color);
+            color: var(--text-primary);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .step-list {
+            list-style: none;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: start;
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .step-item:hover {
+            transform: translateX(5px);
+            background: var(--border-color);
+        }
+
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: var(--primary-color);
+            color: var(--text-primary);
+            border-radius: 50%;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.3rem;
+        }
+
+        .step-description {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* 对比表格 */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comparison-table th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .comparison-table tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .comparison-table .feature-check {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .comparison-table .feature-cross {
+            color: var(--error-color);
+            font-weight: 600;
+        }
+
+        /* 文件选择展示 */
+        .file-selection {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-header {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-item:hover {
+            background: var(--bg-tertiary);
+            margin: 0 -1rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .file-icon {
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .file-name {
+            flex: 1;
+            color: var(--text-secondary);
+        }
+
+        .file-status {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 1rem;
+        }
+
+        .status-added {
+            background: var(--accent-color);
+            color: var(--text-primary);
+        }
+
+        .status-skipped {
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+        }
+
+        /* 代码块 */
+        .code-block {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .code-title {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .copy-btn {
+            background: var(--primary-color);
+            color: var(--text-primary);
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-color);
+            transform: scale(1.05);
+        }
+
+        .copy-btn.copied {
+            background: var(--accent-color);
+        }
+
+        pre {
+            color: var(--text-secondary);
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        /* 提交类型表格 */
+        .commit-types {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+
+        .commit-types th,
+        .commit-types td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .commit-types th {
+            background: var(--primary-color);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .commit-types tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .type-badge {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            font-family: 'Monaco', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* 团队协作检查清单 */
+        .checklist {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .checklist-header {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checklist-items {
+            list-style: none;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: start;
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .checklist-item:hover {
+            transform: translateX(5px);
+            background: var(--border-color);
+        }
+
+        .checklist-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent-color);
+            border-radius: 4px;
+            margin-right: 1rem;
+            flex-shrink: 0;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .checkitem-content {
+            flex: 1;
+            color: var(--text-secondary);
+        }
+
+        /* 问题解决方案 */
+        .troubleshooting-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .trouble-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .trouble-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.2);
+            border-color: var(--warning-color);
+        }
+
+        .trouble-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .trouble-icon {
+            font-size: 1.5rem;
+            color: var(--warning-color);
+        }
+
+        .trouble-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .trouble-solution {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .solution-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        /* 统计数据 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(139, 92, 246, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .comparison-container {
+                grid-template-columns: 1fr;
+            }
+
+            .toc-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pain-points,
+            .value-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- 头部 -->
+    <header class="hero-header">
+        <h1 class="hero-title">Git Workflow Automation</h1>
+        <p class="hero-subtitle">基于Claude Code的Git工作流自动化实战，让团队协作更高效</p>
+    </header>
+
+    <!-- 导航目录 -->
+    <div class="toc-container">
+        <div class="toc-card">
+            <h2 class="toc-title">📋 课程目录</h2>
+            <div class="toc-grid">
+                <div class="toc-item">
+                    <a href="#section-1">1. Git工作流自动化概览</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-2">2. 两种提交流程对比</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-3">3. 精准文件选择</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-4">4. 智能提交信息生成</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-5">5. 分支管理自动化</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-6">6. 团队协作最佳实践</a>
+                </div>
+                <div class="toc-item">
+                    <a href="#section-7">7. 常见问题解决</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="container">
+        <!-- 统计数据 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">80%</div>
+                <div class="stat-label">时间节省</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">95%</div>
+                <div class="stat-label">提交规范性</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">60%</div>
+                <div class="stat-label">冲突减少</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">3x</div>
+                <div class="stat-label">协作效率</div>
+            </div>
+        </div>
+
+        <!-- 第1节：Git工作流自动化概览 -->
+        <section id="section-1" class="section">
+            <div class="section-header">
+                <h2 class="section-title">1. Git工作流自动化概览</h2>
+                <p class="section-subtitle">了解传统Git工作流的痛点和Claude Code的自动化能力</p>
+            </div>
+
+            <h3 style="color: var(--error-color); margin-bottom: 1.5rem;">😫 传统Git工作流的痛点</h3>
+
+            <div class="pain-points">
+                <div class="pain-card">
+                    <div class="pain-icon">📁</div>
+                    <div class="pain-title">文件选择困难</div>
+                    <div class="pain-description">在复杂项目中难以精准选择相关文件，容易遗漏或包含无关文件</div>
+                </div>
+                <div class="pain-card">
+                    <div class="pain-icon">📝</div>
+                    <div class="pain-title">提交信息不规范</div>
+                    <div class="pain-description">团队成员提交信息格式不统一，难以追踪和维护</div>
+                </div>
+                <div class="pain-card">
+                    <div class="pain-icon">🌿</div>
+                    <div class="pain-title">分支管理混乱</div>
+                    <div class="pain-description">缺乏标准化的分支管理策略，协作效率低下</div>
+                </div>
+                <div class="pain-card">
+                    <div class="pain-icon">⚠️</div>
+                    <div class="pain-title">协作冲突频发</div>
+                    <div class="pain-description">多人协作时经常出现冲突，解决耗时</div>
+                </div>
+            </div>
+
+            <h3 style="color: var(--accent-color); margin: 2rem 0 1.5rem;">✨ 自动化的价值</h3>
+
+            <div class="value-cards">
+                <div class="value-card">
+                    <div class="value-icon">⚡</div>
+                    <div class="value-title">提升效率</div>
+                    <div class="value-description">减少重复性手动操作，让开发者专注于代码本身</div>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">📋</div>
+                    <div class="value-title">规范流程</div>
+                    <div class="value-description">统一团队的工作标准，提高代码质量</div>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">🎯</div>
+                    <div class="value-title">降低错误</div>
+                    <div class="value-description">减少人为操作失误，提高稳定性</div>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">🤝</div>
+                    <div class="value-title">改善协作</div>
+                    <div class="value-description">优化团队协作体验，减少沟通成本</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第2节：两种提交流程对比 -->
+        <section id="section-2" class="section">
+            <div class="section-header">
+                <h2 class="section-title">2. 两种提交流程对比</h2>
+                <p class="section-subtitle">界面操作 vs Claude Code自动化，选择适合你的工作方式</p>
+            </div>
+
+            <div class="comparison-container">
+                <div class="process-card">
+                    <div class="process-header">
+                        <h3 class="process-title">界面操作流程</h3>
+                        <span class="process-badge badge-ui">手动控制</span>
+                    </div>
+
+                    <ul class="step-list">
+                        <li class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <div class="step-title">文件状态检查</div>
+                                <div class="step-description">在VS Code的Changes区域查看所有修改的文件</div>
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <div class="step-title">精准添加文件</div>
+                                <div class="step-description">点击相关文件右侧的"+"号添加到暂存区</div>
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <div class="step-title">生成提交信息</div>
+                                <div class="step-description">点击"智能生成提交信息"按钮或使用快捷键</div>
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <div class="step-title">确认和提交</div>
+                                <div class="step-description">检查生成的提交信息，点击"提交"按钮</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="process-card featured">
+                    <div class="process-header">
+                        <h3 class="process-title">Claude Code自动化</h3>
+                        <span class="process-badge badge-ai">AI驱动</span>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">自动化命令示例</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre># 让Claude Code自动提交
+请帮我提交代码，只提交和本次修改内容有关的文件，提交记录写规范点，用中文
+
+# Claude Code的执行过程：
+# 1. 分析当前Git状态
+# 2. 识别功能相关的文件
+# 3. 自动将相关文件添加到暂存区
+# 4. 生成规范的提交信息
+# 5. 执行提交操作</pre>
+                    </div>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>特性</th>
+                        <th>界面操作</th>
+                        <th>Claude Code自动化</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>控制度</td>
+                        <td>完全控制</td>
+                        <td>自动化执行</td>
+                    </tr>
+                    <tr>
+                        <td>速度</td>
+                        <td>手动操作，较慢</td>
+                        <td>一键执行，快速</td>
+                    </tr>
+                    <tr>
+                        <td>准确性</td>
+                        <td>依赖人工判断</td>
+                        <td>AI辅助，更准确</td>
+                    </tr>
+                    <tr>
+                        <td>学习成本</td>
+                        <td>简单直观</td>
+                        <td>需要信任AI</td>
+                    </tr>
+                    <tr>
+                        <td>适用场景</td>
+                        <td>重要提交、谨慎操作</td>
+                        <td>日常提交、快速迭代</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 第3节：精准文件选择 -->
+        <section id="section-3" class="section">
+            <div class="section-header">
+                <h2 class="section-title">3. 精准文件选择</h2>
+                <p class="section-subtitle">掌握可视化文件选择方法和智能选择技巧</p>
+            </div>
+
+            <h3 style="color: var(--text-primary); margin-bottom: 1.5rem;">VS Code界面操作示例</h3>
+
+            <div class="file-selection">
+                <div class="file-header">Git状态面板</div>
+                <div class="file-item">
+                    <div class="file-icon">✅</div>
+                    <div class="file-name">src/components/UserAuth.js</div>
+                    <div class="file-status status-added">[+]</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon">✅</div>
+                    <div class="file-name">src/services/authService.js</div>
+                    <div class="file-status status-added">[+]</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon">✅</div>
+                    <div class="file-name">tests/auth.test.js</div>
+                    <div class="file-status status-added">[+]</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon">❌</div>
+                    <div class="file-name">config/dev.env</div>
+                    <div class="file-status status-skipped">跳过</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon">❌</div>
+                    <div class="file-name">package-lock.json</div>
+                    <div class="file-status status-skipped">跳过</div>
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">批量选择技巧</span>
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                </div>
+                <pre># 使用通配符批量选择
+git add src/**/*auth*
+git add tests/*test*
+git add docs/api-*.md
+
+# 排除特定文件
+git add src/ -- ':!config/*' ':!*.env'</pre>
+            </div>
+        </section>
+
+        <!-- 第4节：智能提交信息生成 -->
+        <section id="section-4" class="section">
+            <div class="section-header">
+                <h2 class="section-title">4. 智能提交信息生成</h2>
+                <p class="section-subtitle">规范化提交信息格式，让代码历史更清晰</p>
+            </div>
+
+            <table class="commit-types">
+                <thead>
+                    <tr>
+                        <th>类型</th>
+                        <th>说明</th>
+                        <th>示例</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="type-badge">feat</span></td>
+                        <td>新功能</td>
+                        <td>feat(auth): 添加用户登录功能</td>
+                    </tr>
+                    <tr>
+                        <td><span class="type-badge">fix</span></td>
+                        <td>Bug修复</td>
+                        <td>fix(api): 修复用户查询接口错误</td>
+                    </tr>
+                    <tr>
+                        <td><span class="type-badge">docs</span></td>
+                        <td>文档更新</td>
+                        <td>docs(readme): 更新安装说明</td>
+                    </tr>
+                    <tr>
+                        <td><span class="type-badge">style</span></td>
+                        <td>代码格式</td>
+                        <td>style(format): 统一代码缩进</td>
+                    </tr>
+                    <tr>
+                        <td><span class="type-badge">refactor</span></td>
+                        <td>重构</td>
+                        <td>refactor(auth): 重构认证服务结构</td>
+                    </tr>
+                    <tr>
+                        <td><span class="type-badge">test</span></td>
+                        <td>测试相关</td>
+                        <td>test(auth): 添加认证服务单元测试</td>
+                    </tr>
+                    <tr>
+                        <td><span class="type-badge">chore</span></td>
+                        <td>构建工具</td>
+                        <td>chore(deps): 更新依赖包版本</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Claude Code智能生成示例</span>
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                </div>
+                <pre># 场景1：新功能开发
+# 提交内容：
+# - 新增用户登录表单组件
+# - 实现认证服务
+# - 添加登录接口
+# - 编写相关测试
+
+# Claude Code生成的提交信息：
+feat(auth): 添加用户认证功能
+
+- 实现登录表单UI组件
+- 新增用户认证服务接口
+- 集成JWT token验证
+- 添加登录状态管理
+- 完善单元测试用例</pre>
+            </div>
+        </section>
+
+        <!-- 第5节：分支管理自动化 -->
+        <section id="section-5" class="section">
+            <div class="section-header">
+                <h2 class="section-title">5. 分支管理自动化</h2>
+                <p class="section-subtitle">标准化分支命名规范和智能分支操作</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">标准命名模式</span>
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                </div>
+                <pre>feature/功能描述           # 功能开发分支
+bugfix/问题描述           # Bug修复分支
+hotfix/紧急修复描述        # 紧急修复分支
+release/版本号            # 发布分支
+experimental/实验性功能    # 实验性分支
+
+# 示例
+feature/user-authentication
+bugfix/login-validation-error
+hotfix/security-vulnerability
+release/v1.2.0
+experimental/ai-chat-integration</pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">智能分支操作</span>
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                </div>
+                <pre># 基于功能描述自动创建分支
+请为"用户登录功能"创建功能分支
+
+# Claude Code执行：
+git checkout -b feature/user-authentication develop
+git push -u origin feature/user-authentication
+
+# 智能合并分支，处理冲突
+请将feature/user-authentication分支合并到develop分支
+
+# Claude Code执行：
+git checkout develop
+git pull origin develop
+git merge feature/user-authentication --no-ff
+git push origin develop</pre>
+            </div>
+        </section>
+
+        <!-- 第6节：团队协作最佳实践 -->
+        <section id="section-6" class="section">
+            <div class="section-header">
+                <h2 class="section-title">6. 团队协作最佳实践</h2>
+                <p class="section-subtitle">建立统一的Git规范和协作流程</p>
+            </div>
+
+            <div class="checklist">
+                <div class="checklist-header">🔍 代码审查Checklist</div>
+                <ul class="checklist-items">
+                    <li class="checklist-item">
+                        <div class="checklist-checkbox"></div>
+                        <div class="checkitem-content">代码质量：代码可读性、结构清晰</div>
+                    </li>
+                    <li class="checklist-item">
+                        <div class="checklist-checkbox"></div>
+                        <div class="checkitem-content">功能正确：功能实现符合需求</div>
+                    </li>
+                    <li class="checklist-item">
+                        <div class="checklist-checkbox"></div>
+                        <div class="checkitem-content">测试覆盖：有充分的测试用例</div>
+                    </li>
+                    <li class="checklist-item">
+                        <div class="checklist-checkbox"></div>
+                        <div class="checkitem-content">性能考虑：没有明显的性能问题</div>
+                    </li>
+                    <li class="checklist-item">
+                        <div class="checklist-checkbox"></div>
+                        <div class="checkitem-content">安全性：没有安全漏洞</div>
+                    </li>
+                    <li class="checklist-item">
+                        <div class="checklist-checkbox"></div>
+                        <div class="checkitem-content">文档更新：相关文档已更新</div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">并行开发策略</span>
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                </div>
+                <pre># 1. 使用功能分支隔离开发
+git checkout -b feature/user-management develop
+git checkout -b feature/product-catalog develop
+
+# 2. 定期同步主分支
+git checkout feature/user-management
+git pull origin develop
+
+# 3. 解决冲突后继续开发
+git merge develop --no-ff
+# 解决冲突...
+git add .
+git commit -m "sync with develop"</pre>
+            </div>
+        </section>
+
+        <!-- 第7节：常见问题解决 -->
+        <section id="section-7" class="section">
+            <div class="section-header">
+                <h2 class="section-title">7. 常见问题解决</h2>
+                <p class="section-subtitle">解决Git工作流中的常见问题和痛点</p>
+            </div>
+
+            <div class="troubleshooting-grid">
+                <div class="trouble-card">
+                    <div class="trouble-header">
+                        <div class="trouble-icon">🎯</div>
+                        <div class="trouble-title">文件选择不准确</div>
+                    </div>
+                    <div class="trouble-solution">
+                        <div class="solution-title">解决方案：</div>
+                        <div class="code-block" style="margin: 0;">
+                            <pre># 手动精确选择
+git add src/components/UserAuth.js
+git add src/services/authService.js
+
+# 使用排除模式
+git add src/ -- ':!config/*' ':!*.tmp'</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="trouble-card">
+                    <div class="trouble-header">
+                        <div class="trouble-icon">📝</div>
+                        <div class="trouble-title">提交信息不符合规范</div>
+                    </div>
+                    <div class="trouble-solution">
+                        <div class="solution-title">解决方案：</div>
+                        <div class="code-block" style="margin: 0;">
+                            <pre># 手动编辑提交信息
+git commit --amend -m "feat(auth): 添加用户认证功能"
+
+# 或者重新提交
+git reset HEAD~1
+# 重新选择文件和提交</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="trouble-card">
+                    <div class="trouble-header">
+                        <div class="trouble-icon">⚔️</div>
+                        <div class="trouble-title">分支冲突</div>
+                    </div>
+                    <div class="trouble-solution">
+                        <div class="solution-title">解决方案：</div>
+                        <div class="code-block" style="margin: 0;">
+                            <pre># 1. 查看冲突文件
+git status
+
+# 2. 手动解决冲突
+# 编辑冲突文件，删除冲突标记
+
+# 3. 标记冲突已解决
+git add .
+
+# 4. 完成合并
+git commit</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="trouble-card">
+                    <div class="trouble-header">
+                        <div class="trouble-icon">🔐</div>
+                        <div class="trouble-title">权限不足</div>
+                    </div>
+                    <div class="trouble-solution">
+                        <div class="solution-title">解决方案：</div>
+                        <div class="code-block" style="margin: 0;">
+                            <pre># 配置权限
+git remote set-url origin git@github.com:user/repo.git
+
+# 使用SSH密钥
+ssh-keygen -t rsa -b 4096 -C "your-email@example.com"</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // 粒子背景效果
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function createParticle() {
+            return {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                radius: Math.random() * 2 + 1,
+                opacity: Math.random() * 0.5 + 0.2
+            };
+        }
+
+        function initParticles() {
+            particles = [];
+            const particleCount = Math.min(100, (canvas.width * canvas.height) / 15000);
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(createParticle());
+            }
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(particle => {
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(139, 92, 246, ${particle.opacity})`;
+                ctx.fill();
+
+                particle.x += particle.vx;
+                particle.y += particle.vy;
+
+                if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
+                if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+            });
+
+            // 连接临近的粒子
+            particles.forEach((p1, i) => {
+                particles.slice(i + 1).forEach(p2 => {
+                    const distance = Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+                    if (distance < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = `rgba(139, 92, 246, ${0.2 * (1 - distance / 120)})`;
+                        ctx.stroke();
+                    }
+                });
+            });
+
+            requestAnimationFrame(drawParticles);
+        }
+
+        // 复制代码功能
+        function copyCode(button) {
+            const codeBlock = button.parentElement.parentElement;
+            const code = codeBlock.querySelector('pre').textContent;
+
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = '已复制';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.textContent = '复制';
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('.toc-item a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+
+                if (targetSection) {
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 检查清单交互
+        document.querySelectorAll('.checklist-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('click', function() {
+                this.style.backgroundColor = this.style.backgroundColor === 'var(--accent-color)'
+                    ? 'transparent'
+                    : 'var(--accent-color)';
+
+                if (this.style.backgroundColor === 'var(--accent-color)') {
+                    this.innerHTML = '✓';
+                    this.style.color = 'var(--text-primary)';
+                    this.style.display = 'flex';
+                    this.style.alignItems = 'center';
+                    this.style.justifyContent = 'center';
+                } else {
+                    this.innerHTML = '';
+                }
+            });
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // 初始化
+        window.addEventListener('load', () => {
+            setCanvasSize();
+            initParticles();
+            drawParticles();
+
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(30px)';
+                section.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                observer.observe(section);
+            });
+        });
+
+        window.addEventListener('resize', () => {
+            setCanvasSize();
+            initParticles();
+        });
+    </script>
+</body>
+</html>

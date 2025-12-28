@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bytebot - 开源AI桌面代理：让AI拥有自己的电脑</title>
+    <meta name="description" content="Bytebot是一个开源的AI桌面代理，通过自然语言命令自动化计算机任务，在容器化的Linux桌面环境中运行。支持文件处理、多应用工作流、企业级RPA替代方案">
+    <meta name="keywords" content="Bytebot,AI代理,桌面自动化,RPA,开源AI,任务自动化,Docker,TypeScript,NestJS">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0066ff;
+            --secondary-color: #00d4ff;
+            --accent-color: #ff6b00;
+            --dark-bg: #0a0e27;
+            --card-bg: #1a1f3a;
+            --text-color: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --border-color: #2a2f4a;
+            --success-color: #00c853;
+            --gradient-primary: linear-gradient(135deg, #0066ff 0%, #00d4ff 100%);
+            --gradient-hero: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+            --shadow-glow: 0 0 30px rgba(0, 102, 255, 0.3);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--dark-bg);
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: var(--gradient-hero);
+            padding: 4rem 2rem 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(0, 102, 255, 0.2);
+            color: var(--secondary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            margin-bottom: 1rem;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .meta-item strong {
+            color: var(--text-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: flex;
+            gap: 3rem;
+            align-items: flex-start;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section-subtitle {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+            color: var(--text-color);
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 20px rgba(0, 102, 255, 0.2);
+        }
+
+        .card h3 {
+            color: var(--text-color);
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .feature-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .feature-item .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-item h4 {
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .feature-item p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .code-block code {
+            color: #58a6ff;
+        }
+
+        .code-block .comment {
+            color: #8b949e;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .code-title {
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .copy-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Lists */
+        .list {
+            margin: 1rem 0 1rem 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .list li {
+            margin-bottom: 0.5rem;
+            line-height: 1.8;
+        }
+
+        .list li::marker {
+            color: var(--primary-color);
+        }
+
+        /* Info Box */
+        .info-box {
+            background: rgba(0, 102, 255, 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .info-box.success {
+            background: rgba(0, 200, 83, 0.1);
+            border-left-color: var(--success-color);
+        }
+
+        .info-box.warning {
+            background: rgba(255, 107, 0, 0.1);
+            border-left-color: var(--accent-color);
+        }
+
+        .info-box strong {
+            color: var(--secondary-color);
+        }
+
+        /* Stat Grid */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--success-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Table of Contents */
+        .toc-sidebar {
+            width: 280px;
+            position: sticky;
+            top: 6rem;
+            align-self: flex-start;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+
+        .toc-sidebar h3 {
+            color: var(--text-color);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .toc-sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc-sidebar li {
+            margin-bottom: 0.75rem;
+        }
+
+        .toc-sidebar a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+            font-size: 0.9rem;
+            display: block;
+            padding: 0.25rem 0;
+        }
+
+        .toc-sidebar a:hover {
+            color: var(--primary-color);
+        }
+
+        .toc-sidebar a.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .toc-sidebar {
+                width: 100%;
+                position: static;
+                margin-bottom: 2rem;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.75rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 2rem 1.5rem;
+            }
+
+            .hero-title {
+                font-size: 1.75rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .main-content {
+                padding: 2rem 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.6rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            h3 {
+                font-size: 1.3rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .code-block {
+                padding: 0.75rem;
+            }
+
+            .feature-item {
+                padding: 1rem;
+            }
+
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" aria-label="返回顶部">↑</button>
+
+    <!-- Hero Section -->
+    <header class="hero-section">
+        <div class="hero-container">
+            <div class="hero-badge">开源AI桌面代理</div>
+            <h1 class="hero-title">Bytebot - 让AI拥有自己的电脑</h1>
+            <p class="hero-subtitle">通过自然语言命令自动化任何计算机任务，在容器化的Linux桌面环境中运行</p>
+
+            <div class="hero-meta">
+                <div class="meta-item">
+                    ⭐ <strong>9,500+</strong> Stars
+                </div>
+                <div class="meta-item">
+                    🔱 <strong>1,178</strong> Forks
+                </div>
+                <div class="meta-item">
+                    📝 <strong>TypeScript</strong>
+                </div>
+                <div class="meta-item">
+                    📄 <strong>Apache 2.0</strong> License
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="content-wrapper">
+            <!-- 项目概述 -->
+            <section id="overview" class="section">
+                <h2 class="section-title">项目概述</h2>
+                <p class="section-description">
+                    Bytebot 是一个拥有自己电脑的AI。与仅限浏览器的代理或传统RPA工具不同，Bytebot配备了完整的虚拟桌面环境，
+                    可以使用任何应用程序、处理文件、执行跨应用工作流，并通过密码管理器处理身份验证。
+                </p>
+
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">Ubuntu 22.04</div>
+                        <div class="stat-label">完整桌面环境</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">实时VNC</div>
+                        <div class="stat-label">桌面访问</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">多AI支持</div>
+                        <div class="stat-label">提供商</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">Docker</div>
+                        <div class="stat-label">容器化部署</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 核心特性 -->
+            <section id="features" class="section">
+                <h2 class="section-title">核心特性</h2>
+
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div class="icon">💻</div>
+                        <h4>完整桌面环境</h4>
+                        <p>Ubuntu 22.04 + XFCE4，预装Firefox、VS Code、Thunderbird等常用应用</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">📁</div>
+                        <h4>完整文件系统</h4>
+                        <p>独立的/home/user目录，可下载、组织和处理各类文档和文件</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🔐</div>
+                        <h4>密码管理器集成</h4>
+                        <p>支持1Password、Bitwarden，自动处理登录和2FA双因素认证</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🔄</div>
+                        <h4>跨应用工作流</h4>
+                        <p>在浏览器、终端、文本编辑器之间无缝切换，完成复杂多步骤任务</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">👁️</div>
+                        <h4>实时VNC访问</h4>
+                        <p>通过noVNC在浏览器中实时观看桌面，支持Takeover模式随时接管</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🎯</div>
+                        <h4>视觉理解能力</h4>
+                        <p>AI通过截图理解界面，不依赖脆弱的元素选择器，UI变化时自动适应</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🐳</div>
+                        <h4>容器化隔离</h4>
+                        <p>完全隔离的Docker容器，不影响宿主系统，可随时重置到干净状态</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🔌</div>
+                        <h4>MCP协议支持</h4>
+                        <p>支持Model Context Protocol，可通过SSE端点连接MCP客户端</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- vs 传统RPA -->
+            <section id="comparison" class="section">
+                <h2 class="section-title">Bytebot vs 传统RPA</h2>
+                <p class="section-description">下一代企业自动化的革命性优势</p>
+
+                <div class="card">
+                    <h3>核心差异对比</h3>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: rgba(0, 102, 255, 0.1);">
+                                    <th style="padding: 1rem; text-align: left; color: var(--text-color);">对比维度</th>
+                                    <th style="padding: 1rem; text-align: left; color: var(--text-color);">传统RPA (UiPath等)</th>
+                                    <th style="padding: 1rem; text-align: left; color: var(--text-color);">Bytebot</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid var(--border-color);">
+                                    <td style="padding: 1rem; color: var(--text-color); font-weight: 600;">实施时间</td>
+                                    <td style="padding: 1rem; color: var(--text-secondary);">3-6个月</td>
+                                    <td style="padding: 1rem; color: var(--success-color); font-weight: 600;">1-2周</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--border-color);">
+                                    <td style="padding: 1rem; color: var(--text-color); font-weight: 600;">开发要求</td>
+                                    <td style="padding: 1rem; color: var(--text-secondary);">需要RPA专家</td>
+                                    <td style="padding: 1rem; color: var(--success-color); font-weight: 600;">任何技术用户</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--border-color);">
+                                    <td style="padding: 1rem; color: var(--text-color); font-weight: 600;">UI变化适应</td>
+                                    <td style="padding: 1rem; color: var(--text-secondary);">立即中断</td>
+                                    <td style="padding: 1rem; color: var(--success-color); font-weight: 600;">自动适应</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 1rem; color: var(--text-color); font-weight: 600;">年度成本</td>
+                                    <td style="padding: 1rem; color: var(--text-secondary);">$100,000+</td>
+                                    <td style="padding: 1rem; color: var(--success-color); font-weight: 600;">自托管基础设施</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div class="icon">🧠</div>
+                        <h4>自然语言 vs 复杂脚本</h4>
+                        <p>传统RPA需要500+行代码处理银行门户，Bytebot只需一句话</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">👁️</div>
+                        <h4>视觉理解 vs 元素映射</h4>
+                        <p>不依赖脆弱的XPath选择器，通过视觉理解界面</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🔒</div>
+                        <h4>数据主权</h4>
+                        <p>完全在您的基础设施上运行，符合SOC2、HIPAA、PCI-DSS等合规要求</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">💰</div>
+                        <h4>成本优势</h4>
+                        <p>开源免费，使用自己的LLM API密钥，无平台费用、无使用限制</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI模型支持 -->
+            <section id="ai-support" class="section">
+                <h2 class="section-title">多AI提供商支持</h2>
+                <p class="section-description">灵活选择最适合您的AI模型</p>
+
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <h4>Anthropic Claude</h4>
+                        <p>推荐用于复杂任务和长上下文处理</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>OpenAI GPT</h4>
+                        <p>强大的通用能力和广泛的应用场景</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>Google Gemini</h4>
+                        <p>快速响应和多模态理解能力</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>Azure OpenAI</h4>
+                        <p>企业级部署和合规性保障</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>AWS Bedrock</h4>
+                        <p>在AWS基础设施上运行多种模型</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>本地模型 (Ollama)</h4>
+                        <p>完全离线运行，数据不出本地</p>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <strong>LiteLLM集成：</strong>通过LiteLLM代理支持100+种AI提供商，实现统一接口和负载均衡
+                </div>
+            </section>
+
+            <!-- 快速开始 -->
+            <section id="quickstart" class="section">
+                <h2 class="section-title">快速开始</h2>
+                <p class="section-description">多种部署方式，2分钟即可启动</p>
+
+                <h3 class="section-subtitle">方式1: Docker Compose (推荐)</h3>
+                <div class="card">
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">完整部署</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre><code><span class="comment"># 克隆项目</span>
+git clone https://github.com/bytebot-ai/bytebot.git
+cd bytebot
+
+<span class="comment"># 配置AI提供商（选择一个）</span>
+echo "ANTHROPIC_API_KEY=sk-ant-..." > docker/.env
+
+<span class="comment"># 启动所有服务（桌面、代理、UI、数据库）</span>
+docker-compose -f docker/docker-compose.yml up -d
+
+<span class="comment"># 访问服务</span>
+<span class="comment"># - 任务界面: http://localhost:9992</span>
+<span class="comment"># - 代理API: http://localhost:9991</span>
+<span class="comment"># - 桌面API: http://localhost:9990</span>
+<span class="comment"># - VNC访问: http://localhost:9990/vnc</span></code></pre>
+                    </div>
+                </div>
+
+                <h3 class="section-subtitle">方式2: Railway 一键部署</h3>
+                <div class="card">
+                    <ul class="list">
+                        <li>访问 Railway 部署页面</li>
+                        <li>点击 "Deploy Now" 按钮</li>
+                        <li>添加环境变量（选择一个AI提供商）</li>
+                        <li>点击 Deploy，等待2-3分钟</li>
+                        <li>Railway会自动构建所有服务并生成公共URL</li>
+                    </ul>
+                </div>
+
+                <h3 class="section-subtitle">系统要求</h3>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <h4>Docker环境</h4>
+                        <p>Docker ≥ 20.10<br>Docker Compose<br>4GB+ 可用内存</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>AI API密钥</h4>
+                        <p>Anthropic / OpenAI / Google<br>任选其一即���<br>支持多提供商切换</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>网络端口</h4>
+                        <p>9990: 桌面API/VNC<br>9991: 代理API<br>9992: Web界面</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- API集成 -->
+            <section id="api" class="section">
+                <h2 class="section-title">API集成指南</h2>
+                <p class="section-description">三种API方式，满足不同集成需求</p>
+
+                <h3 class="section-subtitle">1. Agent API - 高级任务接口</h3>
+                <div class="card">
+                    <h3>创建AI任务 (Python)</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">Python示例</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre><code>import requests
+
+<span class="comment"># 创建任务</span>
+response = requests.post(
+    "http://localhost:9991/tasks",
+    json={
+        "instruction": "登录我的银行账户，下载上月的对账单",
+        "files": []
+    }
+)
+
+task = response.json()
+task_id = task["id"]
+
+<span class="comment"># 检查任务状态</span>
+import time
+while True:
+    status = requests.get(f"http://localhost:9991/tasks/{task_id}")
+    task_data = status.json()
+
+    if task_data['status'] in ['completed', 'failed']:
+        print(f"结果: {task_data['result']}")
+        break
+
+    time.sleep(2)</code></pre>
+                    </div>
+                </div>
+
+                <h3 class="section-subtitle">2. Computer Use API - 直接桌面控制</h3>
+                <div class="card">
+                    <h3>截图和鼠标操作</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">Python示例</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre><code>import requests
+
+BASE_URL = "http://localhost:9990"
+
+<span class="comment"># 获取屏幕截图</span>
+screenshot = requests.post(f"{BASE_URL}/computer-use", json={
+    "action": "screenshot"
+})
+
+<span class="comment"># 移动鼠标并点击</span>
+requests.post(f"{BASE_URL}/computer-use", json={
+    "action": "mouse_move",
+    "coordinate": [100, 200]
+})
+
+requests.post(f"{BASE_URL}/computer-use", json={
+    "action": "left_click"
+})</code></pre>
+                    </div>
+                </div>
+
+                <h3 class="section-subtitle">3. MCP协议 - Claude Desktop集成</h3>
+                <div class="card">
+                    <p class="section-description">
+                        通过Model Context Protocol连接Claude Desktop，让Claude直接控制桌面
+                    </p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">Claude Desktop配置</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <pre><code><span class="comment"># macOS: ~/Library/Application Support/Claude/claude_desktop_config.json</span>
+<span class="comment"># Windows: %APPDATA%\Claude\claude_desktop_config.json</span>
+
+{
+  "mcpServers": {
+    "bytebot": {
+      "url": "http://localhost:9990/mcp"
+    }
+  }
+}</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 使用场景 -->
+            <section id="use-cases" class="section">
+                <h2 class="section-title">企业级应用场景</h2>
+
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div class="icon">🏢</div>
+                        <h4>金融服务自动化</h4>
+                        <p>登录多个银行门户（自动处理2FA）、下载交易文件、运行数据处理脚本、生成合规报告</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">📊</div>
+                        <h4>业务流程自动化</h4>
+                        <p>从多个SaaS平台提取报告、交叉引用和数据对账、客户入职流程自动化</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">📋</div>
+                        <h4>发票处理</h4>
+                        <p>登录供应商门户下载发票、从PDF中提取关键信息、与内部系统对账</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🔬</div>
+                        <h4>研究与分析</h4>
+                        <p>竞争对手网站监控、市场数据收集和分析、新闻和社交媒体监测</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">💻</div>
+                        <h4>开发与QA</h4>
+                        <p>自动化UI测试和回归测试、跨浏览器兼容性验证、视觉回归测试</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">📄</div>
+                        <h4>文档管理</h4>
+                        <p>批量PDF文档处理、合同条款提取和分析、自动化文档分类归档</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 项目信息 -->
+            <section id="project-info" class="section">
+                <h2 class="section-title">项目信息</h2>
+
+                <div class="card">
+                    <h3>技术栈</h3>
+                    <ul class="list">
+                        <li><strong>前端：</strong>Next.js 15, React 19, TypeScript, Radix UI, Tailwind CSS</li>
+                        <li><strong>后端：</strong>NestJS, Prisma ORM, Socket.io, PostgreSQL 16</li>
+                        <li><strong>AI集成：</strong>Anthropic SDK, OpenAI SDK, Google GenAI, LiteLLM</li>
+                        <li><strong>桌面自动化：</strong>nut.js, Ubuntu 22.04, XFCE4, noVNC</li>
+                        <li><strong>部署：</strong>Docker, Docker Compose, Kubernetes, Helm, Railway</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>相关链接</h3>
+                    <ul class="list">
+                        <li><a href="https://github.com/bytebot-ai/bytebot" target="_blank" style="color: var(--primary-color);">GitHub 仓库</a></li>
+                        <li><a href="https://www.bytebot.ai/" target="_blank" style="color: var(--primary-color);">官方网站</a></li>
+                        <li><a href="https://docs.bytebot.ai" target="_blank" style="color: var(--primary-color);">文档中心</a></li>
+                        <li><a href="https://discord.com/invite/d9ewZkWPTP" target="_blank" style="color: var(--primary-color);">Discord社区</a></li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+
+        <!-- Table of Contents Sidebar -->
+        <aside class="toc-sidebar">
+            <h3>目录</h3>
+            <ul>
+                <li><a href="#overview">项目概述</a></li>
+                <li><a href="#features">核心特性</a></li>
+                <li><a href="#comparison">vs 传统RPA</a></li>
+                <li><a href="#ai-support">AI模型支持</a></li>
+                <li><a href="#quickstart">快速开始</a></li>
+                <li><a href="#api">API集成</a></li>
+                <li><a href="#use-cases">使用场景</a></li>
+                <li><a href="#project-info">项目信息</a></li>
+            </ul>
+        </aside>
+    </div>
+
+    <!-- Footer -->
+    <footer style="border-top: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); margin-top: 5rem;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 2rem; text-align: center;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                <div style="font-size: 0.875rem; color: var(--text-secondary);" id="copyright-text"></div>
+                <div style="font-size: 0.875rem; color: #6b7280;" id="beian-number"></div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Load config
+        fetch('/data/articles.json')
+            .then(response => response.json())
+            .then(data => {
+                const { beianNumber, copyrightText } = data.config;
+                document.getElementById('copyright-text').textContent = copyrightText || '© 2025 Halavah\'s Tech. All rights reserved.';
+                if (beianNumber) {
+                    document.getElementById('beian-number').textContent = beianNumber;
+                }
+            })
+            .catch(error => console.error('Failed to load config:', error));
+
+        // TOC active link tracking
+        document.querySelectorAll('.toc-sidebar a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Highlight active section
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    document.querySelectorAll('.toc-sidebar a').forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${entry.target.id}`) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, { rootMargin: '-100px 0px -80% 0px' });
+
+        document.querySelectorAll('section[id]').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Back to top button
+        const backToTop = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Copy code function
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block').querySelector('code');
+            const text = codeBlock.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '已复制!';
+                button.style.background = 'var(--success-color)';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'var(--primary-color)';
+                }, 2000);
+            }).catch(err => {
+                console.error('复制失败:', err);
+                button.textContent = '复制失败';
+                setTimeout(() => {
+                    button.textContent = '复制';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zen MCP Server - 多模型协调指挥系统</title>
+    <meta name="description" content="Zen MCP Server 是BeehiveInnovations开发的多模型协调指挥系统，让Claude作为指挥官协调o3、Gemini 2.5 Pro、Flash等多个模型，提供模型协调、任务分配、结果整合等功能">
+    <meta name="keywords" content="zen-mcp-server,BeehiveInnovations,多模型协调,claude指挥官,任务分配,模型编排,o3,gemini">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #9b59b6;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --error-color: #e74c3c;
+            --text-primary: #ffffff;
+            --text-secondary: #ecf0f1;
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #283c59;
+            --bg-tertiary: #37474f;
+            --gradient-1: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            --gradient-2: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 背景动画 */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 80%, rgba(155, 89, 182, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(52, 152, 219, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(231, 76, 60, 0.2) 0%, transparent 50%);
+            animation: particlesMove 20s ease-in-out infinite;
+        }
+
+        @keyframes particlesMove {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(1deg); }
+            66% { transform: translateY(20px) rotate(-1deg); }
+        }
+
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .floating-element:nth-child(1) {
+            width: 120px;
+            height: 120px;
+            left: 10%;
+            top: 20%;
+            animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+            width: 80px;
+            height: 80px;
+            right: 15%;
+            top: 30%;
+            animation-delay: 2s;
+        }
+
+        .floating-element:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            left: 60%;
+            bottom: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(180deg); }
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 导航栏 */
+        nav {
+            background: rgba(26, 42, 59, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Hero 部分 */
+        .hero {
+            padding: 8rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(155, 89, 182, 0.1), transparent);
+            border-radius: 50%;
+            animation: heroGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes heroGlow {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 指挥系统演示 */
+        .orchestration-demo {
+            background: rgba(38, 50, 56, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .orchestration-demo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-1);
+        }
+
+        .orchestration-flow {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .orchestration-node {
+            background: rgba(26, 42, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .orchestration-node:hover {
+            transform: translateY(-5px);
+            border-color: rgba(155, 89, 182, 0.3);
+            box-shadow: 0 20px 40px rgba(155, 89, 182, 0.2);
+        }
+
+        .node-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1.5rem;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .node-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+        }
+
+        .node-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* 模型协调演示 */
+        .model-coordination {
+            background: rgba(26, 42, 59, 0.95);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            margin: 3rem 0;
+        }
+
+        .coordination-header {
+            background: rgba(38, 50, 56, 0.9);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .coordination-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .coordination-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .control-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .control-dot:hover {
+            opacity: 0.8;
+        }
+
+        .control-close { background: #ef4444; }
+        .control-minimize { background: #f59e0b; }
+        .control-maximize { background: #10b981; }
+
+        .coordination-body {
+            padding: 2rem;
+            min-height: 400px;
+        }
+
+        .commander-interface {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(155, 89, 182, 0.1);
+            border: 1px solid rgba(155, 89, 182, 0.3);
+            border-radius: 10px;
+        }
+
+        .commander-avatar {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .commander-info {
+            flex: 1;
+        }
+
+        .commander-name {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .commander-role {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .model-card {
+            background: rgba(52, 73, 94, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .model-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-2);
+        }
+
+        .model-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(231, 76, 60, 0.3);
+            box-shadow: 0 15px 30px rgba(231, 76, 60, 0.2);
+        }
+
+        .model-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .model-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .model-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--success-color);
+            animation: statusPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        .model-capabilities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .capability-tag {
+            background: rgba(155, 89, 182, 0.2);
+            color: var(--primary-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .task-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .task-step {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(38, 50, 56, 0.3);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .task-step:hover {
+            background: rgba(52, 73, 94, 0.5);
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-arrow {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            animation: flowArrow 3s ease-in-out infinite;
+        }
+
+        @keyframes flowArrow {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+        }
+
+        /* 功能特性 */
+        .features {
+            padding: 4rem 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: rgba(38, 50, 56, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(155, 89, 182, 0.3);
+            box-shadow: 0 20px 40px rgba(155, 89, 182, 0.2);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1.5rem;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 系统架构 */
+        .architecture {
+            padding: 4rem 0;
+        }
+
+        .arch-diagram {
+            background: rgba(38, 50, 56, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 3rem;
+            margin: 2rem 0;
+        }
+
+        .arch-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .arch-box {
+            background: rgba(26, 42, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .arch-box:hover {
+            transform: translateY(-5px);
+            border-color: rgba(155, 89, 182, 0.3);
+            background: rgba(26, 42, 59, 0.8);
+        }
+
+        .arch-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+            font-size: 1.1rem;
+        }
+
+        .arch-items {
+            list-style: none;
+            text-align: left;
+        }
+
+        .arch-items li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        .arch-items li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+        }
+
+        /* 安装指南 */
+        .install-section {
+            padding: 4rem 0;
+        }
+
+        .install-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .install-method {
+            background: rgba(38, 50, 56, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .install-method:hover {
+            transform: translateY(-5px);
+            border-color: rgba(155, 89, 182, 0.3);
+            box-shadow: 0 20px 40px rgba(155, 89, 182, 0.2);
+        }
+
+        .install-method::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-2);
+        }
+
+        .method-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .method-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        /* 代码示例 */
+        .code-example {
+            background: rgba(26, 42, 59, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .code-title {
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .copy-button {
+            background: rgba(155, 89, 182, 0.2);
+            border: 1px solid rgba(155, 89, 182, 0.3);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background: rgba(155, 89, 182, 0.3);
+            border-color: rgba(155, 89, 182, 0.5);
+        }
+
+        .copy-button.copied {
+            background: rgba(46, 204, 113, 0.2);
+            border-color: rgba(46, 204, 113, 0.3);
+            color: var(--success-color);
+        }
+
+        pre {
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(26, 42, 59, 0.9);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 3rem 0;
+            margin-top: 6rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--text-primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .orchestration-flow {
+                grid-template-columns: 1fr;
+            }
+
+            .model-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .arch-container {
+                grid-template-columns: 1fr;
+            }
+
+            .commander-interface {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .task-flow {
+                align-items: center;
+            }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(38, 50, 56, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(155, 89, 182, 0.5);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(155, 89, 182, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景动画 -->
+    <div class="bg-animation">
+        <div class="particles"></div>
+        <div class="floating-elements">
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+        </div>
+    </div>
+
+    <!-- 导航栏 -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">🎯 Zen MCP Server</div>
+            <ul class="nav-links">
+                <li><a href="#demo">指挥系统</a></li>
+                <li><a href="#features">功能特性</a></li>
+                <li><a href="#architecture">系统架构</a></li>
+                <li><a href="#install">安装指南</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero 部分 -->
+    <section class="hero">
+        <div class="container">
+            <h1>Zen MCP Server</h1>
+            <p class="subtitle">BeehiveInnovations开发的MCP服务器，让Claude作为指挥员协调调用o3、gemini2.5pro、flash等模型，发挥各自优势</p>
+        </div>
+    </section>
+
+    <!-- 指挥系统演示 -->
+    <section id="demo" class="container">
+        <div class="orchestration-demo">
+            <h2 style="text-align: center; margin-bottom: 3rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                多模型协调指挥系统
+            </h2>
+
+            <div class="orchestration-flow">
+                <div class="orchestration-node">
+                    <div class="node-icon">🎯</div>
+                    <div class="node-title">智能指挥官</div>
+                    <div class="node-description">Claude担任总指挥官，智能分析任务并分配</div>
+                </div>
+
+                <div class="orchestration-node">
+                    <div class="node-icon">🧠</div>
+                    <div class="node-title">任务分解</div>
+                    <div class="node-description">智能分析复杂度，分解为可管理子任务</div>
+                </div>
+
+                <div class="orchestration-node">
+                    <div class="node-icon">🔄</div>
+                    <div class="node-title">模型选择</div>
+                    <div class="node-description">根据任务特点选择最优模型组合</div>
+                </div>
+
+                <div class="orchestration-node">
+                    <div class="node-icon">⚡</div>
+                    <div class="node-title">并行执行</div>
+                    <div class="node-description">多模型同时处理不同子任务</div>
+                </div>
+
+                <div class="orchestration-node">
+                    <div class="node-icon">🔗</div>
+                    <div class="node-title">结果整合</div>
+                    <div class="node-description">智能整合各模型输出，形成最终结果</div>
+                </div>
+            </div>
+
+            <!-- 模型协调演示 -->
+            <h3 style="text-align: center; margin: 4rem 0 2rem; font-size: 1.8rem; color: var(--text-primary);">
+                Claude 指挥多模型协作演示
+            </h3>
+
+            <div class="model-coordination">
+                <div class="coordination-header">
+                    <div class="coordination-title">Zen MCP Server - 模型协调管理界面</div>
+                    <div class="coordination-controls">
+                        <div class="control-dot control-close"></div>
+                        <div class="control-dot control-minimize"></div>
+                        <div class="control-dot control-maximize"></div>
+                    </div>
+                </div>
+                <div class="coordination-body">
+                    <div class="commander-interface">
+                        <div class="commander-avatar">C</div>
+                        <div class="commander-info">
+                            <div class="commander-name">Claude Commander</div>
+                            <div class="commander-role">主指挥官，协调所有AI模型</div>
+                        </div>
+                    </div>
+
+                    <div class="model-grid">
+                        <div class="model-card">
+                            <div class="model-header">
+                                <div class="model-name">OpenAI o3</div>
+                                <div class="model-status"></div>
+                            </div>
+                            <div class="model-capabilities">
+                                <span class="capability-tag">复杂推理</span>
+                                <span class="capability-tag">数学逻辑</span>
+                                <span class="capability-tag">算法优化</span>
+                            </div>
+                        </div>
+
+                        <div class="model-card">
+                            <div class="model-header">
+                                <div class="model-name">Gemini 2.5 Pro</div>
+                                <div class="model-status"></div>
+                            </div>
+                            <div class="model-capabilities">
+                                <span class="capability-tag">多模态</span>
+                                <span class="capability-tag">创意分析</span>
+                                <span class="capability-tag">数据处理</span>
+                            </div>
+                        </div>
+
+                        <div class="model-card">
+                            <div class="model-header">
+                                <div class="model-name">Claude 3.5 Sonnet</div>
+                                <div class="model-status"></div>
+                            </div>
+                            <div class="model-capabilities">
+                                <span class="capability-tag">推理</span>
+                                <span class="capability-tag">协调</span>
+                                <span class="capability-tag">分析</span>
+                            </div>
+                        </div>
+
+                        <div class="model-card">
+                            <div class="model-header">
+                                <div class="model-name">Flash Model</div>
+                                <div class="model-status"></div>
+                            </div>
+                            <div class="model-capabilities">
+                                <span class="capability-tag">快速响应</span>
+                                <span class="capability-tag">简单任务</span>
+                                <span class="capability-tag">低成本</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="task-flow">
+                        <div class="task-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">Claude分析用户需求</div>
+                            <div class="step-arrow">→</div>
+                        </div>
+
+                        <div class="task-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">分配任务给适合的模型</div>
+                            <div class="step-arrow">→</div>
+                        </div>
+
+                        <div class="task-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">模型并行处理</div>
+                            <div class="step-arrow">→</div>
+                        </div>
+
+                        <div class="task-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">收集和整合结果</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 功能特性 -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                核心功能特性
+            </h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
+                完整的多模型AI协作解决方案
+            </p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">智能指挥官模式</h3>
+                    <p class="feature-description">Claude作为主指挥官协调多个AI模型，智能分析任务需求，协调模型协作，整合最终结果</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="feature-title">多模型支持</h3>
+                    <p class="feature-description">支持OpenAI o3、Gemini 2.5 Pro、Claude系列、Flash模型等多种AI模型的协调使用</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">任务分解与分配</h3>
+                    <p class="feature-description">智能分解复杂任务，将子任务映射到最适合的模型，支持并行处理和依赖管理</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">性能优化</h3>
+                    <p class="feature-description">成本优化、速度优化、质量保证、资源管理和负载均衡的多维性能优化</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔧</div>
+                    <h3 class="feature-title">配置和管理</h3>
+                    <p class="feature-description">灵活配置、实时监控、动态调整、版本管理和完善的权限控制</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 系统架构 -->
+    <section id="architecture" class="architecture">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                系统架构
+            </h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
+                模块化设计，智能协作架构
+            </p>
+
+            <div class="arch-diagram">
+                <div class="arch-container">
+                    <div class="arch-box">
+                        <div class="arch-title">Command Interpreter</div>
+                        <ul class="arch-items">
+                            <li>命令解析和验证</li>
+                            <li>意图识别</li>
+                            <li>参数提取</li>
+                            <li>上下文理解</li>
+                            <li>安全检查</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-box">
+                        <div class="arch-title">Task Analyzer</div>
+                        <ul class="arch-items">
+                            <li>复杂度评估</li>
+                            <li>需求分析</li>
+                            <li>可行性评估</li>
+                            <li>资源评估</li>
+                            <li>风险识别</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-box">
+                        <div class="arch-title">Model Orchestrator</div>
+                        <ul class="arch-items">
+                            <li>模型选择</li>
+                            <li>任务分配</li>
+                            <li>协调管理</li>
+                            <li>状态监控</li>
+                            <li>异常处理</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-box">
+                        <div class="arch-title">Result Aggregator</div>
+                        <ul class="arch-items">
+                            <li>结果收集</li>
+                            <li>质量评估</li>
+                            <li>冲突解决</li>
+                            <li>结果整合</li>
+                            <li>格式化输出</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 安装指南 -->
+    <section id="install" class="install-section">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                安装指南
+            </h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
+                多种部署方式，快速启动多模型协调
+            </p>
+
+            <div class="install-methods">
+                <div class="install-method">
+                    <div class="method-title">
+                        <div class="method-icon">📦</div>
+                        NPM 安装
+                    </div>
+                    <div class="code-example">
+                        <div class="code-header">
+                            <span class="code-title">安装命令</span>
+                            <button class="copy-button" onclick="copyCode(this)">复制代码</button>
+                        </div>
+                        <pre><code># 安装 zen-mcp-server
+npm install -g @beehiveinnovations/zen-mcp-server
+
+# 验证安装
+zen-mcp-server --version
+
+# 初始化配置
+zen-mcp-server init</code></pre>
+                    </div>
+                </div>
+
+                <div class="install-method">
+                    <div class="method-title">
+                        <div class="method-icon">🐙</div>
+                        Git 克隆安装
+                    </div>
+                    <div class="code-example">
+                        <div class="code-header">
+                            <span class="code-title">克隆命令</span>
+                            <button class="copy-button" onclick="copyCode(this)">复制代码</button>
+                        </div>
+                        <pre><code># 克隆仓库
+git clone https://github.com/BeehiveInnovations/zen-mcp-server.git
+cd zen-mcp-server
+
+# 安装依赖
+npm install
+
+# 构建项目
+npm run build
+
+# 全局链接
+npm link
+
+# 验证安装
+zen-mcp-server --version</code></pre>
+                    </div>
+                </div>
+
+                <div class="install-method">
+                    <div class="method-title">
+                        <div class="method-icon">🐳</div>
+                        Docker 部署
+                    </div>
+                    <div class="code-example">
+                        <div class="code-header">
+                            <span class="code-title">Docker命令</span>
+                            <button class="copy-button" onclick="copyCode(this)">复制代码</button>
+                        </div>
+                        <pre><code># 拉取镜像
+docker pull beehiveinnovations/zen-mcp-server
+
+# 运行容器
+docker run -d \
+  --name zen-mcp-server \
+  -p 8080:8080 \
+  -v $(pwd)/config:/app/config \
+  -e OPENAI_API_KEY=your-key \
+  -e ANTHROPIC_API_KEY=your-key \
+  -e GOOGLE_API_KEY=your-key \
+  beehiveinnovations/zen-mcp-server</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-example" style="margin-top: 3rem;">
+                <div class="code-header">
+                    <span class="code-title">Claude Code MCP 配置 (~/.claude/settings.json)</span>
+                    <button class="copy-button" onclick="copyCode(this)">复制代码</button>
+                </div>
+                <pre><code>{
+  "mcpServers": {
+    "zen-mcp": {
+      "command": "zen-mcp-server",
+      "args": ["--mcp-server"],
+      "env": {
+        "OPENAI_API_KEY": "your-openai-key",
+        "ANTHROPIC_API_KEY": "your-anthropic-key",
+        "GOOGLE_API_KEY": "your-google-key",
+        "ZEN_CONFIG_PATH": "/path/to/zen-config.yaml"
+      }
+    }
+  }
+}</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>项目链接</h3>
+                    <ul>
+                        <li><a href="https://github.com/BeehiveInnovations/zen-mcp-server">GitHub仓库</a></li>
+                        <li><a href="https://github.com/BeehiveInnovations/zen-mcp-server/issues">问题反馈</a></li>
+                        <li><a href="https://github.com/BeehiveInnovations/zen-mcp-server/discussions">用户讨论</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>相关资源</h3>
+                    <ul>
+                        <li><a href="https://modelcontextprotocol.io/">MCP协议文档</a></li>
+                        <li><a href="https://docs.anthropic.com/claude/docs/claude-code">Claude Code文档</a></li>
+                        <li><a href="https://news.ycombinator.com/item?id=44306798">Hacker News讨论</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>支持与帮助</h3>
+                    <ul>
+                        <li><a href="#">使用指南</a></li>
+                        <li><a href="#">配置说明</a></li>
+                        <li><a href="#">最佳实践</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 BeehiveInnovations. 开源项目，采用Apache 2.0许可证。Zen MCP Server让AI协作体验更加智能和高效！</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 复制代码功能
+        function copyCode(button) {
+            const codeBlock = button.parentElement.parentElement.querySelector('code');
+            const text = codeBlock.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                button.textContent = '已复制';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.textContent = '复制代码';
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('复制失败:', err);
+            });
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 动态加载动画
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // 观察所有卡片
+        document.querySelectorAll('.orchestration-node, .feature-card, .install-method, .arch-box').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+
+        // 模型状态更新动画
+        function updateModelStatus() {
+            const statusDots = document.querySelectorAll('.model-status');
+            const colors = ['var(--success-color)', 'var(--warning-color)', 'var(--error-color)', 'var(--primary-color)'];
+
+            statusDots.forEach((dot, index) => {
+                setTimeout(() => {
+                    // 随机改变状态颜色
+                    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                    dot.style.background = randomColor;
+                    dot.style.transition = 'background 0.5s ease';
+                }, index * 200);
+            });
+        }
+
+        // 每5秒更新一次状态
+        setInterval(updateModelStatus, 5000);
+
+        // 任务步骤动画
+        function animateTaskFlow() {
+            const steps = document.querySelectorAll('.task-step');
+            const arrows = document.querySelectorAll('.step-arrow');
+
+            steps.forEach((step, index) => {
+                step.style.opacity = '0';
+                step.style.transform = 'translateX(0)';
+                setTimeout(() => {
+                    step.style.opacity = '1';
+                    step.style.transform = 'translateX(10px)';
+                }, index * 200);
+            });
+
+            arrows.forEach((arrow, index) => {
+                arrow.style.opacity = '0';
+                setTimeout(() => {
+                    arrow.style.opacity = '1';
+                }, (index + 1) * 200);
+            });
+        }
+
+        // 每3秒执行一次任务流动画
+        setInterval(animateTaskFlow, 3000);
+
+        // 模型卡悬停效果增强
+        document.querySelectorAll('.model-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // 指挥官节点动画
+        function animateCommander() {
+            const commander = document.querySelector('.commander-avatar');
+            commander.style.animation = 'commanderPulse 3s ease-in-out infinite';
+        }
+
+        @keyframes commanderPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        // 初始化指挥官动画
+        setTimeout(animateCommander, 1000);
+
+        // 粒子效果增强
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.style.position = 'absolute';
+            particle.style.width = Math.random() * 6 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.background = 'rgba(155, 89, 182, 0.6)';
+            particle.style.borderRadius = '50%';
+            particle.style.pointerEvents = 'none';
+
+            const startX = Math.random() * window.innerWidth;
+            const startY = Math.random() * window.innerHeight;
+
+            particle.style.left = startX + 'px';
+            particle.style.top = startY + 'px';
+
+            document.querySelector('.particles').appendChild(particle);
+
+            const duration = Math.random() * 3000 + 2000;
+            const endX = startX + (Math.random() - 0.5) * 200;
+            const endY = startY + (Math.random() - 0.5) * 200;
+
+            particle.animate([
+                { transform: `translate(0, 0) scale(1)`, opacity: 1 },
+                { transform: `translate(${endX - startX}px, ${endY - startY}px) scale(0)`, opacity: 0 }
+            ], {
+                duration: duration,
+                easing: 'ease-out'
+            }).onfinish = () => particle.remove();
+        }
+
+        // 定期创建新粒子
+        setInterval(createParticle, 500);
+    </script>
+</body>
+</html>
