@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ========================================
-# Halavah's Tech - 管理脚本
+# 腾讯云部署管理脚本
 # ========================================
 
 # 颜色定义
@@ -82,27 +82,23 @@ run_script() {
 # 显示主菜单
 show_menu() {
     clear
-    print_header "Halavah's Tech - 管理控制台"
+    print_header "腾讯云部署管理控制台 - Quartz Online"
 
     echo -e "${PURPLE}═══════════════════════════════════════════════════════════${NC}"
-    echo -e "${CYAN}  项目管理${NC}"
+    echo -e "${CYAN}  部署管理${NC}"
     echo -e "${PURPLE}═══════════════════════════════════════════════════════════${NC}"
     echo ""
 
-    echo -e "${GREEN}  1.${NC} 🚀 ${BLUE}启动开发服务器${NC}     (start-server.sh)"
-    echo -e "     ${PURPLE}→${NC} 启动 Next.js 开发环境"
+    echo -e "${GREEN}  1.${NC} 🚀 ${BLUE}完整部署到腾讯云${NC}     (tencent-deploy.sh)"
+    echo -e "     ${PURPLE}→${NC} 构建并部署完整站点到腾讯云服务器"
     echo ""
 
-    echo -e "${GREEN}  2.${NC} 📝 ${BLUE}更新文章列表${NC}      (update-articles.sh)"
-    echo -e "     ${PURPLE}→${NC} 自动扫描 HTML 文件并更新 articles.json"
+    echo -e "${GREEN}  2.${NC} 🔄 ${BLUE}重启服务${NC}             (tencent-restart.sh)"
+    echo -e "     ${PURPLE}→${NC} 重载 Nginx 服务"
     echo ""
 
-    echo -e "${GREEN}  3.${NC} ☁️  ${BLUE}部署到 Cloudflare${NC} (deploy-cf.sh)"
-    echo -e "     ${PURPLE}→${NC} 构建并部署到 Cloudflare Pages"
-    echo ""
-
-    echo -e "${GREEN}  4.${NC} 🚀 ${BLUE}部署到腾讯云${NC}     (tencent.sh)"
-    echo -e "     ${PURPLE}→${NC} 部署到腾讯云服务器"
+    echo -e "${GREEN}  3.${NC} 📝 ${BLUE}快速更新内容${NC}         (tencent-update-content.sh)"
+    echo -e "     ${PURPLE}→${NC} 仅更新内容文件（快速部署）"
     echo ""
 
     echo -e "${PURPLE}═══════════════════════════════════════════════════════════${NC}"
@@ -123,7 +119,7 @@ main() {
         # 重置 choice 变量，避免保留上次的输入
         choice=""
 
-        echo -ne "${YELLOW}请选择操作 [1-4, 9] (默认: 1):${NC} "
+        echo -ne "${YELLOW}请选择操作 [1-3, 9] (默认: 1):${NC} "
         read -r choice
 
         # 如果用户直接按回车，默认选择 1
@@ -131,29 +127,22 @@ main() {
 
         case $choice in
             1)
-                print_header "执行: 启动开发服务器"
-                run_script "start-server.sh"
+                print_header "执行: 完整部署到腾讯云"
+                run_script "tencent-deploy.sh"
                 ;;
 
             2)
-                print_header "执行: 更新文章列表"
-                run_script "update-articles.sh"
+                print_header "执行: 重启服务"
+                run_script "tencent-restart.sh"
                 ;;
 
             3)
-                print_header "执行: 部署到 Cloudflare"
-                run_script "deploy-cf.sh"
-                ;;
-
-            4)
-                print_header "执行: 部署到腾讯云"
-                # 直接执行 tencent.sh（在项目根目录，而不是 bin 目录）
-                cd "$SCRIPT_DIR"
-                ./tencent.sh
+                print_header "执行: 快速更新内容"
+                run_script "tencent-update-content.sh"
                 ;;
 
             9)
-                print_info "感谢使用 Halavah's Tech 管理控制台"
+                print_info "感谢使用腾讯云部署管理控制台"
                 echo ""
                 exit 0
                 ;;
@@ -179,5 +168,5 @@ if [ ! -d "$BIN_DIR" ]; then
     exit 1
 fi
 
-# 启动主循环（交互式菜单，直接回车默认执行选项 1）
+# 启动主循环
 main

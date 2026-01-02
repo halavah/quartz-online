@@ -38,6 +38,9 @@ function Show-MainMenu {
     Write-Host "  3. ☁️  部署到 Cloudflare (deploy-cf.ps1)"
     Write-Host "     → 构建并部署到 Cloudflare Pages"
     Write-Host ""
+    Write-Host "  4. 🚀 部署到腾讯云     (tencent.ps1)"
+    Write-Host "     → 部署到腾讯云服务器"
+    Write-Host ""
     Write-Host "═══════════════════════════════════════════════════════════"
     Write-Host ""
     Write-Host "  9. 🚪 退出"
@@ -75,7 +78,7 @@ $continue = $true
 while ($continue) {
     Show-MainMenu
 
-    $input = Read-Host "请选择操作 [1-3, 9] (默认: 1)"
+    $input = Read-Host "请选择操作 [1-4, 9] (默认: 1)"
 
     # 如果用户直接按回车，默认选择 1
     if ([string]::IsNullOrWhiteSpace($input)) {
@@ -91,6 +94,20 @@ while ($continue) {
         }
         "3" {
             Invoke-Script "deploy-cf.ps1" "部署到 Cloudflare"
+        }
+        "4" {
+            Write-Host ""
+            Write-Host "╔════════════════════════════════════════════════════════════╗"
+            Write-Host "║  执行: 部署到腾讯云"
+            Write-Host "╚════════════════════════════════════════════════════════════╝"
+            Write-Host ""
+            # 直接执行 tencent.ps1（在项目根目录）
+            $tencentScript = Join-Path $ScriptDir "tencent.ps1"
+            if (Test-Path $tencentScript) {
+                & $tencentScript
+            } else {
+                Write-Host "[错误] 脚本不存在: $tencentScript" -ForegroundColor Red
+            }
         }
         "9" {
             Write-Host ""
