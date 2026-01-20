@@ -7,13 +7,16 @@
     "npm": ">=10.0.0"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 31200",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "vercel": "vercel",
-    "vercel:logs": "vercel logs",
-    "deploy": "vercel --prod"
+    "deploy": "bash deploy.sh",
+    "deploy:vercel": "bash bin/deploy-vercel.sh",
+    "deploy:netlify": "bash bin/deploy-netlify.sh",
+    "deploy:render": "bash bin/deploy-render.sh",
+    "deploy:flare": "bash bin/deploy-flare.sh",
+    "deploy:1panel": "bash bin/deploy-1panel.sh"
   },
   "dependencies": {
     "next": "15.5.9",

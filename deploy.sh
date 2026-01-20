@@ -1,8 +1,10 @@
 #!/bin/bash
 
 # ========================================
-# 腾讯云部署管理脚本
+# Quartz Online - 统一部署脚本
 # ========================================
+
+set -e
 
 # 颜色定义
 RED='\033[0;31m'
@@ -13,6 +15,10 @@ PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
+# 获取脚本所在目录
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BIN_DIR="$SCRIPT_DIR/bin"
+
 # 打印函数
 print_success() {
     echo -e "${GREEN}✓${NC} $1"
@@ -20,10 +26,6 @@ print_success() {
 
 print_error() {
     echo -e "${RED}✗${NC} $1"
-}
-
-print_warning() {
-    echo -e "${YELLOW}⚠${NC} $1"
 }
 
 print_info() {
@@ -38,10 +40,6 @@ print_header() {
     echo ""
 }
 
-# 获取脚本所在目录
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BIN_DIR="$SCRIPT_DIR/bin"
-
 # 检查脚本是否存在
 check_script() {
     local script_name=$1
@@ -53,7 +51,7 @@ check_script() {
     fi
 
     if [ ! -x "$script_path" ]; then
-        print_warning "脚本没有执行权限，正在添加..."
+        print_info "脚本没有执行权限，正在添加..."
         chmod +x "$script_path"
         print_success "已添加执行权限"
     fi
@@ -61,19 +59,19 @@ check_script() {
     return 0
 }
 
-# 执行脚本
-run_script() {
+# 执行部署脚本
+run_deploy() {
     local script_name=$1
-    shift
-    local args="$@"
+    local platform_name=$2
 
     if check_script "$script_name"; then
-        print_info "正在执行: $script_name $args"
+        print_header "开始部署到 $platform_name"
         echo ""
         cd "$BIN_DIR"
-        ./"$script_name" $args
+        ./"$script_name"
+        local exit_code=$?
         cd "$SCRIPT_DIR"
-        return $?
+        return $exit_code
     else
         return 1
     fi
@@ -82,23 +80,31 @@ run_script() {
 # 显示主菜单
 show_menu() {
     clear
-    print_header "腾讯云部署管理控制台 - Quartz Online"
+    print_header "Quartz Online - 部署管理"
 
     echo -e "${PURPLE}═══════════════════════════════════════════════════════════${NC}"
-    echo -e "${CYAN}  部署管理${NC}"
+    echo -e "${CYAN}  选择部署平台${NC}"
     echo -e "${PURPLE}═══════════════════════════════════════════════════════════${NC}"
     echo ""
 
-    echo -e "${GREEN}  1.${NC} 🚀 ${BLUE}完整部署到腾讯云${NC}     (tencent-deploy.sh)"
-    echo -e "     ${PURPLE}→${NC} 构建并部署完整站点到腾讯云服务器"
+    echo -e "${GREEN}  1.${NC} ▲ ${BLUE}Vercel${NC}"
+    echo -e "     ${PURPLE}→${NC} 部署到 Vercel 边缘网络 (推荐)"
     echo ""
 
-    echo -e "${GREEN}  2.${NC} 🔄 ${BLUE}重启服务${NC}             (tencent-restart.sh)"
-    echo -e "     ${PURPLE}→${NC} 重载 Nginx 服务"
+    echo -e "${GREEN}  2.${NC} 🌊 ${BLUE}Netlify${NC}"
+    echo -e "     ${PURPLE}→${NC} 部署到 Netlify 平台"
     echo ""
 
-    echo -e "${GREEN}  3.${NC} 📝 ${BLUE}快速更新内容${NC}         (tencent-update-content.sh)"
-    echo -e "     ${PURPLE}→${NC} 仅更新内容文件（快速部署）"
+    echo -e "${GREEN}  3.${NC} 🎨 ${BLUE}Render${NC}"
+    echo -e "     ${PURPLE}→${NC} 部署到 Render (Git 自动部署)"
+    echo ""
+
+    echo -e "${GREEN}  4.${NC} ☁️  ${BLUE}Cloudflare Pages${NC}"
+    echo -e "     ${PURPLE}→${NC} 部署到 Cloudflare Pages (使用 @cloudflare/next-on-pages)"
+    echo ""
+
+    echo -e "${GREEN}  5.${NC} 🏢 ${BLUE}1Panel${NC}"
+    echo -e "     ${PURPLE}→${NC} 部署到腾讯云 1Panel 服务器"
     echo ""
 
     echo -e "${PURPLE}═══════════════════════════════════════════════════════════${NC}"
@@ -113,36 +119,47 @@ show_menu() {
 
 # 主循环
 main() {
+    # 检查 bin 目录是否存在
+    if [ ! -d "$BIN_DIR" ]; then
+        print_error "bin 目录不存在: $BIN_DIR"
+        exit 1
+    fi
+
     while true; do
         show_menu
 
-        # 重置 choice 变量，避免保留上次的输入
+        # 重置 choice 变量
         choice=""
 
-        echo -ne "${YELLOW}请选择操作 [1-3, 9] (默认: 1):${NC} "
+        echo -ne "${YELLOW}请选择部署平台 [1-5, 9] (默认: 9):${NC} "
         read -r choice
 
-        # 如果用户直接按回车，默认选择 1
-        choice=${choice:-1}
+        # 如果用户直接按回车，默认退出
+        choice=${choice:-9}
 
         case $choice in
             1)
-                print_header "执行: 完整部署到腾讯云"
-                run_script "tencent-deploy.sh"
+                run_deploy "deploy-vercel.sh" "Vercel"
                 ;;
 
             2)
-                print_header "执行: 重启服务"
-                run_script "tencent-restart.sh"
+                run_deploy "deploy-netlify.sh" "Netlify"
                 ;;
 
             3)
-                print_header "执行: 快速更新内容"
-                run_script "tencent-update-content.sh"
+                run_deploy "deploy-render.sh" "Render"
+                ;;
+
+            4)
+                run_deploy "deploy-flare.sh" "Cloudflare Pages"
+                ;;
+
+            5)
+                run_deploy "deploy-1panel.sh" "1Panel"
                 ;;
 
             9)
-                print_info "感谢使用腾讯云部署管理控制台"
+                print_info "感谢使用 Quartz Online 部署工具"
                 echo ""
                 exit 0
                 ;;
@@ -161,12 +178,6 @@ main() {
         fi
     done
 }
-
-# 检查 bin 目录是否存在
-if [ ! -d "$BIN_DIR" ]; then
-    print_error "bin 目录不存在: $BIN_DIR"
-    exit 1
-fi
 
 # 启动主循环
 main

@@ -1,5 +1,5 @@
 # ========================================
-# Halavah's Tech - 管理脚本 (PowerShell)
+# Quartz Online - 统一部署脚本 (PowerShell)
 # ========================================
 
 # 设置输出编码为 UTF-8
@@ -22,18 +22,27 @@ function Show-MainMenu {
     Clear-Host
     Write-Host ""
     Write-Host "╔════════════════════════════════════════════════════════════╗"
-    Write-Host "║  Halavah's Tech - 管理控制台"
+    Write-Host "║  Quartz Online - 部署管理"
     Write-Host "╚════════════════════════════════════════════════════════════╝"
     Write-Host ""
     Write-Host "═══════════════════════════════════════════════════════════"
-    Write-Host "  项目管理"
+    Write-Host "  选择部署平台"
     Write-Host "═══════════════════════════════════════════════════════════"
     Write-Host ""
-    Write-Host "  1. 🚀 启动开发服务器     (start-server.ps1)"
-    Write-Host "     → 启动 Next.js 开发环境"
+    Write-Host "  1. ▲ Vercel"
+    Write-Host "     → 部署到 Vercel 边缘网络 (推荐)"
     Write-Host ""
-    Write-Host "  2. 📝 更新文章列表      (update-articles.ps1)"
-    Write-Host "     → 自动扫描 HTML 文件并更新 articles.json"
+    Write-Host "  2. 🌊 Netlify"
+    Write-Host "     → 部署到 Netlify 平台"
+    Write-Host ""
+    Write-Host "  3. 🎨 Render"
+    Write-Host "     → 部署到 Render (Git 自动部署)"
+    Write-Host ""
+    Write-Host "  4. ☁️  Cloudflare Pages"
+    Write-Host "     → 部署到 Cloudflare Pages (使用 @cloudflare/next-on-pages)"
+    Write-Host ""
+    Write-Host "  5. 🏢 1Panel"
+    Write-Host "     → 部署到腾讯云 1Panel 服务器"
     Write-Host ""
     Write-Host "═══════════════════════════════════════════════════════════"
     Write-Host ""
@@ -43,24 +52,27 @@ function Show-MainMenu {
     Write-Host ""
 }
 
-# 执行脚本函数
-function Invoke-Script {
+# 执行部署脚本函数
+function Invoke-DeployScript {
     param(
         [string]$ScriptName,
-        [string]$DisplayName
+        [string]$PlatformName
     )
 
     Write-Host ""
     Write-Host "╔════════════════════════════════════════════════════════════╗"
-    Write-Host "║  执行: $DisplayName"
+    Write-Host "║  开始部署到 $PlatformName"
     Write-Host "╚════════════════════════════════════════════════════════════╝"
     Write-Host ""
 
     $scriptPath = Join-Path $BinDir $ScriptName
 
     if (Test-Path $scriptPath) {
+        Push-Location $BinDir
         & $scriptPath
-        return $LASTEXITCODE
+        $exitCode = $LASTEXITCODE
+        Pop-Location
+        return $exitCode
     } else {
         Write-Host "[错误] 脚本不存在: $scriptPath" -ForegroundColor Red
         return 1
@@ -72,23 +84,32 @@ $continue = $true
 while ($continue) {
     Show-MainMenu
 
-    $input = Read-Host "请选择操作 [1-2, 9] (默认: 1)"
+    $input = Read-Host "请选择部署平台 [1-5, 9] (默认: 9)"
 
-    # 如果用户直接按回车，默认选择 1
+    # 如果用户直接按回车，默认退出
     if ([string]::IsNullOrWhiteSpace($input)) {
-        $input = "1"
+        $input = "9"
     }
 
     switch ($input) {
         "1" {
-            Invoke-Script "start-server.ps1" "启动开发服务器"
+            Invoke-DeployScript "deploy-vercel.ps1" "Vercel"
         }
         "2" {
-            Invoke-Script "update-articles.ps1" "更新文章列表"
+            Invoke-DeployScript "deploy-netlify.ps1" "Netlify"
+        }
+        "3" {
+            Invoke-DeployScript "deploy-render.ps1" "Render"
+        }
+        "4" {
+            Invoke-DeployScript "deploy-flare.ps1" "Cloudflare Pages"
+        }
+        "5" {
+            Invoke-DeployScript "deploy-1panel.ps1" "1Panel"
         }
         "9" {
             Write-Host ""
-            Write-Host "[信息] 感谢使用 Halavah's Tech 管理控制台" -ForegroundColor Cyan
+            Write-Host "[信息] 感谢使用 Quartz Online 部署工具" -ForegroundColor Cyan
             Write-Host ""
             $continue = $false
         }

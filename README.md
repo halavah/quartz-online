@@ -64,9 +64,9 @@ docker-compose up -d
 
 # 方式 2: 使用 Docker 命令
 docker build -t quartz-online .
-docker run -d -p 3000:3000 --name quartz-online quartz-online
+docker run -d -p 3000:31200 --name quartz-online quartz-online
 
-# 访问 http://localhost:3000
+# 访问 http://localhost:31200
 ```
 
 ### 方式五：手动部署
@@ -82,7 +82,7 @@ npm install
 # 3. 启动开发服务器
 npm run dev
 
-# 4. 访问 http://localhost:3000
+# 4. 访问 http://localhost:31200
 ```
 
 ---
@@ -375,9 +375,9 @@ docker build -t quartz-online .
 
 # 2. 运行容器
 docker run -d \
-  -p 3000:3000 \
+  -p 3000:31200 \
   -e NODE_ENV=production \
-  -e NEXT_PUBLIC_SITE_URL=http://localhost:3000 \
+  -e NEXT_PUBLIC_SITE_URL=http://localhost:31200 \
   --name quartz-online \
   quartz-online
 
@@ -402,7 +402,7 @@ server {
     server_name your-domain.com;
 
     location / {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://localhost:31200;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';

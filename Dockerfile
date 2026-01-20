@@ -47,14 +47,14 @@ RUN chown -R nextjs:nodejs /app
 USER nextjs
 
 # 暴露端口
-EXPOSE 3000
+EXPOSE 31200
 
-ENV PORT=3000
+ENV PORT=31200
 ENV HOSTNAME="0.0.0.0"
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:31200/ || exit 1
 
 # 启动应用
 CMD ["node", "server.js"]

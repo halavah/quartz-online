@@ -51,8 +51,8 @@ fi
 # 启动开发服务器
 echo "🌐 启动开发服务器..."
 echo ""
-echo "📍 本地访问地址: http://localhost:3000"
-echo "📍 网络访问地址: http://$(hostname -I | awk '{print $1}'):3000"
+echo "📍 本地访问地址: http://localhost:31200"
+echo "📍 网络访问地址: http://$(hostname -I | awk '{print $1}'):31200"
 echo ""
 echo "⚠️  按 Ctrl+C 停止服务器"
 echo ""

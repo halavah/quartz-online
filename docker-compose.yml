@@ -10,17 +10,17 @@ services:
     container_name: quartz-online
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "31200:31200"
     environment:
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1
-      - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
-      - PORT=3000
+      - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-http://localhost:31200}
+      - PORT=31200
       - HOSTNAME=0.0.0.0
     networks:
       - quartz-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:31200/"]
       interval: 30s
       timeout: 10s
       retries: 3

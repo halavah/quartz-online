@@ -97,13 +97,6 @@ show_menu() {
     echo -e "     ${PURPLE}→${NC} 自动扫描 HTML 文件并更新 articles.json"
     echo ""
 
-    echo -e "${GREEN}  3.${NC} ☁️  ${BLUE}部署到 Cloudflare${NC} (deploy-cf.sh)"
-    echo -e "     ${PURPLE}→${NC} 构建并部署到 Cloudflare Pages"
-    echo ""
-
-    echo -e "${GREEN}  4.${NC} 🚀 ${BLUE}部署到腾讯云${NC}     (tencent.sh)"
-    echo -e "     ${PURPLE}→${NC} 部署到腾讯云服务器"
-    echo ""
 
     echo -e "${PURPLE}═══════════════════════════════════════════════════════════${NC}"
     echo ""
@@ -123,7 +116,7 @@ main() {
         # 重置 choice 变量，避免保留上次的输入
         choice=""
 
-        echo -ne "${YELLOW}请选择操作 [1-4, 9] (默认: 1):${NC} "
+        echo -ne "${YELLOW}请选择操作 [1-2, 9] (默认: 1):${NC} "
         read -r choice
 
         # 如果用户直接按回车，默认选择 1
@@ -140,17 +133,6 @@ main() {
                 run_script "update-articles.sh"
                 ;;
 
-            3)
-                print_header "执行: 部署到 Cloudflare"
-                run_script "deploy-cf.sh"
-                ;;
-
-            4)
-                print_header "执行: 部署到腾讯云"
-                # 直接执行 tencent.sh（在项目根目录，而不是 bin 目录）
-                cd "$SCRIPT_DIR"
-                ./tencent.sh
-                ;;
 
             9)
                 print_info "感谢使用 Halavah's Tech 管理控制台"
